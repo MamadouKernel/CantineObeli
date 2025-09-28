@@ -1,0 +1,79 @@
+@model Obeli_K.Models.Fonction
+@{
+    ViewData["Title"] = "Nouvelle Fonction";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-plus me-2"></i>
+                        Nouvelle Fonction
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Créer une nouvelle fonction dans l'organisation
+                    </p>
+                </div>
+                <div class="text-end">
+                    <a href="@Url.Action("List")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-briefcase me-2"></i>
+                        Informations de la fonction
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Nom" class="form-label">Nom de la fonction *</label>
+                                <input asp-for="Nom" class="form-control" placeholder="Entrez le nom de la fonction" />
+                                <span asp-validation-for="Nom" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Description" class="form-label">Description</label>
+                                <input asp-for="Description" class="form-control" placeholder="Entrez une description (optionnel)" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="@Url.Action("List")" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Créer la fonction
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

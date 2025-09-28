@@ -1,0 +1,199 @@
+@model Obeli_K.Models.ViewModels.CreateUtilisateurViewModel
+@{
+    ViewData["Title"] = "Nouvel Utilisateur";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Nouvel Utilisateur
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Créer un nouvel utilisateur dans le système
+                    </p>
+                </div>
+                <div class="text-end">
+                    <a href="@Url.Action("List")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-user me-2"></i>
+                        Informations de l'utilisateur
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row g-3">
+                            <!-- Informations personnelles -->
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-id-card me-2"></i>Informations personnelles
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Nom" class="form-label">Nom *</label>
+                                <input asp-for="Nom" class="form-control" placeholder="Entrez le nom" />
+                                <span asp-validation-for="Nom" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Prenoms" class="form-label">Prénoms *</label>
+                                <input asp-for="Prenoms" class="form-control" placeholder="Entrez les prénoms" />
+                                <span asp-validation-for="Prenoms" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="UserName" class="form-label">Matricule *</label>
+                                <input asp-for="UserName" class="form-control" placeholder="Entrez le matricule" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="CodeCommande" class="form-label">Code Commande</label>
+                                <input asp-for="CodeCommande" class="form-control" placeholder="Entrez le code commande (optionnel)" />
+                                <span asp-validation-for="CodeCommande" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">Email <small class="text-muted">(optionnel)</small></label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Entrez l'email (optionnel)" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label">Téléphone <small class="text-muted">(optionnel)</small></label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Entrez le numéro de téléphone (optionnel)" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                            
+                            <!-- Mot de passe -->
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-lock me-2"></i>Mot de passe
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="MotDePasse" class="form-label">Mot de passe *</label>
+                                <input asp-for="MotDePasse" type="password" class="form-control" placeholder="Entrez le mot de passe" />
+                                <span asp-validation-for="MotDePasse" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmerMotDePasse" class="form-label">Confirmer le mot de passe *</label>
+                                <input asp-for="ConfirmerMotDePasse" type="password" class="form-control" placeholder="Confirmez le mot de passe" />
+                                <span asp-validation-for="ConfirmerMotDePasse" class="text-danger"></span>
+                            </div>
+                            
+                            <!-- Rôle et affectation -->
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-user-tag me-2"></i>Rôle et affectation
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Role" class="form-label">Rôle *</label>
+                                <select asp-for="Role" class="form-select">
+                                    <option value="">Sélectionnez un rôle</option>
+                                    @if (ViewBag.Roles != null)
+                                    {
+                                        @foreach (var role in ViewBag.Roles)
+                                        {
+                                            <option value="@role.Value">@role.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="DepartementId" class="form-label">Département *</label>
+                                <select asp-for="DepartementId" class="form-select">
+                                    <option value="">Sélectionnez un département</option>
+                                    @if (ViewBag.Departements != null)
+                                    {
+                                        @foreach (var dept in ViewBag.Departements)
+                                        {
+                                            <option value="@dept.Value">@dept.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="DepartementId" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="FonctionId" class="form-label">Fonction <small class="text-muted">(optionnel)</small></label>
+                                <select asp-for="FonctionId" class="form-select">
+                                    <option value="">Sélectionnez une fonction (optionnel)</option>
+                                    @if (ViewBag.Fonctions != null)
+                                    {
+                                        @foreach (var fonction in ViewBag.Fonctions)
+                                        {
+                                            <option value="@fonction.Value">@fonction.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="FonctionId" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Lieu" class="form-label">Lieu <small class="text-muted">(optionnel)</small></label>
+                                <input asp-for="Lieu" class="form-control" placeholder="Entrez le lieu (optionnel)" />
+                                <span asp-validation-for="Lieu" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="Site" class="form-label">Site <small class="text-muted">(optionnel)</small></label>
+                                <select asp-for="Site" class="form-select">
+                                    <option value="">Sélectionnez un site (optionnel)</option>
+                                    <option value="0">CIT Terminal</option>
+                                    <option value="1">CIT Billing</option>
+                                </select>
+                                <span asp-validation-for="Site" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="@Url.Action("List")" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Créer l'utilisateur
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Configuration des Commandes";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-cogs text-primary me-2"></i>
+                        Configuration des Commandes
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["InfoMessage"] != null)
+                    {
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @TempData["InfoMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Statut actuel -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card @(ViewBag.IsBlocked == true ? "border-danger" : "border-success")">
+                                <div class="card-header @(ViewBag.IsBlocked == true ? "bg-danger text-white" : "bg-success text-white")">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-@(ViewBag.IsBlocked == true ? "lock" : "unlock") me-2"></i>
+                                        Statut des Commandes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>État actuel :</h6>
+                                            <span class="badge @(ViewBag.IsBlocked == true ? "bg-danger" : "bg-success") fs-6">
+                                                @(ViewBag.IsBlocked == true ? "BLOQUÉES" : "AUTORISÉES")
+                                            </span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Prochaine clôture :</h6>
+                                            <span class="fw-bold text-primary">
+                                                @(((DateTime)ViewBag.ProchaineCloture).ToString("dddd dd/MM/yyyy à HH:mm", new System.Globalization.CultureInfo("fr-FR")))
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuration -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-sliders-h me-2"></i>
+                                        Paramètres de Clôture
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form asp-action="UpdateConfiguration" method="post">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="jourCloture" class="form-label">Jour de clôture</label>
+                                                    <select name="jourCloture" id="jourCloture" class="form-select" required>
+                                                        <option value="Monday" selected="@(ViewBag.JourCloture == "Monday")">Lundi</option>
+                                                        <option value="Tuesday" selected="@(ViewBag.JourCloture == "Tuesday")">Mardi</option>
+                                                        <option value="Wednesday" selected="@(ViewBag.JourCloture == "Wednesday")">Mercredi</option>
+                                                        <option value="Thursday" selected="@(ViewBag.JourCloture == "Thursday")">Jeudi</option>
+                                                        <option value="Friday" selected="@(ViewBag.JourCloture == "Friday")">Vendredi</option>
+                                                        <option value="Saturday" selected="@(ViewBag.JourCloture == "Saturday")">Samedi</option>
+                                                        <option value="Sunday" selected="@(ViewBag.JourCloture == "Sunday")">Dimanche</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-3">
+                                                    <label for="heureCloture" class="form-label">Heure de clôture</label>
+                                                    <input type="time" name="heureCloture" id="heureCloture" class="form-control" 
+                                                           value="@ViewBag.HeureCloture" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-check mb-3">
+                                                    <input type="checkbox" name="autoConfirm" id="autoConfirm" class="form-check-input" 
+                                                           @(ViewBag.AutoConfirm == "true" ? "checked" : "")>
+                                                    <label for="autoConfirm" class="form-check-label">
+                                                        Confirmation automatique des commandes
+                                                    </label>
+                                                    <small class="form-text text-muted">
+                                                        Les commandes seront automatiquement confirmées à l'heure de clôture
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-1"></i>
+                                                Sauvegarder
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                                <i class="fas fa-undo me-1"></i>
+                                                Annuler
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tools me-2"></i>
+                                        Actions
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <form asp-action="TestBlocage" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-info w-100">
+                                                <i class="fas fa-search me-1"></i>
+                                                Tester le Blocage
+                                            </button>
+                                        </form>
+                                        
+                                        <form asp-action="ForcerConfirmation" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-warning w-100" 
+                                                    onclick="return confirm('Êtes-vous sûr de vouloir forcer la confirmation des commandes ?')">
+                                                <i class="fas fa-check-double me-1"></i>
+                                                Forcer Confirmation
+                                            </button>
+                                        </form>
+                                        
+                                        <form asp-action="ResetConfiguration" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger w-100" 
+                                                    onclick="return confirm('Êtes-vous sûr de vouloir réinitialiser la configuration ?')">
+                                                <i class="fas fa-undo me-1"></i>
+                                                Réinitialiser
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Informations
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <small class="text-muted">
+                                        <strong>Jour de clôture :</strong> Jour de la semaine où les commandes sont bloquées<br><br>
+                                        <strong>Heure de clôture :</strong> Heure exacte du blocage<br><br>
+                                        <strong>Auto-confirmation :</strong> Confirme automatiquement les commandes à l'heure de clôture<br><br>
+                                        <strong>Note :</strong> Les commandes sont autorisées uniquement pour la semaine N+1
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        function resetForm() {
+            document.getElementById('jourCloture').value = '@ViewBag.JourCloture';
+            document.getElementById('heureCloture').value = '@ViewBag.HeureCloture';
+            document.getElementById('autoConfirm').checked = @(ViewBag.AutoConfirm == "true" ? "true" : "false");
+        }
+    </script>
+}

@@ -1,0 +1,122 @@
+@model Obeli_K.Models.ViewModels.ExtractionModalViewModel
+
+<div class="modal fade" id="extractionModal" tabindex="-1" aria-labelledby="extractionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="extractionModalLabel">
+                    <i class="fas fa-file-export me-2"></i>
+                    Extraction des Commandes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="ExtraireCommandes" method="post" id="extractionForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="DateDebut" class="form-label"></label>
+                            <input asp-for="DateDebut" type="date" class="form-control" />
+                            <span asp-validation-for="DateDebut" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DateFin" class="form-label"></label>
+                            <input asp-for="DateFin" type="date" class="form-control" />
+                            <span asp-validation-for="DateFin" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>
+                            Rechercher les Commandes
+                        </button>
+                    </div>
+                </form>
+
+                @if (Model.CommandesAvecMarges.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type Formule</th>
+                                    <th>Menu</th>
+                                    <th>Nb Commandes</th>
+                                    <th>Marge (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var commande in Model.CommandesAvecMarges)
+                                {
+                                    <tr>
+                                        <td>@commande.Date.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <span class="badge bg-secondary">@commande.TypeFormule</span>
+                                        </td>
+                                        <td>
+                                            <strong>@commande.NomFormule</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@commande.NombreCommandes</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">@commande.Marge%</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th colspan="3">TOTAL</th>
+                                    <th>@Model.CommandesAvecMarges.Sum(c => c.NombreCommandes) commandes</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>
+                            Fermer
+                        </button>
+                        <form asp-action="ExporterExcel" method="post" style="display: inline;">
+                            <input type="hidden" asp-for="DateDebut" />
+                            <input type="hidden" asp-for="DateFin" />
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-download me-1"></i>
+                                Exporter en Excel
+                            </button>
+                        </form>
+                    </div>
+                }
+                else if (Model.DateDebut != default(DateTime) && Model.DateFin != default(DateTime))
+                {
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucune commande consommée trouvée pour la période sélectionnée.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Auto-submit form when modal is shown with date values
+            $('#extractionModal').on('shown.bs.modal', function () {
+                const dateDebut = $('#DateDebut').val();
+                const dateFin = $('#DateFin').val();
+                
+                if (dateDebut && dateFin) {
+                    $('#extractionForm').submit();
+                }
+            });
+        });
+    </script>
+}

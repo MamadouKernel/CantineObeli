@@ -1,0 +1,293 @@
+@model Obeli_K.Models.Utilisateur
+@{
+    ViewData["Title"] = "Détails de l'Utilisateur";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-user me-2"></i>
+                        Détails de l'Utilisateur
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Informations complètes de l'utilisateur
+                    </p>
+                </div>
+                <div class="text-end">
+                    <a href="@Url.Action("List")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations personnelles -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-id-card me-2"></i>
+                        Informations personnelles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nom</label>
+                            <div class="p-2 bg-light rounded">
+                                @Model.Nom
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Prénoms</label>
+                            <div class="p-2 bg-light rounded">
+                                @Model.Prenoms
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Matricule</label>
+                            <div class="p-2 bg-light rounded">
+                                <span class="badge bg-primary">@(Model.CodeCommande ?? "Non renseigné")</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nom d'utilisateur</label>
+                            <div class="p-2 bg-light rounded">
+                                <span class="text-muted">@Model.UserName</span>
+                                <small class="d-block text-muted">Généré automatiquement</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email</label>
+                            <div class="p-2 bg-light rounded">
+                                @if (!string.IsNullOrEmpty(Model.Email))
+                                {
+                                    <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Non renseigné</span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Téléphone</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.PhoneNumber ?? "Non renseigné")
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Lieu</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.Lieu ?? "Non renseigné")
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Site</label>
+                            <div class="p-2 bg-light rounded">
+                                @if (Model.Site.HasValue)
+                                {
+                                    @(Model.Site.Value == 0 ? "Site 1" : "Site 2")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Non renseigné</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rôle et affectation -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-user-tag me-2"></i>
+                        Rôle et affectation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Rôle</label>
+                            <div class="p-2">
+                                @{
+                                    var roleClass = Model.Role.ToString() switch
+                                    {
+                                        "Administrateur" => "bg-danger",
+                                        "RessourcesHumaines" => "bg-warning",
+                                        "PrestataireCantine" => "bg-info",
+                                        "Employe" => "bg-success",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @roleClass">@Model.Role</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Département</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.Departement?.Nom ?? "Non assigné")
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fonction</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.Fonction?.Nom ?? "Non assignée")
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Statut</label>
+                            <div class="p-2">
+                                @if (Model.Supprimer == 0)
+                                {
+                                    <span class="badge bg-success">Actif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Supprimé</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations d'audit -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-history me-2"></i>
+                        Informations d'audit
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Créé le</label>
+                            <div class="p-2 bg-light rounded">
+                                @if (Model.CreatedAt.HasValue)
+                                {
+                                    @Model.CreatedAt.Value.ToString("dd/MM/yyyy à HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Non renseigné</span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Créé par</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.CreatedBy ?? "Système")
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Modifié le</label>
+                            <div class="p-2 bg-light rounded">
+                                @if (Model.ModifiedAt.HasValue)
+                                {
+                                    @Model.ModifiedAt.Value.ToString("dd/MM/yyyy à HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Jamais modifié</span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Modifié par</label>
+                            <div class="p-2 bg-light rounded">
+                                @(Model.ModifiedBy ?? "Personne")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="@Url.Action("List")" class="btn btn-secondary">
+                            <i class="fas fa-list me-2"></i>Retour à la liste
+                        </a>
+                        <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Modifier
+                        </a>
+                        @if (Model.Supprimer == 0)
+                        {
+                            <button type="button" class="btn btn-danger" 
+                                    onclick="confirmDelete('@Model.Id', '@Model.Nom @Model.Prenoms')">
+                                <i class="fas fa-trash me-2"></i>Supprimer
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="userName"></strong> ?</p>
+                <p class="text-muted small">Cette action ne peut pas être annulée.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(userId, userName) {
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + userId;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

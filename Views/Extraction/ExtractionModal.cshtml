@@ -1,0 +1,128 @@
+@model Obeli_K.Models.ViewModels.ExtractionModalViewModel
+
+@{
+    ViewData["Title"] = "Extraction des Commandes - Étape 2";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-file-export text-primary me-2"></i>
+                        Extraction des Commandes - Étape 2
+                    </h3>
+                    <p class="mb-0 text-muted">Période : @Model.DateDebut.ToString("dd/MM/yyyy") au @Model.DateFin.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="DateDebut" class="form-label"></label>
+                            <input asp-for="DateDebut" type="date" class="form-control" />
+                            <span asp-validation-for="DateDebut" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DateFin" class="form-label"></label>
+                            <input asp-for="DateFin" type="date" class="form-control" />
+                            <span asp-validation-for="DateFin" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="button" id="searchCommandesBtn" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>
+                            Rechercher les Commandes
+                        </button>
+                    </div>
+
+                    <div id="extractionResults" style="display: none;">
+                        <!-- Les résultats seront affichés ici -->
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour à l'étape 1
+                        </a>
+                        <div id="exportSection" style="display: none;">
+                            <form asp-action="ExporterExcel" method="post" id="exportForm">
+                                <input type="hidden" asp-for="DateDebut" />
+                                <input type="hidden" asp-for="DateFin" />
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-download me-1"></i>
+                                    Exporter en Excel
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Auto-dismiss alerts after 10 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 10000);
+
+        // Rechercher les commandes
+        $('#searchCommandesBtn').click(function() {
+            var dateDebut = $('#DateDebut').val();
+            var dateFin = $('#DateFin').val();
+            
+            if (!dateDebut || !dateFin) {
+                alert('Veuillez sélectionner les deux dates.');
+                return;
+            }
+
+            // Afficher un indicateur de chargement
+            $('#extractionResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Recherche en cours...</div>').show();
+            $('#exportSection').hide();
+
+            // Appeler l'action ExtraireCommandes
+            $.ajax({
+                url: '@Url.Action("ExtraireCommandes", "Extraction")',
+                type: 'POST',
+                data: {
+                    DateDebut: dateDebut,
+                    DateFin: dateFin,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    $('#extractionResults').html(data);
+                    $('#exportSection').show();
+                },
+                error: function() {
+                    $('#extractionResults').html('<div class="alert alert-danger">Erreur lors de la recherche des commandes.</div>');
+                }
+            });
+        });
+
+        // Auto-search au chargement de la page
+        $(document).ready(function() {
+            $('#searchCommandesBtn').click();
+        });
+    </script>
+}

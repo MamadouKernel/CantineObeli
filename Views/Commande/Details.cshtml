@@ -1,0 +1,409 @@
+@model Obeli_K.Models.ViewModels.CommandeListViewModel
+
+@{
+    ViewData["Title"] = "Détails de la Commande";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-info-circle text-warning me-2"></i>
+                        Détails de la Commande
+                    </h3>
+                    <div class="btn-group" role="group">
+                        @if (!User.IsInRole("PrestataireCantine"))
+                        {
+                        <a asp-action="Edit" asp-route-id="@Model.IdCommande" class="btn btn-warning">
+                            <i class="fas fa-edit me-1"></i>
+                            Modifier
+                        </a>
+                        }
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour à la liste
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        Informations Générales
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Code Commande :</strong></div>
+                                        <div class="col-sm-8">
+                                            <span class="badge bg-secondary fs-6">@Model.CodeCommande</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Date de Commande :</strong></div>
+                                        <div class="col-sm-8">@Model.Date.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))</div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Date de Consommation :</strong></div>
+                                        <div class="col-sm-8">
+                                            @if (Model.DateConsommation.HasValue)
+                                            {
+                                                @Model.DateConsommation.Value.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Non définie</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Statut :</strong></div>
+                                        <div class="col-sm-8">
+                                            @switch (Model.StatusCommande)
+                                            {
+                                                case Obeli_K.Enums.StatutCommande.Precommander:
+                                                    <span class="badge bg-warning fs-6">Précommandée</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.Consommee:
+                                                    <span class="badge bg-success fs-6">Consommée</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.Annulee:
+                                                    <span class="badge bg-danger fs-6">Annulée</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary fs-6">Précommandée</span>
+                                                    break;
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Période :</strong></div>
+                                        <div class="col-sm-8">
+                                            @switch (Model.PeriodeService)
+                                            {
+                                                case Obeli_K.Enums.Periode.Jour:
+                                                    <span class="badge bg-primary fs-6">Jour</span>
+                                                    break;
+                                                case Obeli_K.Enums.Periode.Nuit:
+                                                    <span class="badge bg-dark fs-6">Nuit</span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary fs-6">@Model.PeriodeService</span>
+                                                    break;
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Site :</strong></div>
+                                        <div class="col-sm-8">
+                                            @if (Model.Site.HasValue)
+                                            {
+                                                @switch (Model.Site.Value)
+                                                {
+                                                    case Obeli_K.Models.Enums.SiteType.CIT_Terminal:
+                                                        <span class="badge bg-info fs-6">CIT Terminal</span>
+                                                        break;
+                                                    case Obeli_K.Models.Enums.SiteType.CIT_Billing:
+                                                        <span class="badge bg-info fs-6">CIT Billing</span>
+                                                        break;
+                                                    default:
+                                <span class="badge bg-secondary fs-6">@Model.Site.Value</span>
+                                                        break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Non spécifié</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Quantité :</strong></div>
+                                        <div class="col-sm-8">
+                                            <span class="badge bg-primary fs-6">@Model.Quantite</span>
+                                            @if (Model.TypeClient == Obeli_K.Enums.TypeClientCommande.CitUtilisateur && Model.Quantite == 1)
+                                            {
+                                                <small class="text-muted ms-2">(Limité à 1 pour les groupes CIT)</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-user me-2"></i>
+                                        Informations Client
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(Model.UtilisateurNomComplet))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Type :</strong></div>
+                                            <div class="col-sm-8">
+                                                <span class="badge bg-primary fs-6">Groupe CIT</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Nom :</strong></div>
+                                            <div class="col-sm-8">@Model.UtilisateurNomComplet</div>
+                                        </div>
+                                    }
+                                    else if (!string.IsNullOrEmpty(Model.GroupeNonCitNom))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Type :</strong></div>
+                                            <div class="col-sm-8">
+                                                <span class="badge bg-info fs-6">Groupe Non-CIT</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Groupe :</strong></div>
+                                            <div class="col-sm-8">@Model.GroupeNonCitNom</div>
+                                        </div>
+                                    }
+                                    else if (!string.IsNullOrEmpty(Model.VisiteurNom))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Type :</strong></div>
+                                            <div class="col-sm-8">
+                                                <span class="badge bg-success fs-6">Groupe CIT</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Nom :</strong></div>
+                                            <div class="col-sm-8">@Model.VisiteurNom</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.VisiteurTelephone))
+                                        {
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4"><strong>Téléphone :</strong></div>
+                                                <div class="col-sm-8">@Model.VisiteurTelephone</div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">Aucune information client disponible</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-utensils me-2"></i>
+                                        Détails de la Formule
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(Model.NomPlat))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Plat :</strong></div>
+                                            <div class="col-sm-8">
+                                                <strong class="text-primary">@Model.NomPlat</strong>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Formule :</strong></div>
+                                        <div class="col-sm-8">@Model.FormuleNom</div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(Model.TypeFormuleNom))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Type :</strong></div>
+                                            <div class="col-sm-8">@Model.TypeFormuleNom</div>
+                                        </div>
+                                    }
+                                    @if (Model.FormuleDate.HasValue)
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Date Formule :</strong></div>
+                                            <div class="col-sm-8">@Model.FormuleDate.Value.ToString("dd/MM/yyyy")</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-info me-2"></i>
+                                        Informations Supplémentaires
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-sm-4"><strong>Instantanée :</strong></div>
+                                        <div class="col-sm-8">
+                                            @if (Model.Instantanee)
+                                            {
+                                                <span class="badge bg-warning fs-6">Oui</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary fs-6">Non</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    @if (Model.StatusCommande == Obeli_K.Enums.StatutCommande.Annulee)
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Annulée par Prestataire :</strong></div>
+                                            <div class="col-sm-8">
+                                                @if (Model.AnnuleeParPrestataire)
+                                                {
+                                                    <span class="badge bg-danger fs-6">Oui</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary fs-6">Non</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.MotifAnnulation))
+                                        {
+                                            <div class="row mb-3">
+                                                <div class="col-sm-4"><strong>Motif d'Annulation :</strong></div>
+                                                <div class="col-sm-8">@Model.MotifAnnulation</div>
+                                            </div>
+                                        }
+                                    }
+                                    @if (Model.CreatedOn.HasValue)
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Créée le :</strong></div>
+                                            <div class="col-sm-8">@Model.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CreatedBy))
+                                    {
+                                        <div class="row mb-3">
+                                            <div class="col-sm-4"><strong>Créée par :</strong></div>
+                                            <div class="col-sm-8">@Model.CreatedBy</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Boutons d'action pour les prestataires et administrateurs *@
+                    @if (User.IsInRole("PrestataireCantine") || User.IsInRole("Administrateur"))
+                    {
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-cogs me-2"></i>
+                                            Actions
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            @if (Model.StatusCommande != Obeli_K.Enums.StatutCommande.Consommee)
+                                            {
+                                                <div class="col-md-4">
+                                                    <form asp-action="ValiderCommande" method="post" class="d-inline">
+                                                        <input type="hidden" name="id" value="@Model.IdCommande" />
+                                                        <button type="submit" class="btn btn-success w-100" 
+                                                                onclick="return confirm('Confirmer la validation de cette commande ?')">
+                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            Valider
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#annulerModal">
+                                                        <i class="fas fa-times-circle me-2"></i>
+                                                        Annuler
+                                                    </button>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-8">
+                                                    <div class="alert alert-success text-center">
+                                                        <i class="fas fa-check-circle me-2"></i>
+                                                        Commande déjà validée
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div class="col-md-4">
+                                                <a asp-action="VerifierCommande" class="btn btn-secondary w-100">
+                                                    <i class="fas fa-times me-2"></i>
+                                                    Fermer
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal pour l'annulation avec motif *@
+@if (User.IsInRole("PrestataireCantine") || User.IsInRole("Administrateur"))
+{
+    <div class="modal fade" id="annulerModal" tabindex="-1" aria-labelledby="annulerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="annulerModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Annuler la Commande
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="AnnulerCommande" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" value="@Model.IdCommande" />
+                        <div class="mb-3">
+                            <label for="motif" class="form-label">Motif d'annulation :</label>
+                            <select id="motif" name="motif" class="form-select" required>
+                                <option value="">Sélectionner un motif</option>
+                                <option value="Repas indisponible">Repas indisponible</option>
+                                <option value="Finir">Finir</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>
+                            Fermer
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-check me-1"></i>
+                            Confirmer l'annulation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+

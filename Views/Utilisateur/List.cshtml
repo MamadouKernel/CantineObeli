@@ -1,0 +1,201 @@
+@{
+    ViewData["Title"] = "Liste des Utilisateurs";
+    var utilisateurs = ViewBag.Utilisateurs as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-list me-2"></i>
+                        Liste des Utilisateurs
+                    </h2>
+                    <p class="text-muted mb-0">
+                        @utilisateurs.Count() utilisateur(s) trouvé(s)
+                    </p>
+                </div>
+                <div class="text-end">
+                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des utilisateurs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    @if (!utilisateurs.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun utilisateur trouvé</h5>
+                            <p class="text-muted">Commencez par créer votre premier utilisateur.</p>
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Créer un utilisateur
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Matricule</th>
+                                        <th>Email</th>
+                                        <th>Rôle</th>
+                                        <th>Département</th>
+                                        <th>Fonction</th>
+                                        <th>Créé le</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in utilisateurs)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                        @user.Nom.ToString().Substring(0, 1).ToUpper()
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">@user.Nom @user.Prenoms</div>
+                                                        @if (!string.IsNullOrEmpty(user.PhoneNumber?.ToString()))
+                                                        {
+                                                            <small class="text-muted">@user.PhoneNumber</small>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">@user.UserName</span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(user.Email?.ToString()))
+                                                {
+                                                    <a href="mailto:@user.Email" class="text-decoration-none">
+                                                        @user.Email
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var roleClass = user.Role.ToString() switch
+                                                    {
+                                                        "Administrateur" => "bg-danger",
+                                                        "RessourcesHumaines" => "bg-warning",
+                                                        "PrestataireCantine" => "bg-info",
+                                                        "Employe" => "bg-success",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                }
+                                                <span class="badge @roleClass">@user.Role</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">@user.DepartementNom</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">@user.FonctionNom</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @if (user.CreatedAt != null)
+                                                    {
+                                                        @(((DateTime)user.CreatedAt).ToString("dd/MM/yyyy"))
+                                                    }
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Details", new { id = user.Id })" 
+                                                       class="btn btn-sm btn-outline-info" title="Voir les détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Edit", new { id = user.Id })" 
+                                                       class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="confirmDelete('@user.Id', '@user.Nom @user.Prenoms')" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="userName"></strong> ?</p>
+                <p class="text-muted small">Cette action ne peut pas être annulée.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+</style>
+
+<script>
+    function confirmDelete(userId, userName) {
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + userId;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

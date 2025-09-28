@@ -1,0 +1,248 @@
+@model Obeli_K.Models.ViewModels.CreerCommandeInstantaneeViewModel
+
+@{
+    ViewData["Title"] = "Créer une Commande Instantanée";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        Créer une Commande Instantanée
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-utensils me-2"></i>
+                                        Commande Instantanée - @ViewBag.DateAujourdhui?.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form asp-action="CreerCommandeInstantanee" method="post">
+                                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                                        
+                                        <div class="row">
+                                            <!-- Type de client -->
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label asp-for="TypeClient" class="form-label">
+                                                        <i class="fas fa-users me-1"></i>
+                                                        Type de client
+                                                    </label>
+                                                    <select asp-for="TypeClient" class="form-select" id="typeClientSelect">
+                                                        <option value="">-- Sélectionner --</option>
+                                                        <option value="1">Groupe non-CIT</option>
+                                                        <option value="0">Groupe CIT</option>
+                                                    </select>
+                                                    <span asp-validation-for="TypeClient" class="text-danger"></span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Formule -->
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label asp-for="IdFormule" class="form-label">
+                                                        <i class="fas fa-utensils me-1"></i>
+                                                        Formule
+                                                    </label>
+                                                    <select asp-for="IdFormule" class="form-select" asp-items="ViewBag.FormulesAujourdhui">
+                                                        <option value="">-- Sélectionner une formule --</option>
+                                                    </select>
+                                                    <span asp-validation-for="IdFormule" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Section Groupe non-CIT -->
+                                        <div id="groupeSection" class="row" style="display: none;">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label asp-for="GroupeNonCitId" class="form-label">
+                                                        <i class="fas fa-building me-1"></i>
+                                                        Groupe non-CIT
+                                                    </label>
+                                                    <select asp-for="GroupeNonCitId" class="form-select" asp-items="ViewBag.GroupesNonCit">
+                                                        <option value="">-- Sélectionner un groupe --</option>
+                                                    </select>
+                                                    <span asp-validation-for="GroupeNonCitId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Section Groupe CIT -->
+                                        <div id="groupeCitSection" class="row" style="display: none;">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label asp-for="UtilisateurId" class="form-label">
+                                                        <i class="fas fa-user me-1"></i>
+                                                        Utilisateur CIT
+                                                    </label>
+                                                    <select asp-for="UtilisateurId" class="form-select" asp-items="ViewBag.Utilisateurs">
+                                                        <option value="">-- Sélectionner un utilisateur --</option>
+                                                    </select>
+                                                    <span asp-validation-for="UtilisateurId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quantité -->
+                                        <div class="col-md-2" id="quantiteSection">
+                                            <div class="mb-3">
+                                                <label asp-for="Quantite" class="form-label">
+                                                    <i class="fas fa-hashtag me-1"></i>
+                                                    Quantité
+                                                </label>
+                                                <input asp-for="Quantite" class="form-control" type="number" min="1" max="100" />
+                                                <span asp-validation-for="Quantite" class="text-danger"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <!-- Période de service -->
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label asp-for="PeriodeService" class="form-label">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Période de service
+                                                    </label>
+                                                    <select asp-for="PeriodeService" class="form-select">
+                                                        <option value="0">Jour</option>
+                                                        <option value="1">Nuit</option>
+                                                    </select>
+                                                    <span asp-validation-for="PeriodeService" class="text-danger"></span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Site -->
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label asp-for="Site" class="form-label">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                                        Site
+                                                    </label>
+                                                    <select asp-for="Site" class="form-select">
+                                                        <option value="">-- Sélectionner --</option>
+                                                        <option value="0">CIT-Terminal</option>
+                                                        <option value="1">CIT-Billing</option>
+                                                    </select>
+                                                    <span asp-validation-for="Site" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between">
+                                            <a asp-action="Index" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-1"></i>
+                                                Retour à la liste
+                                            </a>
+                                            <button type="submit" class="btn btn-warning">
+                                                <i class="fas fa-bolt me-1"></i>
+                                                Créer la commande instantanée
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Fonction pour afficher/masquer les sections selon le type de client
+            function toggleClientSections() {
+                var typeClient = $('#typeClientSelect').val();
+                var isPrestataire = @User.IsInRole("PrestataireCantine").ToString().ToLower();
+                
+                // Masquer toutes les sections
+                $('#groupeSection').hide();
+                $('#groupeCitSection').hide();
+                
+                // Gérer l'affichage du champ quantité
+                // Les groupes CIT ont la quantité fixée à 1
+                if (typeClient === '0') { // Groupe CIT
+                    $('#quantiteSection').hide();
+                    $('#Quantite').val(1); // Définir automatiquement la quantité à 1
+                } else {
+                    $('#quantiteSection').show(); // Groupes non-CIT peuvent avoir N quantités
+                }
+                
+                // Afficher la section appropriée
+                switch(typeClient) {
+                    case '1': // GroupeNonCit
+                        $('#groupeSection').show();
+                        break;
+                    case '0': // Groupe CIT
+                        $('#groupeCitSection').show();
+                        break;
+                }
+            }
+
+            // Écouter les changements du type de client
+            $('#typeClientSelect').change(toggleClientSections);
+            
+            // Initialiser l'affichage
+            toggleClientSections();
+
+            // Validation côté client
+            $('form').submit(function(e) {
+                var typeClient = $('#typeClientSelect').val();
+                var isValid = true;
+
+                // Réinitialiser les classes d'erreur
+                $('.form-control, .form-select').removeClass('is-invalid');
+
+                // Validation selon le type de client
+                switch(typeClient) {
+                    case '1': // GroupeNonCit
+                        if (!$('#GroupeNonCitId').val()) {
+                            $('#GroupeNonCitId').addClass('is-invalid');
+                            isValid = false;
+                        }
+                        break;
+                    case '0': // Groupe CIT
+                        if (!$('#UtilisateurId').val()) {
+                            $('#UtilisateurId').addClass('is-invalid');
+                            isValid = false;
+                        }
+                        break;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Veuillez remplir tous les champs obligatoires.');
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,192 @@
+@{
+    ViewData["Title"] = "Liste des Départements";
+    var departements = ViewBag.Departements as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-list me-2"></i>
+                        Liste des Départements
+                    </h2>
+                    <p class="text-muted mb-0">
+                        @departements.Count() département(s) trouvé(s)
+                    </p>
+                </div>
+                <div class="text-end">
+                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Nouveau Département
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des départements -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    @if (!departements.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun département trouvé</h5>
+                            <p class="text-muted">Commencez par créer votre premier département.</p>
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer un département
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Utilisateurs</th>
+                                        <th>Créé le</th>
+                                        <th>Créé par</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var dept in departements)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                        <i class="fas fa-building"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">@dept.Nom</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(dept.Description?.ToString()))
+                                                {
+                                                    <span class="text-muted">@dept.Description</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@dept.NombreUtilisateurs utilisateur(s)</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @if (dept.CreatedOn != null)
+                                                    {
+                                                        @(((DateTime)dept.CreatedOn).ToString("dd/MM/yyyy"))
+                                                    }
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@dept.CreatedBy</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Details", new { id = dept.Id })" 
+                                                       class="btn btn-sm btn-outline-info" title="Voir les détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Edit", new { id = dept.Id })" 
+                                                       class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="confirmDelete('@dept.Id', '@dept.Nom', @dept.NombreUtilisateurs)" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le département <strong id="deptName"></strong> ?</p>
+                <div id="warningMessage" class="alert alert-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Ce département contient <strong id="userCount"></strong> utilisateur(s). 
+                    Vous devez d'abord réassigner ou supprimer ces utilisateurs.
+                </div>
+                <p class="text-muted small">Cette action ne peut pas être annulée.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" id="deleteButton">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+</style>
+
+<script>
+    function confirmDelete(deptId, deptName, userCount) {
+        document.getElementById('deptName').textContent = deptName;
+        document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + deptId;
+        
+        if (userCount > 0) {
+            document.getElementById('warningMessage').style.display = 'block';
+            document.getElementById('userCount').textContent = userCount;
+            document.getElementById('deleteButton').disabled = true;
+        } else {
+            document.getElementById('warningMessage').style.display = 'none';
+            document.getElementById('deleteButton').disabled = false;
+        }
+        
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

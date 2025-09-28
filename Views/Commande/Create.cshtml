@@ -1,0 +1,396 @@
+@model Obeli_K.Models.ViewModels.CommandeParSemaineViewModel
+
+@{
+    ViewData["Title"] = "Passez vos commandes";
+}
+
+<div class="container-fluid">
+    <!-- Message de blocage si les commandes sont fermées -->
+    @if (ViewBag.IsBlocked == true)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-danger text-center" role="alert">
+                    <h2 class="alert-heading">
+                        <i class="fas fa-lock me-3"></i>
+                        Commandes fermées
+                    </h2>
+                    <p class="mb-3">
+                        Les commandes pour la semaine suivante sont actuellement fermées.
+                    </p>
+                    @if (ViewBag.ProchaineCloture != null)
+                    {
+                        <p class="mb-0">
+                            <strong>Prochaine ouverture :</strong> @(((DateTime)ViewBag.ProchaineCloture).ToString("dddd dd MMMM yyyy à HH:mm", new System.Globalization.CultureInfo("fr-FR")))
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- En-tête avec titre et dates -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 class="display-4 fw-bold text-warning mb-2">
+                        <i class="fas fa-utensils me-3"></i>
+                        Passez vos commandes
+                    </h1>
+                    <h3 class="text-muted">
+                        du @Model.DateDebutSemaine.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                        au @Model.DateFinSemaine.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                    </h3>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+        <!-- Colonne principale - Menus par jour -->
+        <div class="col-lg-8">
+            @foreach (var jour in Model.JoursSemaine)
+            {
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-calendar-day me-2"></i>
+                            @jour.NomJour @jour.Date.ToString("dd/MM")
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var formule in jour.Formules)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 border-0 @(formule.EstCommande ? "bg-light-success" : "bg-light")">
+                                        <div class="card-header @(formule.EstCommande ? "bg-success text-white" : "bg-secondary text-white")">
+                                            <h6 class="card-title mb-0">
+                                                @if (formule.EstCommande)
+                                                {
+                                                    <i class="fas fa-check-circle me-2"></i>
+                                                }
+                                                @formule.TypeFormule
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Affichage des plats selon le type de formule -->
+                                            @if (formule.TypeFormule == "Améliorée")
+                                            {
+                                                <!-- Formule Améliorée - Afficher seulement Entrée et Plat -->
+                                                @if (!string.IsNullOrEmpty(formule.Entree))
+                                                {
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">Entrée:</small><br>
+                                                        <strong>@formule.Entree</strong>
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Plat))
+                                                {
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">Plat:</small><br>
+                                                        <strong>@formule.Plat</strong>
+                                                    </div>
+                                                }
+                                                @if (string.IsNullOrEmpty(formule.Entree) && string.IsNullOrEmpty(formule.Plat))
+                                                {
+                                                    <div class="mb-2 text-muted">
+                                                        <em>Aucun contenu disponible</em>
+                                                    </div>
+                                                }
+                                            }
+                                            else if (formule.TypeFormule == "Standard1")
+                                            {
+                                                <!-- Formule Standard1 - Toujours afficher les 2 champs -->
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Plat:</small><br>
+                                                    <strong>@(string.IsNullOrEmpty(formule.PlatStandard1) ? "Non spécifié" : formule.PlatStandard1)</strong>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Garniture:</small><br>
+                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard1) ? "Non spécifié" : formule.GarnitureStandard1)</strong>
+                                                </div>
+                                            }
+                                            else if (formule.TypeFormule == "Standard2")
+                                            {
+                                                <!-- Formule Standard2 - Toujours afficher les 2 champs -->
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Plat:</small><br>
+                                                    <strong>@(string.IsNullOrEmpty(formule.PlatStandard2) ? "Non spécifié" : formule.PlatStandard2)</strong>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Garniture:</small><br>
+                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard2) ? "Non spécifié" : formule.GarnitureStandard2)</strong>
+                                                </div>
+                                            }
+                                            
+                                            <!-- Champs communs -->
+                                            @if (!string.IsNullOrEmpty(formule.Feculent))
+                                            {
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Féculent:</small><br>
+                                                    <strong>@formule.Feculent</strong>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(formule.Legumes))
+                                            {
+                                                <div class="mb-2">
+                                                    <small class="text-muted">Légumes:</small><br>
+                                                    <strong>@formule.Legumes</strong>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            @if (!formule.EstCommande)
+                                            {
+                                                <div class="mb-2">
+                                                    <label class="form-label small">Période:</label>
+                                                    <select class="form-select form-select-sm periode-select" 
+                                                            data-formule-id="@formule.IdFormule" 
+                                                            data-date="@jour.Date.ToString("yyyy-MM-dd")">
+                                                        <option value="0">Midi</option>
+                                                        <option value="1">Soir</option>
+                                                    </select>
+                                                </div>
+                                                <button type="button" 
+                                                        class="btn btn-warning btn-sm w-100 commander-btn"
+                                                        data-formule-id="@formule.IdFormule"
+                                                        data-date="@jour.Date.ToString("yyyy-MM-dd")"
+                                                        data-type-formule="@formule.TypeFormule">
+                                                    <i class="fas fa-shopping-cart me-1"></i>
+                                                    Commander
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-center">
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>
+                                                        Commandé (@(formule.PeriodeCommande == Obeli_K.Enums.Periode.Jour ? "Midi" : "Soir"))
+                                                    </span>
+                                                    <br>
+                                                    <small class="text-muted">@formule.CodeCommande</small>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Colonne droite - Mes Commandes -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Mes Commandes
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        var dateJour = Model.DateDebutSemaine.AddDays(i);
+                        var nomJour = dateJour.ToString("dddd", new System.Globalization.CultureInfo("fr-FR"));
+                        var commandesDuJour = Model.CommandesExistantes.Where(c => c.DateConsommation.Date == dateJour.Date).ToList();
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center" 
+                                     style="width: 30px; height: 30px; font-weight: bold;">
+                                    @(i + 1)
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">@char.ToUpper(nomJour[0])@nomJour.Substring(1)</div>
+                                @if (commandesDuJour.Any())
+                                {
+                                    @foreach (var commande in commandesDuJour)
+                                    {
+                                        <div class="small text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            @commande.NomPlat (@(commande.PeriodeService == Obeli_K.Enums.Periode.Jour ? "Midi" : "Soir"))
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="small text-muted">Aucune commande</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-success btn-lg" id="bonAppetitBtn">
+                            <i class="fas fa-heart me-2"></i>
+                            BON APPÉTIT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la commande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir commander cette formule ?</p>
+                <div id="commandeDetails"></div>
+                
+                <!-- Sélection du site de livraison -->
+                <div class="mt-3">
+                    <label for="siteLivraison" class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Site de livraison
+                    </label>
+                    <select id="siteLivraison" class="form-select">
+                        <option value="">Sélectionner un site (optionnel)</option>
+                        <option value="0">CIT Terminal</option>
+                        <option value="1">CIT Billing</option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Vous pourrez modifier ce choix jusqu'à 24h avant la date de consommation.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-warning" id="confirmCommandeBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script>
+        $(document).ready(function() {
+            let commandeEnCours = null;
+
+            // Gestion du clic sur le bouton Commander
+            $('.commander-btn').click(function() {
+                const formuleId = $(this).data('formule-id');
+                const date = $(this).data('date');
+                const typeFormule = $(this).data('type-formule');
+                const periode = $(this).closest('.card-footer').find('.periode-select').val();
+                const periodeText = periode === '0' ? 'Midi' : 'Soir';
+                
+                commandeEnCours = {
+                    formuleId: formuleId,
+                    date: date,
+                    periode: parseInt(periode),
+                    typeFormule: typeFormule,
+                    periodeText: periodeText
+                };
+
+                // Afficher les détails dans le modal
+                const dateFormatee = new Date(date).toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                $('#commandeDetails').html(`
+                    <div class="alert alert-info">
+                        <strong>${typeFormule}</strong><br>
+                        <strong>Date:</strong> ${dateFormatee}<br>
+                        <strong>Période:</strong> ${periodeText}
+                    </div>
+                `);
+                
+                // Réinitialiser la sélection du site
+                $('#siteLivraison').val('');
+
+                $('#confirmationModal').modal('show');
+            });
+
+            // Confirmation de la commande
+            $('#confirmCommandeBtn').click(function() {
+                if (!commandeEnCours) return;
+
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>En cours...');
+
+                // Récupérer le site sélectionné
+                const siteSelectionne = $('#siteLivraison').val();
+                
+                $.ajax({
+                    url: '@Url.Action("CreateCommandeSemaine", "Commande")',
+                    type: 'POST',
+                    data: {
+                        idFormule: commandeEnCours.formuleId,
+                        dateConsommation: commandeEnCours.date,
+                        periode: commandeEnCours.periode,
+                        typeFormule: commandeEnCours.typeFormule,
+                        site: siteSelectionne || null,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Afficher un message de succès
+                            showAlert('success', response.message);
+                            
+                            // Recharger la page pour mettre à jour l'affichage
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('danger', response.message);
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'Erreur lors de la création de la commande');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html('Confirmer');
+                        $('#confirmationModal').modal('hide');
+                    }
+                });
+            });
+
+            // Fonction pour afficher les alertes
+            function showAlert(type, message) {
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999;">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                $('body').append(alertHtml);
+                
+                // Auto-dismiss après 5 secondes
+                setTimeout(function() {
+                    $('.alert').fadeOut();
+                }, 5000);
+            }
+
+            // Animation du bouton BON APPÉTIT
+            $('#bonAppetitBtn').hover(
+                function() {
+                    $(this).addClass('btn-lg').removeClass('btn-lg');
+                },
+                function() {
+                    $(this).removeClass('btn-lg').addClass('btn-lg');
+                }
+            );
+        });
+    </script>
+    }
+}

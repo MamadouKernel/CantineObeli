@@ -1,0 +1,67 @@
+@model List<Obeli_K.Models.ViewModels.CommandeAvecMargeViewModel>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type Formule</th>
+                                    <th>Menu</th>
+                                    <th>Nb Commandes</th>
+                                    <th>Marge</th>
+                                    <th>Total (Marge + Nb)</th>
+                                </tr>
+                            </thead>
+            <tbody>
+                @foreach (var commande in Model)
+                {
+                    <tr>
+                        <td>@commande.Date.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="badge bg-secondary">@commande.TypeFormule</span>
+                        </td>
+                        <td>
+                            <strong>@commande.NomFormule</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">@commande.NombreCommandes</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-success">@commande.Marge</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-warning text-dark fw-bold">@commande.TotalCommande</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th colspan="3">TOTAL</th>
+                    <th>@Model.Sum(c => c.NombreCommandes) commandes</th>
+                    <th></th>
+                    <th class="text-warning fw-bold">@Model.Sum(c => c.TotalCommande)</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Aucune commande précommandée trouvée pour la période sélectionnée.</strong>
+        <br>
+        <small class="text-muted">
+            Vérifiez que :
+            <ul class="mb-0 mt-2">
+                <li>Les commandes ont bien une date de consommation</li>
+                <li>Les commandes ont le statut "Précommandée" (pas encore validées par le prestataire)</li>
+                <li>La période sélectionnée correspond aux dates des commandes</li>
+            </ul>
+        </small>
+    </div>
+}

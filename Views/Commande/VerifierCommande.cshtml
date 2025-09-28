@@ -1,0 +1,124 @@
+@{
+    ViewData["Title"] = "Vérifier une Commande";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-search text-warning me-2"></i>
+                        Vérifier une Commande
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-user me-2"></i>
+                                        Vérification Commande du Jour
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form asp-action="VerifierCommande" method="post">
+                                        <div class="mb-3">
+                                            <label for="matricule" class="form-label">
+                                                <i class="fas fa-user me-1"></i>
+                                                Matricule
+                                            </label>
+                                            <input type="text" 
+                                                   id="matricule" 
+                                                   name="matricule" 
+                                                   class="form-control form-control-lg text-center" 
+                                                   placeholder="Ex: EMP001"
+                                                   required 
+                                                   autofocus />
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Saisissez le matricule pour vérifier la commande du jour
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-warning btn-lg">
+                                                <i class="fas fa-search me-2"></i>
+                                                Vérifier la Commande
+                                            </button>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <a asp-action="CreerCommandeInstantanee" class="btn btn-success w-100">
+                                                        <i class="fas fa-plus me-1"></i>
+                                                        Créer
+                                                    </a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary w-100">
+                                                        <i class="fas fa-times me-1"></i>
+                                                        Annuler
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Comment utiliser cette fonctionnalité ?
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Saisissez le matricule de l'utilisateur (ex: EMP001)</li>
+                                    <li>Cliquez sur "Vérifier la Commande"</li>
+                                    <li>Seules les commandes du jour seront recherchées</li>
+                                    <li>Les détails de la commande s'afficheront si elle existe</li>
+                                    <li>Vous pourrez voir toutes les informations de la commande</li>
+                                    <li>Utilisez "Créer" pour créer une nouvelle commande ou "Annuler" pour retourner au dashboard</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 10 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 10000);
+
+        // Focus sur le champ matricule
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('matricule').focus();
+        });
+    </script>
+}

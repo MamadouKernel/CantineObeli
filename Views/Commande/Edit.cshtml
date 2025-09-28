@@ -1,0 +1,270 @@
+@model Obeli_K.Models.ViewModels.EditCommandeViewModel
+
+@{
+    ViewData["Title"] = "Modifier la Commande";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit text-warning me-2"></i>
+                        Modifier la Commande
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" id="commandeForm">
+                        <input type="hidden" asp-for="IdCommande" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DateConsommation" class="form-label"></label>
+                                    <input asp-for="DateConsommation" type="date" class="form-control" />
+                                    <span asp-validation-for="DateConsommation" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PeriodeService" class="form-label"></label>
+                                    <select asp-for="PeriodeService" class="form-select" asp-items="ViewBag.Periodes">
+                                        <option value="">Sélectionner une période</option>
+                                    </select>
+                                    <span asp-validation-for="PeriodeService" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IdFormule" class="form-label"></label>
+                                    <select asp-for="IdFormule" class="form-select" asp-items="ViewBag.Formules">
+                                        <option value="">Sélectionner une formule</option>
+                                    </select>
+                                    <span asp-validation-for="IdFormule" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Quantite" class="form-label"></label>
+                                    <input asp-for="Quantite" type="number" min="1" class="form-control" />
+                                    <span asp-validation-for="Quantite" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TypeClient" class="form-label"></label>
+                                    <select asp-for="TypeClient" class="form-select" asp-items="ViewBag.TypeClients" id="typeClientSelect">
+                                        <option value="">Sélectionner un type de client</option>
+                                    </select>
+                                    <span asp-validation-for="TypeClient" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="StatusCommande" class="form-label"></label>
+                                    <select asp-for="StatusCommande" class="form-select" asp-items="ViewBag.Statuts">
+                                        <option value="">Sélectionner un statut</option>
+                                    </select>
+                                    <span asp-validation-for="StatusCommande" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Site" class="form-label"></label>
+                                    <select asp-for="Site" class="form-select" asp-items="ViewBag.Sites">
+                                        <option value="">Sélectionner un site (optionnel)</option>
+                                    </select>
+                                    <span asp-validation-for="Site" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="Instantanee" class="form-check-input" />
+                                        <label asp-for="Instantanee" class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Utilisateur CIT -->
+                        <div id="utilisateurSection" class="row" style="display: none;">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="UtilisateurId" class="form-label"></label>
+                                    <select asp-for="UtilisateurId" class="form-select" asp-items="ViewBag.Utilisateurs">
+                                        <option value="">Sélectionner un utilisateur</option>
+                                    </select>
+                                    <span asp-validation-for="UtilisateurId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Groupe Non-CIT -->
+                        <div id="groupeSection" class="row" style="display: none;">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="GroupeNonCitId" class="form-label"></label>
+                                    <select asp-for="GroupeNonCitId" class="form-select" asp-items="ViewBag.GroupesNonCit">
+                                        <option value="">Sélectionner un groupe</option>
+                                    </select>
+                                    <span asp-validation-for="GroupeNonCitId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Visiteur -->
+                        <div id="visiteurSection" class="row" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="VisiteurNom" class="form-label"></label>
+                                    <input asp-for="VisiteurNom" class="form-control" placeholder="Nom du visiteur" />
+                                    <span asp-validation-for="VisiteurNom" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="VisiteurTelephone" class="form-label"></label>
+                                    <input asp-for="VisiteurTelephone" class="form-control" placeholder="Téléphone du visiteur" />
+                                    <span asp-validation-for="VisiteurTelephone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Annulation -->
+                        <div id="annulationSection" class="row" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="MotifAnnulation" class="form-label"></label>
+                                    <textarea asp-for="MotifAnnulation" class="form-control" rows="3" placeholder="Motif d'annulation"></textarea>
+                                    <span asp-validation-for="MotifAnnulation" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="AnnuleeParPrestataire" class="form-check-input" />
+                                        <label asp-for="AnnuleeParPrestataire" class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>
+                                        Retour à la liste
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-1"></i>
+                                        Enregistrer les modifications
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Gestion de l'affichage des sections selon le type de client
+            function toggleClientSections() {
+                var typeClient = $('#typeClientSelect').val();
+                
+                // Masquer toutes les sections
+                $('#utilisateurSection').hide();
+                $('#groupeSection').hide();
+                $('#visiteurSection').hide();
+                
+                // Afficher la section appropriée
+                switch(typeClient) {
+                    case '0': // CitUtilisateur
+                        $('#utilisateurSection').show();
+                        break;
+                    case '1': // GroupeNonCit
+                        $('#groupeSection').show();
+                        break;
+                    case '2': // Visiteur
+                        $('#visiteurSection').show();
+                        break;
+                }
+            }
+            
+            // Gestion de l'affichage de la section annulation
+            function toggleAnnulationSection() {
+                var statut = $('#StatusCommande').val();
+                if (statut === '2') { // Annulee
+                    $('#annulationSection').show();
+                } else {
+                    $('#annulationSection').hide();
+                }
+            }
+            
+            // Événements de changement
+            $('#typeClientSelect').change(toggleClientSections);
+            $('#StatusCommande').change(toggleAnnulationSection);
+            
+            // Initialiser l'affichage
+            toggleClientSections();
+            toggleAnnulationSection();
+            
+            // Validation du formulaire
+            $('#commandeForm').on('submit', function(e) {
+                var typeClient = $('#typeClientSelect').val();
+                var isValid = true;
+                
+                // Validation selon le type de client
+                switch(typeClient) {
+                    case '0': // CitUtilisateur
+                        if (!$('#UtilisateurId').val()) {
+                            $('#UtilisateurId').addClass('is-invalid');
+                            isValid = false;
+                        } else {
+                            $('#UtilisateurId').removeClass('is-invalid');
+                        }
+                        break;
+                    case '1': // GroupeNonCit
+                        if (!$('#GroupeNonCitId').val()) {
+                            $('#GroupeNonCitId').addClass('is-invalid');
+                            isValid = false;
+                        } else {
+                            $('#GroupeNonCitId').removeClass('is-invalid');
+                        }
+                        break;
+                    case '2': // Visiteur
+                        if (!$('#VisiteurNom').val()) {
+                            $('#VisiteurNom').addClass('is-invalid');
+                            isValid = false;
+                        } else {
+                            $('#VisiteurNom').removeClass('is-invalid');
+                        }
+                        break;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Veuillez remplir tous les champs obligatoires selon le type de client sélectionné.');
+                }
+            });
+        });
+    </script>
+}

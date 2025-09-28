@@ -1,0 +1,410 @@
+@model Obeli_K.Models.ViewModels.ReportingDashboardViewModel
+@{
+    ViewData["Title"] = "Tableau de Bord - Reporting";
+    var role = User?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<div class="container-fluid">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Tableau de Bord - Reporting Avancé
+                        </h3>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filtersModal">
+                                <i class="fas fa-filter me-1"></i>
+                                Filtres
+                            </button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download me-1"></i>
+                                    Exporter
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form asp-action="ExporterCsv" method="post" class="d-inline">
+                                            <input type="hidden" asp-for="DateDebut" />
+                                            <input type="hidden" asp-for="DateFin" />
+                                            <input type="hidden" asp-for="Site" />
+                                            <input type="hidden" asp-for="DepartementId" />
+                                            <input type="hidden" asp-for="FonctionId" />
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-file-csv me-2"></i>CSV
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form asp-action="ExporterPdf" method="post" class="d-inline">
+                                            <input type="hidden" asp-for="DateDebut" />
+                                            <input type="hidden" asp-for="DateFin" />
+                                            <input type="hidden" asp-for="Site" />
+                                            <input type="hidden" asp-for="DepartementId" />
+                                            <input type="hidden" asp-for="FonctionId" />
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-file-pdf me-2"></i>PDF
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicateurs principaux -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="bg-primary rounded-circle p-3">
+                            <i class="fas fa-shopping-cart text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-primary mb-1">@Model.Indicateurs.NombreTotalCommandes</h4>
+                    <p class="text-muted mb-0">Total Commandes</p>
+                    <small class="text-muted">@Model.DateDebut.ToString("dd/MM") - @Model.DateFin.ToString("dd/MM")</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="bg-success rounded-circle p-3">
+                            <i class="fas fa-users text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-success mb-1">@Model.Indicateurs.TauxParticipation%</h4>
+                    <p class="text-muted mb-0">Taux de Participation</p>
+                    <small class="text-muted">Utilisateurs actifs</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="bg-warning rounded-circle p-3">
+                            <i class="fas fa-exclamation-triangle text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-warning mb-1">@Model.Indicateurs.VolumeSurplus</h4>
+                    <p class="text-muted mb-0">Volume Surplus</p>
+                    <small class="text-muted">Commandes annulées</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="bg-info rounded-circle p-3">
+                            <i class="fas fa-chart-pie text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <h4 class="text-info mb-1">@Model.Indicateurs.RepartitionParFormule.Count</h4>
+                    <p class="text-muted mb-0">Types de Formules</p>
+                    <small class="text-muted">Standard & Améliorée</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques et analyses -->
+    <div class="row mb-4">
+        <!-- Répartition par formule -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Répartition par Formule
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Indicateurs.RepartitionParFormule.Any())
+                    {
+                        <canvas id="formuleChart" width="400" height="200"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune donnée disponible</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes par site -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-building me-2"></i>
+                        Commandes par Site
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Indicateurs.CommandesParSite.Any())
+                    {
+                        <canvas id="siteChart" width="400" height="200"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune donnée disponible</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableaux détaillés -->
+    <div class="row mb-4">
+        <!-- Commandes par département -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-sitemap me-2"></i>
+                        Commandes par Département
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Indicateurs.CommandesParDepartement.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Département</th>
+                                        <th class="text-end">Commandes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Indicateurs.CommandesParDepartement.OrderByDescending(x => x.Value))
+                                    {
+                                        <tr>
+                                            <td>@item.Key</td>
+                                            <td class="text-end">
+                                                <span class="badge bg-primary">@item.Value</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-sitemap fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune donnée disponible</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes par période -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-clock me-2"></i>
+                        Commandes par Période
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Indicateurs.CommandesParPeriode.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Période</th>
+                                        <th class="text-end">Commandes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Indicateurs.CommandesParPeriode)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-@(item.Key == "Jour" ? "sun" : "moon") me-2"></i>
+                                                @item.Key
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="badge bg-@(item.Key == "Jour" ? "warning" : "dark")">@item.Value</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune donnée disponible</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal des filtres -->
+<div class="modal fade" id="filtersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="Dashboard" method="get">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtres du Tableau de Bord
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DateDebut" class="form-label"></label>
+                            <input asp-for="DateDebut" class="form-control" type="date" />
+                            <span asp-validation-for="DateDebut" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DateFin" class="form-label"></label>
+                            <input asp-for="DateFin" class="form-control" type="date" />
+                            <span asp-validation-for="DateFin" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Site" class="form-label"></label>
+                            <select asp-for="Site" class="form-select">
+                                <option value="">Tous les sites</option>
+                                @foreach (var site in Model.Sites)
+                                {
+                                    <option value="@site">@site</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DepartementId" class="form-label"></label>
+                            <select asp-for="DepartementId" class="form-select">
+                                <option value="">Tous les départements</option>
+                                @foreach (var dept in Model.Departements)
+                                {
+                                    <option value="@dept.Id">@dept.Nom</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="FonctionId" class="form-label"></label>
+                            <select asp-for="FonctionId" class="form-select">
+                                <option value="">Toutes les fonctions</option>
+                                @foreach (var fonction in Model.Fonctions)
+                                {
+                                    <option value="@fonction.Id">@fonction.Nom</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>
+                        Appliquer les Filtres
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Graphique en secteurs pour les formules
+        @if (Model.Indicateurs.RepartitionParFormule.Any())
+        {
+            <text>
+            const formuleCtx = document.getElementById('formuleChart').getContext('2d');
+            new Chart(formuleCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Indicateurs.RepartitionParFormule.Keys.Select(k => $"'{k}'")))],
+                    datasets: [{
+                        data: [@string.Join(",", Model.Indicateurs.RepartitionParFormule.Values)],
+                        backgroundColor: [
+                            '#EDAC00',
+                            '#A32D18',
+                            '#59311F',
+                            '#A26D55'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+
+        // Graphique en barres pour les sites
+        @if (Model.Indicateurs.CommandesParSite.Any())
+        {
+            <text>
+            const siteCtx = document.getElementById('siteChart').getContext('2d');
+            new Chart(siteCtx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Indicateurs.CommandesParSite.Keys.Select(k => $"'{k}'")))],
+                    datasets: [{
+                        label: 'Commandes',
+                        data: [@string.Join(",", Model.Indicateurs.CommandesParSite.Values)],
+                        backgroundColor: '#EDAC00',
+                        borderColor: '#A32D18',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}

@@ -1,0 +1,237 @@
+@model IEnumerable<Obeli_K.Models.ViewModels.FormuleJourViewModel>
+
+@{
+    ViewData["Title"] = "Gestion des Formules";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-utensils text-warning me-2"></i>
+                        Gestion des Formules
+                        @if (ViewBag.SemaineSuivante == true)
+                        {
+                            <span class="badge bg-success ms-2">Semaine N+1</span>
+                        }
+                    </h3>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Create" class="btn btn-warning">
+                            <i class="fas fa-plus me-1"></i>
+                            Nouvelle Formule
+                        </a>
+                        <a asp-action="CreateBulk" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus me-1"></i>
+                            Création en Lot
+                        </a>
+                        <a asp-action="Import" class="btn btn-info">
+                            <i class="fas fa-file-import me-1"></i>
+                            Importer
+                        </a>
+                        <a asp-action="Index" asp-route-semaineSuivante="true" class="btn btn-success">
+                            <i class="fas fa-calendar-week me-1"></i>
+                            Semaine N+1
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Filtres -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dateDebut" class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="@ViewBag.DateDebut">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="dateFin" class="form-label">Date de fin</label>
+                                    <input type="date" class="form-control" id="dateFin" name="dateFin" value="@ViewBag.DateFin">
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-search me-1"></i>
+                                        Filtrer
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Effacer
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Nom</th>
+                                        <th>Type</th>
+                                        <th>Formule Améliorée</th>
+                                        <th>Formule Standard 1</th>
+                                        <th>Formule Standard 2</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var formule in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@formule.Date.ToString("dd/MM/yyyy")</strong><br>
+                                                <small class="text-muted">@formule.Date.ToString("dddd", new System.Globalization.CultureInfo("fr-FR"))</small>
+                                            </td>
+                                            <td>@formule.NomFormule</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(formule.TypeFormuleNom))
+                                                {
+                                                    <span class="badge bg-info">@formule.TypeFormuleNom</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Non défini</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(formule.Plat) || !string.IsNullOrEmpty(formule.Entree))
+                                                {
+                                                    <div class="small">
+                                                        @if (!string.IsNullOrEmpty(formule.Entree))
+                                                        {
+                                                            <div><strong>Entrée:</strong> @formule.Entree</div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(formule.Plat))
+                                                        {
+                                                            <div><strong>Plat:</strong> @formule.Plat</div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(formule.Garniture))
+                                                        {
+                                                            <div><strong>Garniture:</strong> @formule.Garniture</div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(formule.Dessert))
+                                                        {
+                                                            <div><strong>Dessert:</strong> @formule.Dessert</div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Non définie</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(formule.PlatStandard1))
+                                                {
+                                                    <div class="small">
+                                                        <div><strong>Plat:</strong> @formule.PlatStandard1</div>
+                                                        @if (!string.IsNullOrEmpty(formule.GarnitureStandard1))
+                                                        {
+                                                            <div><strong>Garniture:</strong> @formule.GarnitureStandard1</div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Non définie</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(formule.PlatStandard2))
+                                                {
+                                                    <div class="small">
+                                                        <div><strong>Plat:</strong> @formule.PlatStandard2</div>
+                                                        @if (!string.IsNullOrEmpty(formule.GarnitureStandard2))
+                                                        {
+                                                            <div><strong>Garniture:</strong> @formule.GarnitureStandard2</div>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Non définie</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (formule.Verrouille)
+                                                {
+                                                    <span class="badge bg-warning">Verrouillée</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Active</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Details" asp-route-id="@formule.IdFormule" 
+                                                       class="btn btn-outline-info" title="Voir les détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@formule.IdFormule" 
+                                                       class="btn btn-outline-warning" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form asp-action="Delete" method="post" class="d-inline" 
+                                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');">
+                                                        <input type="hidden" name="id" value="@formule.IdFormule" />
+                                                        <button type="submit" class="btn btn-outline-danger" title="Supprimer">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucune formule trouvée</h5>
+                            <p class="text-muted">Il n'y a actuellement aucune formule à afficher.</p>
+                            <a asp-action="Create" class="btn btn-warning">
+                                <i class="fas fa-plus me-1"></i>
+                                Créer une nouvelle formule
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

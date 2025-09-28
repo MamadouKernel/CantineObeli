@@ -1,0 +1,121 @@
+@model Obeli_K.Models.ViewModels.DefinirMargesViewModel
+
+@{
+    ViewData["Title"] = "Définir les Marges";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-percentage text-primary me-2"></i>
+                        Définir les Marges - Période du @Model.DateDebut.ToString("dd/MM/yyyy") au @Model.DateFin.ToString("dd/MM/yyyy")
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="ValiderMarges" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <input type="hidden" asp-for="DateDebut" />
+                        <input type="hidden" asp-for="DateFin" />
+
+                        @if (Model.MenusAvecMarges.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Formule</th>
+                                            <th>Menu</th>
+                                            <th>Marge Actuelle</th>
+                                            <th>Nouvelle Marge</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.MenusAvecMarges.Count; i++)
+                                        {
+                                            var menu = Model.MenusAvecMarges[i];
+                                            <tr>
+                                                <td>@menu.Date.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">@menu.TypeFormule</span>
+                                                </td>
+                                                <td>
+                                                    <strong>@menu.NomFormule</strong>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">@menu.MargeActuelle</span>
+                                                </td>
+                                                <td>
+                                                    <input type="number" asp-for="MenusAvecMarges[i].NouvelleMarge" 
+                                                           class="form-control form-control-sm" 
+                                                           min="0" max="100" style="width: 100px;" />
+                                                    <input type="hidden" asp-for="MenusAvecMarges[i].IdFormule" />
+                                                    <input type="hidden" asp-for="MenusAvecMarges[i].Date" />
+                                                    <input type="hidden" asp-for="MenusAvecMarges[i].NomFormule" />
+                                                    <input type="hidden" asp-for="MenusAvecMarges[i].TypeFormule" />
+                                                    <input type="hidden" asp-for="MenusAvecMarges[i].MargeActuelle" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Retour
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check me-1"></i>
+                                    Valider les Marges
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucun menu trouvé pour la période sélectionnée.
+                            </div>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Retour
+                            </a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 10 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 10000);
+    </script>
+}

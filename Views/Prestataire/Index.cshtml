@@ -1,0 +1,119 @@
+@using System.Globalization
+@{
+    var fr = CultureInfo.GetCultureInfo("fr-FR");
+    var date = (DateTime)(ViewBag.Date ?? DateTime.Today);
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-utensils me-2"></i>
+                        Tableau de Bord Prestataire
+                    </h2>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-calendar-day me-1"></i>
+                        @date.ToString("dddd dd MMMM yyyy", fr)
+                    </p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="fas fa-utensils me-1"></i>
+                        Gestion Cantine
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Bienvenue dans votre espace prestataire
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-4x text-primary mb-4"></i>
+                        <h4 class="text-primary mb-3">Espace Prestataire Cantine</h4>
+                        <p class="text-muted mb-4">
+                            Bienvenue dans votre tableau de bord. Ici vous pourrez gérer les commandes et suivre les statistiques de votre cantine.
+                        </p>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-chart-line fa-2x text-primary mb-3"></i>
+                                        <h6 class="card-title">Statistiques</h6>
+                                        <p class="card-text text-muted small">
+                                            Consultez les statistiques de commandes et de consommation
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-list fa-2x text-info mb-3"></i>
+                                        <h6 class="card-title">Gestion</h6>
+                                        <p class="card-text text-muted small">
+                                            Gérez les formules et les commandes du jour
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cog fa-2x text-warning mb-3"></i>
+                                        <h6 class="card-title">Configuration</h6>
+                                        <p class="card-text text-muted small">
+                                            Configurez vos paramètres et préférences
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+    }
+    
+    .fs-6 {
+        font-size: 1rem !important;
+    }
+    
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .fa-4x {
+            font-size: 3rem !important;
+        }
+        
+        .fa-2x {
+            font-size: 1.5rem !important;
+        }
+    }
+</style>

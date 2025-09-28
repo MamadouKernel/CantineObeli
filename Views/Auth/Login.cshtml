@@ -1,0 +1,142 @@
+﻿@model Obeli_K.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Connexion - O'Beli";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <img src="~/images/logo.png" alt="Logo CIT" width="85%" />
+            <p class="login-subtitle">O'Beli - Gestion de la cantine CIT</p>
+        </div>        
+        <div class="login-body">
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    @TempData["error"]
+                </div>
+            }
+            
+            @if (TempData["success"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    @TempData["success"]
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                
+                <div class="mb-3">
+                    <label asp-for="Matricule" class="form-label">
+                        <i class="bi bi-person me-2"></i>Matricule
+                    </label>
+                    <input asp-for="Matricule" class="form-control" placeholder="Votre matricule" required />
+                    <span asp-validation-for="Matricule" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MotDePasse" class="form-label">
+                        <i class="bi bi-lock me-2"></i>Mot de passe
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="MotDePasse" type="password" class="form-control" placeholder="Votre mot de passe" required id="passwordInput" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" id="togglePasswordBtn">
+                            <i class="bi bi-eye" id="passwordIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="MotDePasse" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="SeSouvenirDeMoi" class="form-check-input" />
+                    <label asp-for="SeSouvenirDeMoi" class="form-check-label">
+                        Se souvenir de moi
+                    </label>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Se connecter
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                        <i class="bi bi-question-circle me-1"></i>
+                        Mot de passe oublié ?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Mot de passe oublié -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-question-circle me-2"></i>
+                        Mot de passe oublié
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Contactez votre administrateur système pour réinitialiser votre mot de passe.</p>
+                    <p class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Votre matricule : <strong>@User.Identity?.Name</strong>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordIcon = document.getElementById('passwordIcon');
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            
+            if (passwordInput.type === 'password') {
+                // Afficher le mot de passe
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('bi-eye');
+                passwordIcon.classList.add('bi-eye-slash');
+                toggleBtn.setAttribute('title', 'Masquer le mot de passe');
+            } else {
+                // Masquer le mot de passe
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('bi-eye-slash');
+                passwordIcon.classList.add('bi-eye');
+                toggleBtn.setAttribute('title', 'Afficher le mot de passe');
+            }
+        }
+        
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            toggleBtn.setAttribute('title', 'Afficher le mot de passe');
+        });
+    </script>
+</body>
+</html>

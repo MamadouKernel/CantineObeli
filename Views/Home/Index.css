@@ -1,0 +1,47 @@
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #A32D18 0%, #EDAC00 100%);
+}
+
+.menu-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.menu-card:hover {
+    transform: translateY(-2px);
+}
+
+.menu-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.commande-item {
+    transition: all 0.2s ease-in-out;
+}
+
+.commande-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.bg-opacity-10 {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+}

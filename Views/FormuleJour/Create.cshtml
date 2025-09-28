@@ -1,0 +1,236 @@
+@model Obeli_K.Models.ViewModels.FormuleJourViewModel
+
+@{
+    ViewData["Title"] = "Nouvelle Formule";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-plus-circle text-warning me-2"></i>
+                        Nouvelle Formule
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Date" class="form-label"></label>
+                                    <input asp-for="Date" type="date" class="form-control" />
+                                    <span asp-validation-for="Date" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="NomFormule" class="form-label"></label>
+                                    <input asp-for="NomFormule" class="form-control" placeholder="Nom de la formule" />
+                                    <span asp-validation-for="NomFormule" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="TypeFormuleId" class="form-label"></label>
+                                    <select asp-for="TypeFormuleId" class="form-select" asp-items="ViewBag.TypeFormules">
+                                        <option value="">Sélectionner un type de formule</option>
+                                    </select>
+                                    <span asp-validation-for="TypeFormuleId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="Verrouille" class="form-check-input" />
+                                        <label asp-for="Verrouille" class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formule Améliorée -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-star me-2"></i>
+                                    Formule Améliorée
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Entree" class="form-label"></label>
+                                            <input asp-for="Entree" class="form-control" placeholder="Entrée" />
+                                            <span asp-validation-for="Entree" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Plat" class="form-label"></label>
+                                            <input asp-for="Plat" class="form-control" placeholder="Plat principal" />
+                                            <span asp-validation-for="Plat" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Garniture" class="form-label"></label>
+                                            <input asp-for="Garniture" class="form-control" placeholder="Garniture" />
+                                            <span asp-validation-for="Garniture" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Dessert" class="form-label"></label>
+                                            <input asp-for="Dessert" class="form-control" placeholder="Dessert" />
+                                            <span asp-validation-for="Dessert" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formule Standard 1 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-utensils me-2"></i>
+                                    Formule Standard 1
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="PlatStandard1" class="form-label"></label>
+                                            <input asp-for="PlatStandard1" class="form-control" placeholder="Plat standard 1" />
+                                            <span asp-validation-for="PlatStandard1" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="GarnitureStandard1" class="form-label"></label>
+                                            <input asp-for="GarnitureStandard1" class="form-control" placeholder="Garniture standard 1" />
+                                            <span asp-validation-for="GarnitureStandard1" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formule Standard 2 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-utensils me-2"></i>
+                                    Formule Standard 2
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="PlatStandard2" class="form-label"></label>
+                                            <input asp-for="PlatStandard2" class="form-control" placeholder="Plat standard 2" />
+                                            <span asp-validation-for="PlatStandard2" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="GarnitureStandard2" class="form-label"></label>
+                                            <input asp-for="GarnitureStandard2" class="form-control" placeholder="Garniture standard 2" />
+                                            <span asp-validation-for="GarnitureStandard2" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Champs communs -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-leaf me-2"></i>
+                                    Éléments Communs
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Feculent" class="form-label"></label>
+                                            <input asp-for="Feculent" class="form-control" placeholder="Féculent" />
+                                            <span asp-validation-for="Feculent" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Legumes" class="form-label"></label>
+                                            <input asp-for="Legumes" class="form-control" placeholder="Légumes" />
+                                            <span asp-validation-for="Legumes" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Marge" class="form-label"></label>
+                                            <input asp-for="Marge" type="number" min="0" max="100" class="form-control" placeholder="Marge (%)" />
+                                            <span asp-validation-for="Marge" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Statut" class="form-label"></label>
+                                            <select asp-for="Statut" class="form-select">
+                                                <option value="">Sélectionner un statut</option>
+                                                <option value="1">Active</option>
+                                                <option value="0">Inactive</option>
+                                            </select>
+                                            <span asp-validation-for="Statut" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historique -->
+                        <div class="mb-3">
+                            <label asp-for="Historique" class="form-label"></label>
+                            <textarea asp-for="Historique" class="form-control" rows="3" placeholder="Historique ou notes"></textarea>
+                            <span asp-validation-for="Historique" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>
+                                        Retour à la liste
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-1"></i>
+                                        Créer la formule
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
