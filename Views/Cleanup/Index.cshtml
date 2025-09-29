@@ -1,0 +1,208 @@
+@{
+    ViewData["Title"] = "Nettoyage des Commandes en Doublon";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-broom me-2"></i>
+                        Nettoyage des Commandes Instantanées en Doublon
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Attention :</strong> Cette opération va supprimer les commandes instantanées en doublon pour chaque utilisateur CIT, en gardant seulement la commande la plus récente par jour.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button id="viewDuplicates" class="btn btn-info btn-lg w-100 mb-3">
+                                <i class="fas fa-eye me-2"></i>
+                                Voir les Doublons
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="cleanupDuplicates" class="btn btn-danger btn-lg w-100 mb-3">
+                                <i class="fas fa-broom me-2"></i>
+                                Nettoyer les Doublons
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="results" class="mt-4" style="display: none;">
+                        <!-- Les résultats seront affichés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#viewDuplicates').click(function() {
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Chargement...');
+                
+                $.get('/Cleanup/ViewDuplicateInstantOrders')
+                    .done(function(data) {
+                        displayResults(data, 'Vue des Doublons');
+                    })
+                    .fail(function(xhr) {
+                        displayError('Erreur lors de la récupération des doublons: ' + xhr.responseText);
+                    })
+                    .always(function() {
+                        $('#viewDuplicates').prop('disabled', false).html('<i class="fas fa-eye me-2"></i>Voir les Doublons');
+                    });
+            });
+
+            $('#cleanupDuplicates').click(function() {
+                if (!confirm('Êtes-vous sûr de vouloir supprimer les commandes en doublon ? Cette action est irréversible.')) {
+                    return;
+                }
+
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Nettoyage en cours...');
+                
+                $.get('/Cleanup/CleanupDuplicateInstantOrders')
+                    .done(function(data) {
+                        displayResults(data, 'Résultat du Nettoyage');
+                    })
+                    .fail(function(xhr) {
+                        displayError('Erreur lors du nettoyage: ' + xhr.responseText);
+                    })
+                    .always(function() {
+                        $('#cleanupDuplicates').prop('disabled', false).html('<i class="fas fa-broom me-2"></i>Nettoyer les Doublons');
+                    });
+            });
+
+            function displayResults(data, title) {
+                let html = `
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">${title}</h5>
+                        </div>
+                        <div class="card-body">
+                `;
+
+                if (data.success) {
+                    html += `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${data.message}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-danger">${data.commandsDeleted || 0}</h3>
+                                        <p class="mb-0">Commandes supprimées</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3 class="text-success">${data.commandsRemaining || 0}</h3>
+                                        <p class="mb-0">Commandes restantes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (data.cleanupReport && data.cleanupReport.length > 0) {
+                        html += `
+                            <h6 class="mt-4">Détail des suppressions :</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Utilisateur</th>
+                                            <th>Date</th>
+                                            <th>Commande</th>
+                                            <th>Date Création</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        data.cleanupReport.forEach(function(item) {
+                            html += `
+                                <tr>
+                                    <td>${item.nomComplet} (${item.userName})</td>
+                                    <td>${item.dateConsommation}</td>
+                                    <td>${item.idCommande}</td>
+                                    <td>${item.dateCreation}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+
+                    if (data.userStatistics && data.userStatistics.length > 0) {
+                        html += `
+                            <h6 class="mt-4">Statistiques par utilisateur :</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Utilisateur</th>
+                                            <th>Nombre de commandes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        data.userStatistics.forEach(function(stat) {
+                            html += `
+                                <tr>
+                                    <td>${stat.nomComplet} (${stat.userName})</td>
+                                    <td><span class="badge bg-primary">${stat.count}</span></td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                } else {
+                    html += `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            ${data.message}
+                        </div>
+                    `;
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+
+                $('#results').html(html).show();
+            }
+
+            function displayError(message) {
+                $('#results').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${message}
+                    </div>
+                `).show();
+            }
+        });
+    </script>
+}

@@ -220,6 +220,152 @@ namespace Obeli_K.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var utilisateur = await _db.Utilisateurs
+                .Include(u => u.Fonction)
+                .Include(u => u.Departement)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (utilisateur == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            return View(utilisateur);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var utilisateur = await _db.Utilisateurs
+                .Include(u => u.Fonction)
+                .Include(u => u.Departement)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (utilisateur == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Préparer les listes pour les dropdowns
+            ViewBag.Fonctions = await _db.Fonctions
+                .Where(f => f.Supprimer == 0)
+                .OrderBy(f => f.Nom)
+                .Select(f => new { Value = f.Id.ToString(), Text = f.Nom })
+                .ToListAsync();
+
+            ViewBag.Departements = await _db.Departements
+                .Where(d => d.Supprimer == 0)
+                .OrderBy(d => d.Nom)
+                .Select(d => new { Value = d.Id.ToString(), Text = d.Nom })
+                .ToListAsync();
+
+            return View(utilisateur);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(Utilisateur model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var id))
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var utilisateur = await _db.Utilisateurs.FindAsync(id);
+            if (utilisateur == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Validation des champs obligatoires
+            if (string.IsNullOrWhiteSpace(model.Nom) || string.IsNullOrWhiteSpace(model.Prenoms) || string.IsNullOrWhiteSpace(model.UserName))
+            {
+                ModelState.AddModelError("", "Le nom, prénoms et matricule sont obligatoires.");
+                await PopulateEditProfileViewBags();
+                return View(model);
+            }
+
+            // Vérifier si le matricule est déjà utilisé par un autre utilisateur
+            if (model.UserName != utilisateur.UserName)
+            {
+                var existingUser = await _db.Utilisateurs
+                    .FirstOrDefaultAsync(u => u.UserName == model.UserName && u.Id != id && u.Supprimer == 0);
+                
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("UserName", "Ce matricule est déjà utilisé par un autre utilisateur.");
+                    await PopulateEditProfileViewBags();
+                    return View(model);
+                }
+            }
+
+            // Vérifier si l'email est déjà utilisé par un autre utilisateur (si fourni)
+            if (!string.IsNullOrWhiteSpace(model.Email) && model.Email != utilisateur.Email)
+            {
+                var existingEmail = await _db.Utilisateurs
+                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Id != id && u.Supprimer == 0);
+                
+                if (existingEmail != null)
+                {
+                    ModelState.AddModelError("Email", "Cet email est déjà utilisé par un autre utilisateur.");
+                    await PopulateEditProfileViewBags();
+                    return View(model);
+                }
+            }
+
+            // Mettre à jour les informations (sauf le mot de passe)
+            utilisateur.Nom = model.Nom.Trim();
+            utilisateur.Prenoms = model.Prenoms.Trim();
+            utilisateur.UserName = model.UserName.Trim();
+            utilisateur.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
+            utilisateur.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
+            utilisateur.Lieu = string.IsNullOrWhiteSpace(model.Lieu) ? null : model.Lieu.Trim();
+            utilisateur.DepartementId = model.DepartementId;
+            utilisateur.FonctionId = model.FonctionId;
+            utilisateur.Site = model.Site;
+            utilisateur.ModifiedAt = DateTime.UtcNow;
+            utilisateur.ModifiedBy = utilisateur.UserName;
+
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Vos informations ont été mises à jour avec succès !";
+            return RedirectToAction(nameof(Profile));
+        }
+
+        private async Task PopulateEditProfileViewBags()
+        {
+            ViewBag.Fonctions = await _db.Fonctions
+                .Where(f => f.Supprimer == 0)
+                .OrderBy(f => f.Nom)
+                .Select(f => new { Value = f.Id.ToString(), Text = f.Nom })
+                .ToListAsync();
+
+            ViewBag.Departements = await _db.Departements
+                .Where(d => d.Supprimer == 0)
+                .OrderBy(d => d.Nom)
+                .Select(d => new { Value = d.Id.ToString(), Text = d.Nom })
+                .ToListAsync();
+        }
+
         private static string Sha256Base64(string input)
         {
             using var sha = SHA256.Create();

@@ -1,0 +1,430 @@
+@model Obeli_K.Models.Utilisateur
+@{
+    ViewData["Title"] = "Modifier mes informations";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #EDAC00 0%, #ffc107 100%);">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-user-edit fa-3x text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 text-white">
+                                <i class="fas fa-edit me-2"></i>Modifier mes informations
+                            </h3>
+                            <p class="mb-0 text-white-50">Mettez à jour vos informations personnelles et professionnelles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages d'alerte -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Erreurs détectées :</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Formulaire de modification -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="EditProfile" method="post">
+                        <div class="row">
+                            <!-- Informations Personnelles -->
+                            <div class="col-12 mb-4">
+                                <h5 class="section-title">
+                                    <i class="fas fa-id-card"></i>Informations Personnelles
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="Nom" class="form-label">
+                                                <i class="fas fa-user"></i>Nom *
+                                            </label>
+                                            <input asp-for="Nom" class="form-control" placeholder="Votre nom" />
+                                            <span asp-validation-for="Nom" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="Prenoms" class="form-label">
+                                                <i class="fas fa-user"></i>Prénoms *
+                                            </label>
+                                            <input asp-for="Prenoms" class="form-control" placeholder="Vos prénoms" />
+                                            <span asp-validation-for="Prenoms" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="UserName" class="form-label">
+                                                <i class="fas fa-id-badge"></i>Matricule *
+                                            </label>
+                                            <input asp-for="UserName" class="form-control" placeholder="Votre matricule" />
+                                            <span asp-validation-for="UserName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="Email" class="form-label">
+                                                <i class="fas fa-envelope"></i>Email
+                                            </label>
+                                            <input asp-for="Email" type="email" class="form-control" placeholder="votre.email@exemple.com" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="PhoneNumber" class="form-label">
+                                                <i class="fas fa-phone"></i>Téléphone
+                                            </label>
+                                            <input asp-for="PhoneNumber" class="form-control" placeholder="+225 XX XX XX XX" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="Lieu" class="form-label">
+                                                <i class="fas fa-map-marker-alt"></i>Lieu
+                                            </label>
+                                            <input asp-for="Lieu" class="form-control" placeholder="Votre lieu de résidence" />
+                                            <span asp-validation-for="Lieu" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations Professionnelles -->
+                            <div class="col-12 mb-4">
+                                <h5 class="section-title">
+                                    <i class="fas fa-briefcase"></i>Informations Professionnelles
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="FonctionId" class="form-label">
+                                                <i class="fas fa-user-tie"></i>Fonction
+                                            </label>
+                                            <select asp-for="FonctionId" class="form-select">
+                                                <option value="">-- Sélectionner une fonction --</option>
+                                                @if (ViewBag.Fonctions != null)
+                                                {
+                                                    @foreach (var fonction in ViewBag.Fonctions)
+                                                    {
+                                                        <option value="@fonction.Value">@fonction.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <span asp-validation-for="FonctionId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="DepartementId" class="form-label">
+                                                <i class="fas fa-building"></i>Département *
+                                            </label>
+                                            <select asp-for="DepartementId" class="form-select" required>
+                                                <option value="">-- Sélectionner un département --</option>
+                                                @if (ViewBag.Departements != null)
+                                                {
+                                                    @foreach (var departement in ViewBag.Departements)
+                                                    {
+                                                        <option value="@departement.Value">@departement.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <span asp-validation-for="DepartementId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label asp-for="Site" class="form-label">
+                                                <i class="fas fa-map-marker-alt"></i>Site
+                                            </label>
+                                            <select asp-for="Site" class="form-select" asp-items="Html.GetEnumSelectList<Obeli_K.Models.Enums.SiteType>()">
+                                                <option value="">-- Sélectionner un site --</option>
+                                            </select>
+                                            <span asp-validation-for="Site" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Informations non modifiables -->
+                            <div class="col-12 mb-4">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Note :</strong> Le mot de passe ne peut pas être modifié depuis cette page. 
+                                    Utilisez le bouton "Changer le mot de passe" pour modifier votre mot de passe.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-center gap-3">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                                    </button>
+                                    <a href="@Url.Action("Profile", "Auth")" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables de couleurs harmonisées */
+    :root {
+        --primary-gold: #EDAC00;
+        --primary-gold-dark: #d4a600;
+        --primary-gold-light: #f4e04d;
+        --secondary-red: #A32D18;
+        --secondary-red-dark: #8b1e1e;
+        --text-dark: #2c3e50;
+        --text-medium: #495057;
+        --text-light: #6c757d;
+        --bg-light: #f8f9fa;
+        --bg-white: #ffffff;
+        --border-light: #e9ecef;
+        --shadow-light: rgba(0, 0, 0, 0.08);
+        --shadow-medium: rgba(0, 0, 0, 0.12);
+        --shadow-gold: rgba(237, 172, 0, 0.2);
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 0.95rem;
+    }
+    
+    .form-label i {
+        color: var(--primary-gold);
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid var(--border-light);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: var(--bg-white);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 0.2rem var(--shadow-gold);
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+    
+    .text-danger {
+        color: var(--secondary-red) !important;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        display: block;
+    }
+    
+    .section-title {
+        color: var(--primary-gold) !important;
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-gold), var(--primary-gold-light));
+        border-radius: 2px;
+    }
+    
+    .section-title i {
+        margin-right: 0.75rem;
+        color: var(--primary-gold);
+    }
+    
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px var(--shadow-light);
+        overflow: hidden;
+        background: var(--bg-white);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%) !important;
+        border: none;
+        padding: 2rem;
+    }
+    
+    .card-header h3 {
+        color: var(--text-dark) !important;
+        font-weight: 800;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card-header p {
+        color: var(--text-dark) !important;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+    
+    .card-header i {
+        color: var(--text-dark) !important;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+        border: none;
+        color: var(--text-dark);
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px var(--shadow-gold);
+    }
+    
+    .btn-warning:hover {
+        background: linear-gradient(135deg, var(--primary-gold-dark) 0%, #c49600 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px var(--shadow-gold);
+        color: var(--text-dark);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--text-medium) 0%, var(--text-dark) 100%);
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, var(--text-dark) 0%, #1a252f 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        color: white;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+        border-left: 4px solid var(--secondary-red);
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+        margin: 2rem 0;
+    }
+    
+    @@media (max-width: 768px) {
+        .card-header {
+            padding: 1.5rem;
+        }
+        
+        .btn-warning, .btn-secondary {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-control, .form-select {
+            padding: 0.6rem 0.8rem;
+        }
+    }
+    
+    @@media (max-width: 576px) {
+        .form-label {
+            font-size: 0.9rem;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.95rem;
+        }
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

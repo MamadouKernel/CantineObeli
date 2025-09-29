@@ -84,10 +84,20 @@ namespace Obeli_K.Controllers
                 .Select(u => new
                 {
                     Value = u.Id.ToString(),
-                    Text = $"{u.Nom} {u.Prenoms} ({u.UserName})"
+                    Text = $"{u.Nom} {u.Prenoms}",
+                    UserName = u.UserName
                 })
                 .ToListAsync();
-            ViewBag.Utilisateurs = new SelectList(utilisateurs, "Value", "Text");
+            
+            // Créer le SelectList avec les attributs data pour la recherche par matricule
+            var selectListItems = utilisateurs.Select(u => new SelectListItem
+            {
+                Value = u.Value,
+                Text = u.Text
+            }).ToList();
+            
+            ViewBag.Utilisateurs = new SelectList(selectListItems, "Value", "Text");
+            ViewBag.UtilisateursData = utilisateurs.ToDictionary(u => u.Value, u => u.UserName);
             _logger.LogInformation("Chargement de {Count} utilisateurs", utilisateurs.Count);
 
             // Groupes non-CIT disponibles
@@ -1574,9 +1584,17 @@ namespace Obeli_K.Controllers
                     .Select(u => new
                     {
                         Value = u.Id.ToString(),
-                        Text = $"{u.Nom} {u.Prenoms} ({u.UserName})"
+                        Text = $"{u.Nom} {u.Prenoms}",
+                        UserName = u.UserName
                     })
                     .ToListAsync();
+
+                // Créer le SelectList avec les attributs data pour la recherche par matricule
+                var selectListItems = utilisateurs.Select(u => new SelectListItem
+                {
+                    Value = u.Value,
+                    Text = u.Text
+                }).ToList();
 
                 // Créer un SelectList personnalisé avec le nom du menu et les plats
                 var formulesSelectList = formulesAujourdhui.Select(f => new
@@ -1587,7 +1605,8 @@ namespace Obeli_K.Controllers
 
                 ViewBag.FormulesAujourdhui = new SelectList(formulesSelectList, "IdFormule", "DisplayText");
                 ViewBag.GroupesNonCit = new SelectList(groupesNonCit, "Id", "Nom");
-                ViewBag.Utilisateurs = new SelectList(utilisateurs, "Value", "Text");
+                ViewBag.Utilisateurs = new SelectList(selectListItems, "Value", "Text");
+                ViewBag.UtilisateursData = utilisateurs.ToDictionary(u => u.Value, u => u.UserName);
 
                 // Types de clients
                 var typesClient = new[]
@@ -1664,6 +1683,67 @@ namespace Obeli_K.Controllers
                         if (!model.UtilisateurId.HasValue || model.UtilisateurId == Guid.Empty)
                         {
                             ModelState.AddModelError(nameof(model.UtilisateurId), "L'utilisateur CIT est obligatoire pour ce type de client.");
+                            await PopulateViewBagsForInstantOrder();
+                            return View(model);
+                        }
+
+                        // Vérifier l'état des commandes existantes pour cet utilisateur CIT aujourd'hui
+                        var commandesExistantes = await _context.Commandes
+                            .Include(c => c.Utilisateur)
+                            .Include(c => c.FormuleJour)
+                            .Where(c => c.UtilisateurId == model.UtilisateurId 
+                                && c.Instantanee == true 
+                                && c.DateConsommation.HasValue && c.DateConsommation.Value.Date == DateTime.Today
+                                && c.Supprimer == 0)
+                            .OrderByDescending(c => c.Date)
+                            .ToListAsync();
+
+                        if (commandesExistantes.Any())
+                        {
+                            var commandeRecente = commandesExistantes.First();
+                            var utilisateur = commandeRecente.Utilisateur;
+                            var nomUtilisateur = $"{utilisateur?.Nom} {utilisateur?.Prenoms}".Trim();
+                            var matricule = utilisateur?.UserName ?? "N/A";
+                            
+                            string messageErreur;
+                            string icone;
+                            
+                            switch ((StatutCommande)commandeRecente.StatusCommande)
+                            {
+                                case StatutCommande.Precommander:
+                                    icone = "⏳";
+                                    messageErreur = $"{icone} <strong>{nomUtilisateur} ({matricule})</strong> a déjà une commande instantanée <strong>en attente de validation</strong> pour aujourd'hui.<br/>" +
+                                                  $"📅 <strong>Date de consommation :</strong> {commandeRecente.DateConsommation?.ToString("dd/MM/yyyy")}<br/>" +
+                                                  $"🍽️ <strong>Formule :</strong> {commandeRecente.FormuleJour?.NomFormule ?? "N/A"}<br/>" +
+                                                  $"⏰ <strong>Créée le :</strong> {commandeRecente.Date.ToString("dd/MM/yyyy à HH:mm")}<br/>" +
+                                                  $"<em>Veuillez attendre que le prestataire valide ou annule cette commande avant d'en créer une nouvelle.</em>";
+                                    break;
+                                    
+                                case StatutCommande.Consommee:
+                                    icone = "✅";
+                                    messageErreur = $"{icone} <strong>{nomUtilisateur} ({matricule})</strong> a déjà une commande instantanée <strong>consommée</strong> pour aujourd'hui.<br/>" +
+                                                  $"📅 <strong>Date de consommation :</strong> {commandeRecente.DateConsommation?.ToString("dd/MM/yyyy")}<br/>" +
+                                                  $"🍽️ <strong>Formule :</strong> {commandeRecente.FormuleJour?.NomFormule ?? "N/A"}<br/>" +
+                                                  $"⏰ <strong>Créée le :</strong> {commandeRecente.Date.ToString("dd/MM/yyyy à HH:mm")}<br/>" +
+                                                  $"<em>Cette commande a déjà été consommée et ne peut plus être modifiée.</em>";
+                                    break;
+                                    
+                                case StatutCommande.Annulee:
+                                    icone = "❌";
+                                    messageErreur = $"{icone} <strong>{nomUtilisateur} ({matricule})</strong> a une commande instantanée <strong>annulée par le prestataire</strong> pour aujourd'hui.<br/>" +
+                                                  $"📅 <strong>Date de consommation :</strong> {commandeRecente.DateConsommation?.ToString("dd/MM/yyyy")}<br/>" +
+                                                  $"🍽️ <strong>Formule :</strong> {commandeRecente.FormuleJour?.NomFormule ?? "N/A"}<br/>" +
+                                                  $"⏰ <strong>Créée le :</strong> {commandeRecente.Date.ToString("dd/MM/yyyy à HH:mm")}<br/>" +
+                                                  $"<em>Vous pouvez créer une nouvelle commande pour remplacer celle qui a été annulée.</em>";
+                                    break;
+                                    
+                                default:
+                                    icone = "⚠️";
+                                    messageErreur = $"{icone} <strong>{nomUtilisateur} ({matricule})</strong> a déjà une commande instantanée pour aujourd'hui avec un statut inconnu.";
+                                    break;
+                            }
+                            
+                            ModelState.AddModelError(nameof(model.UtilisateurId), messageErreur);
                             await PopulateViewBagsForInstantOrder();
                             return View(model);
                         }
@@ -1787,9 +1867,17 @@ namespace Obeli_K.Controllers
                 .Select(u => new
                 {
                     Value = u.Id.ToString(),
-                    Text = $"{u.Nom} {u.Prenoms} ({u.UserName})"
+                    Text = $"{u.Nom} {u.Prenoms}",
+                    UserName = u.UserName
                 })
                 .ToListAsync();
+
+            // Créer le SelectList avec les attributs data pour la recherche par matricule
+            var selectListItems = utilisateurs.Select(u => new SelectListItem
+            {
+                Value = u.Value,
+                Text = u.Text
+            }).ToList();
 
             var directions = await _context.Directions
                 .Where(d => d.Supprimer == 0)
@@ -1805,7 +1893,8 @@ namespace Obeli_K.Controllers
 
             ViewBag.FormulesAujourdhui = new SelectList(formulesSelectList, "IdFormule", "DisplayText");
             ViewBag.GroupesNonCit = new SelectList(groupesNonCit, "Id", "Nom");
-            ViewBag.Utilisateurs = new SelectList(utilisateurs, "Value", "Text");
+            ViewBag.Utilisateurs = new SelectList(selectListItems, "Value", "Text");
+            ViewBag.UtilisateursData = utilisateurs.ToDictionary(u => u.Value, u => u.UserName);
             ViewBag.Directions = new SelectList(directions, "Id", "Nom");
 
             var typesClient = new[]

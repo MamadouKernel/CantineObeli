@@ -1,0 +1,578 @@
+@model Obeli_K.Models.Utilisateur
+@{
+    ViewData["Title"] = "Mon Profil";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #EDAC00 0%, #ffc107 100%);">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-user-circle fa-3x text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 text-white">
+                                <i class="fas fa-user me-2"></i>Mon Profil
+                            </h3>
+                            <p class="mb-0 text-white-50">Informations personnelles et professionnelles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages d'alerte -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Profile Information -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Photo/Avatar Section -->
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    <i class="fas fa-user fa-4x text-muted"></i>
+                                </div>
+                                <div class="mt-3">
+                                    <h5 class="mb-1">@Model.Nom @Model.Prenoms</h5>
+                                    <p class="text-muted mb-0">@Model.UserName</p>
+                                    <span class="badge bg-primary mt-2">Utilisateur Actif</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Information Details -->
+                        <div class="col-md-8">
+                            <div class="row">
+                                <!-- Informations Personnelles -->
+                                <div class="col-12 mb-4">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-id-card"></i>Informations Personnelles
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-user"></i>Nom complet
+                                                </label>
+                                                <div class="info-value">@Model.Nom @Model.Prenoms</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-id-badge"></i>Matricule
+                                                </label>
+                                                <div class="info-value">@Model.UserName</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-envelope"></i>Email
+                                                </label>
+                                                <div class="info-value">@(Model.Email ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-phone"></i>Téléphone
+                                                </label>
+                                                <div class="info-value">@(Model.PhoneNumber ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informations Professionnelles -->
+                                <div class="col-12 mb-4">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-briefcase"></i>Informations Professionnelles
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-user-tie"></i>Fonction
+                                                </label>
+                                                <div class="info-value">@(Model.Fonction?.Nom ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-building"></i>Département
+                                                </label>
+                                                <div class="info-value">@(Model.Departement?.Nom ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-map-marker-alt"></i>Lieu
+                                                </label>
+                                                <div class="info-value">@(Model.Lieu ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-shield-alt"></i>Rôle
+                                                </label>
+                                                <div class="info-value">
+                                                    @if (Model.Role == Obeli_K.Models.Enums.RoleType.Admin)
+                                                    {
+                                                        <span class="badge bg-danger">Administrateur</span>
+                                                    }
+                                                    else if (Model.Role == Obeli_K.Models.Enums.RoleType.PrestataireCantine)
+                                                    {
+                                                        <span class="badge bg-warning text-dark">Prestataire Cantine</span>
+                                                    }
+                                                    else if (Model.Role == Obeli_K.Models.Enums.RoleType.RH)
+                                                    {
+                                                        <span class="badge bg-primary">Ressources Humaines</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-info">Employé</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informations Système -->
+                                <div class="col-12">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-cog"></i>Informations Système
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-calendar-plus"></i>Date de création
+                                                </label>
+                                                <div class="info-value">@(Model.CreatedAt?.ToString("dd/MM/yyyy à HH:mm") ?? "Non renseigné")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-calendar-edit"></i>Dernière modification
+                                                </label>
+                                                <div class="info-value">@(Model.ModifiedAt?.ToString("dd/MM/yyyy à HH:mm") ?? "Jamais")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-key"></i>Statut du mot de passe
+                                                </label>
+                                                <div class="info-value">
+                                                    @if (Model.MustResetPassword)
+                                                    {
+                                                        <span class="badge bg-warning text-dark">Réinitialisation requise</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-success">À jour</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-3">
+                                            <div class="info-item">
+                                                <label class="info-label">
+                                                    <i class="fas fa-toggle-on"></i>Statut du compte
+                                                </label>
+                                                <div class="info-value">
+                                                    @if (Model.Supprimer == 0)
+                                                    {
+                                                        <span class="badge bg-success">Actif</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-danger">Supprimé</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="@Url.Action("ChangePassword", "Auth")" class="btn btn-warning">
+                                    <i class="fas fa-key me-2"></i>Changer le mot de passe
+                                </a>
+                                <a href="@Url.Action("EditProfile", "Auth")" class="btn btn-secondary">
+                                    <i class="fas fa-edit me-2"></i>Modifier mes informations
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables de couleurs harmonisées */
+    :root {
+        --primary-gold: #EDAC00;
+        --primary-gold-dark: #d4a600;
+        --primary-gold-light: #f4e04d;
+        --secondary-red: #A32D18;
+        --secondary-red-dark: #8b1e1e;
+        --secondary-brown: #59311F;
+        --secondary-brown-light: #A26D55;
+        --text-dark: #2c3e50;
+        --text-medium: #495057;
+        --text-light: #6c757d;
+        --bg-light: #f8f9fa;
+        --bg-white: #ffffff;
+        --border-light: #e9ecef;
+        --shadow-light: rgba(0, 0, 0, 0.08);
+        --shadow-medium: rgba(0, 0, 0, 0.12);
+        --shadow-gold: rgba(237, 172, 0, 0.2);
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+    }
+    
+    .profile-avatar {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .avatar-circle {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-gold-light) 0%, var(--primary-gold) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 5px solid var(--primary-gold);
+        box-shadow: 0 8px 25px var(--shadow-gold);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .avatar-circle::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+    
+    @@keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    }
+    
+    .avatar-circle i {
+        color: var(--text-dark);
+        font-size: 3.5rem;
+        z-index: 1;
+        position: relative;
+    }
+    
+    .info-item {
+        background: var(--bg-white);
+        border-radius: 12px;
+        padding: 1.25rem;
+        border-left: 5px solid var(--primary-gold);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px var(--shadow-light);
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .info-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-gold), var(--primary-gold-light));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .info-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px var(--shadow-medium);
+        border-left-color: var(--primary-gold-dark);
+    }
+    
+    .info-item:hover::before {
+        opacity: 1;
+    }
+    
+    .info-label {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-medium);
+        margin-bottom: 0.75rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .info-label i {
+        color: var(--primary-gold);
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        line-height: 1.4;
+    }
+    
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge.bg-success {
+        background: linear-gradient(135deg, #28a745, #20c997) !important;
+        color: white !important;
+    }
+    
+    .badge.bg-warning {
+        background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark)) !important;
+        color: var(--text-dark) !important;
+    }
+    
+    .badge.bg-danger {
+        background: linear-gradient(135deg, var(--secondary-red), var(--secondary-red-dark)) !important;
+        color: white !important;
+    }
+    
+    .badge.bg-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3) !important;
+        color: white !important;
+    }
+    
+    .badge.bg-info {
+        background: linear-gradient(135deg, #17a2b8, #138496) !important;
+        color: white !important;
+    }
+    
+    .text-primary {
+        color: var(--primary-gold) !important;
+        font-weight: 700;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px var(--shadow-light);
+        overflow: hidden;
+        background: var(--bg-white);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%) !important;
+        border: none;
+        padding: 2rem;
+    }
+    
+    .card-header h3 {
+        color: var(--text-dark) !important;
+        font-weight: 800;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .card-header p {
+        color: var(--text-dark) !important;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+    
+    .card-header i {
+        color: var(--text-dark) !important;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+        border: none;
+        color: var(--text-dark);
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px var(--shadow-gold);
+    }
+    
+    .btn-warning:hover {
+        background: linear-gradient(135deg, var(--primary-gold-dark) 0%, #c49600 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px var(--shadow-gold);
+        color: var(--text-dark);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--text-medium) 0%, var(--text-dark) 100%);
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, var(--text-dark) 0%, #1a252f 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        color: white;
+    }
+    
+    .profile-avatar h5 {
+        color: var(--text-dark);
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+    }
+    
+    .profile-avatar p {
+        color: var(--text-medium);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title {
+        color: var(--primary-gold) !important;
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-gold), var(--primary-gold-light));
+        border-radius: 2px;
+    }
+    
+    .section-title i {
+        margin-right: 0.75rem;
+        color: var(--primary-gold);
+    }
+    
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+        margin: 2rem 0;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+    
+    .alert-success i {
+        color: #28a745;
+    }
+    
+    @@media (max-width: 768px) {
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .avatar-circle i {
+            font-size: 3rem !important;
+        }
+        
+        .info-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+        }
+        
+        .btn-warning, .btn-secondary {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @@media (max-width: 576px) {
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .avatar-circle i {
+            font-size: 2.5rem !important;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+        }
+    }
+</style>
