@@ -117,36 +117,68 @@
                                 <div class="card-header">
                                     <h6 class="card-title mb-0">
                                         <i class="fas fa-info-circle me-2"></i>
-                                        Instructions
+                                        Instructions - Format Simplifié
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <h6>Format du fichier :</h6>
-                                    <p class="small">Le fichier doit contenir les colonnes suivantes :</p>
+                                    <h6>Nouveau Format :</h6>
+                                    <p class="small"><strong>1 ligne = 1 jour complet</strong> avec toutes les formules</p>
+                                    
+                                    <h6 class="mt-3">Colonnes du fichier :</h6>
                                     <ul class="small">
-                                        <li><strong>Date</strong> : Date de la formule (YYYY-MM-DD)</li>
-                                        <li><strong>NomFormule</strong> : Nom de la formule</li>
+                                        <li><strong>Date</strong> : JJ/MM/AAAA (ex: 02/02/2026) - OBLIGATOIRE</li>
                                         <li><strong>Entree</strong> : Entrée (formule améliorée)</li>
+                                        <li><strong>Dessert</strong> : Dessert (formule améliorée)</li>
                                         <li><strong>Plat</strong> : Plat principal (formule améliorée)</li>
                                         <li><strong>Garniture</strong> : Garniture (formule améliorée)</li>
-                                        <li><strong>Dessert</strong> : Dessert (formule améliorée)</li>
-                                        <li><strong>PlatStandard1</strong> : Plat standard 1</li>
-                                        <li><strong>GarnitureStandard1</strong> : Garniture standard 1</li>
-                                        <li><strong>PlatStandard2</strong> : Plat standard 2</li>
-                                        <li><strong>GarnitureStandard2</strong> : Garniture standard 2</li>
-                                        <li><strong>Feculent</strong> : Féculent commun</li>
-                                        <li><strong>Legumes</strong> : Légumes communs</li>
-                                        <li><strong>Marge</strong> : Marge (0-100, peut être vide)</li>
-                                        <li><strong>Statut</strong> : Statut (1=actif, 0=inactif)</li>
+                                        <li><strong>Feculent</strong> : Féculent commun (optionnel)</li>
+                                        <li><strong>Legumes</strong> : Légumes communs (optionnel)</li>
+                                        <li><strong>Plat standard 1</strong> : Premier plat standard</li>
+                                        <li><strong>Garniture standard 1</strong> : Garniture du premier plat</li>
+                                        <li><strong>Plat standard 2</strong> : Deuxième plat standard</li>
+                                        <li><strong>Garniture standard 2</strong> : Garniture du deuxième plat</li>
                                     </ul>
+                                    
+                                    <h6 class="mt-3">Avantages :</h6>
+                                    <ul class="small">
+                                        <li><strong>Plus simple :</strong> 1 ligne par jour au lieu de 3</li>
+                                        <li><strong>Plus rapide :</strong> 7 lignes pour une semaine complète</li>
+                                        <li><strong>Automatique :</strong> Le système crée les 3 formules automatiquement</li>
+                                    </ul>
+                                    
+                                    <h6 class="mt-3">Exemple :</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered small">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Entree</th>
+                                                    <th>Plat</th>
+                                                    <th>Plat std 1</th>
+                                                    <th>Plat std 2</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>02/02/2026</td>
+                                                    <td>Salade</td>
+                                                    <td>Poulet</td>
+                                                    <td>Lasagne</td>
+                                                    <td>Soupe</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="small text-muted mb-0">
+                                        ➜ Cette ligne créera automatiquement 3 formules pour le 02/02/2026
+                                    </p>
                                     
                                     <h6 class="mt-3">Conseils :</h6>
                                     <ul class="small">
-                                        <li>Téléchargez d'abord le modèle Excel (.xlsx) pour voir le format</li>
-                                        <li>Le modèle contient des exemples et des instructions détaillées</li>
-                                        <li>Les champs vides seront ignorés</li>
-                                        <li>Vérifiez les dates avant l'import</li>
-                                        <li>Les formules existantes peuvent être remplacées</li>
+                                        <li>Téléchargez le modèle Excel pour voir le format exact</li>
+                                        <li>Le modèle contient 7 jours d'exemples</li>
+                                        <li>Les champs vides sont autorisés</li>
+                                        <li>Au moins une formule doit être remplie par jour</li>
                                     </ul>
                                 </div>
                             </div>

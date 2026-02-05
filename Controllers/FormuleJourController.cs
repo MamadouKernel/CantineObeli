@@ -690,7 +690,7 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Télécharge un modèle Excel pour l'importation
+        /// Télécharge un modèle Excel pour l'importation (Format simplifié : 1 ligne = 1 jour avec toutes les formules)
         /// </summary>
         [HttpGet]
         public IActionResult DownloadTemplate()
@@ -698,102 +698,115 @@ namespace Obeli_K.Controllers
             try
             {
                 using var workbook = new ClosedXML.Excel.XLWorkbook();
-                var worksheet = workbook.Worksheets.Add("Formules");
+                var worksheet = workbook.Worksheets.Add("Menus Semaine");
 
-                // En-têtes
+                // En-têtes (Format simplifié : 1 ligne = 1 jour complet)
                 var headers = new[]
                 {
-                    "Date", "NomFormule", "Entree", "Plat", "Garniture", "Dessert",
-                    "PlatStandard1", "GarnitureStandard1", "PlatStandard2", "GarnitureStandard2",
-                    "Feculent", "Legumes", "Marge", "Statut"
+                    "Date", "Entree", "Dessert", "Plat", "Garniture", "Feculent", "Legumes",
+                    "Plat standard 1", "Garniture standard 1", "Plat standard 2", "Garniture standard 2"
                 };
 
                 // Style pour les en-têtes
                 var headerRow = worksheet.Row(1);
                 headerRow.Style.Font.Bold = true;
-                headerRow.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightBlue;
+                headerRow.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromArgb(79, 129, 189); // Bleu
+                headerRow.Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
                 headerRow.Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                headerRow.Style.Alignment.Vertical = ClosedXML.Excel.XLAlignmentVerticalValues.Center;
+                headerRow.Height = 30;
 
                 // Ajouter les en-têtes
                 for (int i = 0; i < headers.Length; i++)
                 {
-                    worksheet.Cell(1, i + 1).Value = headers[i];
+                    var cell = worksheet.Cell(1, i + 1);
+                    cell.Value = headers[i];
+                    cell.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
                 }
 
-                // Données d'exemple - Menu 1 (Formule Améliorée)
-                var sampleData1 = new[]
+                // Données d'exemple (7 jours de la semaine)
+                var sampleData = new[]
                 {
-                    "2024-01-15", "Formule Améliorée", "Salade verte aux tomates", "Poulet rôti aux herbes", "Riz pilaf aux légumes", "Fruit de saison",
-                    "Sauce graine", "Viande de bœuf", "Attieke", "Poisson grillé", "Riz blanc", "Légumes de saison", "0", "1"
+                    new[] { "02/02/2026", "Salade de Crudités", "Yaourt", "Filet de Sosso au Four", "Pois Chiches Sautés", "", "", "Lasagne Bolognaise", "Salade Verte", "Soupe de Poulet", "Riz Blanc" },
+                    new[] { "03/02/2026", "Salade Verdurette", "Brownie", "Gratin de Cabillaud", "Pommes de Terre Vapeur", "", "", "APF", "Attiéké", "Bœuf Sauce Bawin", "Riz Blanc" },
+                    new[] { "04/02/2026", "Friand au Fromage", "Beignet Nature", "Émincé de Bœuf à La Moutarde", "Riz Safrané", "", "", "Poulet au Four", "Pommes de Terre Sautées", "Poisson Fumé Sauce Gouagouassou", "Riz Blanc" },
+                    new[] { "05/02/2026", "Salade Composée", "Gâteau Semoule Raisins", "Lapin aux Pruneaux", "Purée de Patates Douces", "", "", "Choukouya de Bœuf", "Attiéké", "Akpéssi de Banane au Poulet", "Banane Plantain" },
+                    new[] { "06/02/2026", "Mini Quiche Légumes", "Salade de Fruits Maison", "Chili Con Carne Doux", "Riz Blanc", "", "", "Poisson Frit Abolo", "Abolo", "Bœuf Sauce Pistache", "Riz" },
+                    new[] { "07/02/2026", "Cocktail de Crudités", "Pain Perdu", "Colombo de Poulet", "Couscous", "", "", "Poulet à L'Ivoirienne", "Attiéké", "Poisson Frit Sauce Feuilles", "Riz Blanc" },
+                    new[] { "08/02/2026", "Œufs Brouillés aux Légumes", "Moka Café", "Saumon Grillé", "Patates Douces Rôties", "", "", "Chicken Burger", "Pommes de Terre Sautées", "Poulet Fumé Sauce Doumglé", "Riz Blanc" }
                 };
 
-                // Données d'exemple - Menu 2 (Formule Standard)
-                var sampleData2 = new[]
+                // Ajouter les exemples avec style
+                for (int row = 0; row < sampleData.Length; row++)
                 {
-                    "2024-01-16", "Formule Standard", "", "", "", "",
-                    "Sauce arachide", "Poulet", "Foutou", "Poisson", "Riz", "Épinards", "0", "1"
-                };
-
-                // Données d'exemple - Menu 3 (Formule Mixte)
-                var sampleData3 = new[]
-                {
-                    "2024-01-17", "Formule Mixte", "Carottes râpées", "Agouti sauce", "Riz parfumé", "Banane",
-                    "Sauce tomate", "Agouti", "Igname pilée", "Poisson fumé", "Riz", "Gombo", "5", "1"
-                };
-
-                // Ajouter les exemples
-                for (int i = 0; i < sampleData1.Length; i++)
-                {
-                    worksheet.Cell(2, i + 1).Value = sampleData1[i];
-                }
-
-                for (int i = 0; i < sampleData2.Length; i++)
-                {
-                    worksheet.Cell(3, i + 1).Value = sampleData2[i];
-                }
-
-                for (int i = 0; i < sampleData3.Length; i++)
-                {
-                    worksheet.Cell(4, i + 1).Value = sampleData3[i];
+                    for (int col = 0; col < sampleData[row].Length; col++)
+                    {
+                        var cell = worksheet.Cell(row + 2, col + 1);
+                        cell.Value = sampleData[row][col];
+                        cell.Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                        
+                        // Alterner les couleurs des lignes
+                        if (row % 2 == 0)
+                        {
+                            cell.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromArgb(220, 230, 241);
+                        }
+                    }
                 }
 
                 // Ajuster la largeur des colonnes
                 worksheet.Columns().AdjustToContents();
+                
+                // Largeur minimale pour la lisibilité
+                foreach (var column in worksheet.ColumnsUsed())
+                {
+                    if (column.Width < 15)
+                        column.Width = 15;
+                }
 
                 // Ajouter des instructions
-                worksheet.Cell(6, 1).Value = "Instructions :";
-                worksheet.Cell(6, 1).Style.Font.Bold = true;
+                var instructionRow = 10;
+                worksheet.Cell(instructionRow, 1).Value = "INSTRUCTIONS :";
+                worksheet.Cell(instructionRow, 1).Style.Font.Bold = true;
+                worksheet.Cell(instructionRow, 1).Style.Font.FontSize = 12;
                 
                 var instructions = new[]
                 {
-                    "• Date : Format YYYY-MM-DD (ex: 2024-01-15)",
-                    "• NomFormule : Nom de la formule (ex: Formule Améliorée, Formule Standard, Formule Mixte)",
                     "",
-                    "TYPES DE FORMULES :",
-                    "• FORMULE AMÉLIORÉE : Remplir Entree, Plat, Garniture, Dessert (ligne 2)",
-                    "• FORMULE STANDARD : Remplir PlatStandard1, GarnitureStandard1, PlatStandard2, GarnitureStandard2 (ligne 3)",
-                    "• FORMULE MIXTE : Combiner éléments améliorés ET standard (ligne 4)",
+                    "FORMAT SIMPLIFIÉ : 1 ligne = 1 jour complet avec toutes les formules",
                     "",
-                    "CHAMPS OBLIGATOIRES :",
-                    "• Date et NomFormule sont toujours obligatoires",
-                    "• Pour formule améliorée : au moins Entree OU Plat",
-                    "• Pour formule standard : au moins PlatStandard1 OU PlatStandard2",
+                    "• Date : Format JJ/MM/AAAA (ex: 02/02/2026) - OBLIGATOIRE",
+                    "• Entree : Entrée de la formule améliorée",
+                    "• Dessert : Dessert de la formule améliorée",
+                    "• Plat : Plat principal de la formule améliorée",
+                    "• Garniture : Garniture de la formule améliorée",
+                    "• Feculent : Féculent commun (optionnel)",
+                    "• Legumes : Légumes communs (optionnel)",
+                    "• Plat standard 1 : Premier plat standard",
+                    "• Garniture standard 1 : Garniture du premier plat standard",
+                    "• Plat standard 2 : Deuxième plat standard",
+                    "• Garniture standard 2 : Garniture du deuxième plat standard",
                     "",
-                    "AUTRES CHAMPS :",
-                    "• Feculent, Legumes : Compléments communs (optionnels)",
-                    "• Marge : Pourcentage de marge (0-100, peut être vide ou 0)",
-                    "• Statut : 1 pour actif, 0 pour inactif"
+                    "AVANTAGES :",
+                    "• 1 ligne par jour au lieu de 3 lignes",
+                    "• 7 lignes pour une semaine complète",
+                    "• Plus simple et plus rapide à remplir",
+                    "",
+                    "NOTES :",
+                    "• Les champs vides sont autorisés",
+                    "• Le système créera automatiquement 3 formules par jour :",
+                    "  - Formule Améliorée (si Entree, Plat, Garniture ou Dessert remplis)",
+                    "  - Formule Standard 1 (si Plat standard 1 rempli)",
+                    "  - Formule Standard 2 (si Plat standard 2 rempli)"
                 };
 
                 for (int i = 0; i < instructions.Length; i++)
                 {
-                    worksheet.Cell(7 + i, 1).Value = instructions[i];
+                    var cell = worksheet.Cell(instructionRow + 1 + i, 1);
+                    cell.Value = instructions[i];
+                    cell.Style.Font.Italic = true;
+                    cell.Style.Font.FontColor = ClosedXML.Excel.XLColor.DarkGray;
+                    worksheet.Range(instructionRow + 1 + i, 1, instructionRow + 1 + i, headers.Length).Merge();
                 }
-
-                // Style pour les instructions
-                var instructionRange = worksheet.Range(7, 1, 7 + instructions.Length - 1, 1);
-                instructionRange.Style.Font.Italic = true;
-                instructionRange.Style.Font.FontColor = ClosedXML.Excel.XLColor.DarkGray;
 
                 // Générer le fichier en mémoire
                 using var stream = new MemoryStream();
@@ -802,7 +815,7 @@ namespace Obeli_K.Controllers
 
                 return File(stream.ToArray(), 
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-                    "modele_formules.xlsx");
+                    "modele_menus_semaine.xlsx");
             }
             catch (Exception ex)
             {
@@ -827,12 +840,12 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Traite le fichier d'importation Excel
+        /// Traite le fichier d'importation Excel (Format simplifié : 1 ligne = 1 jour avec toutes les formules)
         /// </summary>
         private async Task<ImportResultViewModel> ProcessImportFile(ImportFormuleViewModel model)
         {
             var result = new ImportResultViewModel();
-            var lignesImportees = 0;
+            var formulesCreees = 0;
             var lignesErreur = 0;
             var erreurs = new List<string>();
 
@@ -846,94 +859,201 @@ namespace Obeli_K.Controllers
                 var totalRows = usedRows.Count();
                 result.TotalLignes = totalRows;
 
-                // Traiter chaque ligne
+                // Traiter chaque ligne (1 ligne = 1 jour avec 3 formules potentielles)
                 foreach (var row in usedRows)
                 {
                     try
                     {
                         var rowNumber = row.RowNumber();
                         
-                        // Lire les valeurs des cellules
-                        var dateValue = row.Cell(1).GetString();
-                        var nomFormule = row.Cell(2).GetString();
-                        var entree = row.Cell(3).GetString();
-                        var plat = row.Cell(4).GetString();
-                        var garniture = row.Cell(5).GetString();
-                        var dessert = row.Cell(6).GetString();
-                        var platStandard1 = row.Cell(7).GetString();
-                        var garnitureStandard1 = row.Cell(8).GetString();
-                        var platStandard2 = row.Cell(9).GetString();
-                        var garnitureStandard2 = row.Cell(10).GetString();
-                        var feculent = row.Cell(11).GetString();
-                        var legumes = row.Cell(12).GetString();
-                        var margeValue = row.Cell(13).GetString();
-                        var statutValue = row.Cell(14).GetString();
+                        // Lire les valeurs des cellules (nouveau format)
+                        var dateValue = row.Cell(1).GetString().Trim();
+                        var entree = row.Cell(2).GetString().Trim();
+                        var dessert = row.Cell(3).GetString().Trim();
+                        var plat = row.Cell(4).GetString().Trim();
+                        var garniture = row.Cell(5).GetString().Trim();
+                        var feculent = row.Cell(6).GetString().Trim();
+                        var legumes = row.Cell(7).GetString().Trim();
+                        var platStandard1 = row.Cell(8).GetString().Trim();
+                        var garnitureStandard1 = row.Cell(9).GetString().Trim();
+                        var platStandard2 = row.Cell(10).GetString().Trim();
+                        var garnitureStandard2 = row.Cell(11).GetString().Trim();
 
-                        // Vérifier les champs obligatoires
-                        if (string.IsNullOrEmpty(dateValue) || string.IsNullOrEmpty(nomFormule))
+                        // Vérifier le champ obligatoire
+                        if (string.IsNullOrEmpty(dateValue))
                         {
-                            erreurs.Add($"Ligne {rowNumber}: Date et NomFormule sont obligatoires");
+                            erreurs.Add($"Ligne {rowNumber}: La date est obligatoire");
                             lignesErreur++;
                             continue;
                         }
 
-                        var formule = new FormuleJour
+                        // Parser la date (supporter plusieurs formats)
+                        DateTime date;
+                        if (!DateTime.TryParseExact(dateValue, new[] { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd" }, 
+                            System.Globalization.CultureInfo.InvariantCulture, 
+                            System.Globalization.DateTimeStyles.None, out date))
                         {
-                            IdFormule = Guid.NewGuid(),
-                            Date = DateTime.Parse(dateValue),
-                            NomFormule = nomFormule,
-                            Entree = string.IsNullOrEmpty(entree) ? null : entree,
-                            Plat = string.IsNullOrEmpty(plat) ? null : plat,
-                            Garniture = string.IsNullOrEmpty(garniture) ? null : garniture,
-                            Dessert = string.IsNullOrEmpty(dessert) ? null : dessert,
-                            PlatStandard1 = string.IsNullOrEmpty(platStandard1) ? null : platStandard1,
-                            GarnitureStandard1 = string.IsNullOrEmpty(garnitureStandard1) ? null : garnitureStandard1,
-                            PlatStandard2 = string.IsNullOrEmpty(platStandard2) ? null : platStandard2,
-                            GarnitureStandard2 = string.IsNullOrEmpty(garnitureStandard2) ? null : garnitureStandard2,
-                            Feculent = string.IsNullOrEmpty(feculent) ? null : feculent,
-                            Legumes = string.IsNullOrEmpty(legumes) ? null : legumes,
-                            Marge = string.IsNullOrEmpty(margeValue) || margeValue == "0" ? 0 : int.Parse(margeValue),
-                            Statut = string.IsNullOrEmpty(statutValue) ? null : int.Parse(statutValue),
-                            CreatedOn = DateTime.Now,
-                            CreatedBy = User.Identity?.Name ?? "System"
-                        };
-
-                        // Vérifier si une formule existe déjà pour cette date
-                        var formuleExistante = await _context.FormulesJour
-                            .FirstOrDefaultAsync(f => f.Date.Date == formule.Date.Date && f.Supprimer == 0);
-
-                        if (formuleExistante != null && !model.RemplacerExistantes)
-                        {
-                            erreurs.Add($"Ligne {rowNumber}: Une formule existe déjà pour la date {formule.Date:dd/MM/yyyy}");
+                            erreurs.Add($"Ligne {rowNumber}: Format de date invalide '{dateValue}'. Utilisez JJ/MM/AAAA (ex: 02/02/2026)");
                             lignesErreur++;
                             continue;
                         }
 
-                        if (formuleExistante != null && model.RemplacerExistantes)
+                        // Vérifier si au moins une formule est remplie
+                        var hasAmeliore = !string.IsNullOrEmpty(entree) || !string.IsNullOrEmpty(plat) || 
+                                         !string.IsNullOrEmpty(garniture) || !string.IsNullOrEmpty(dessert);
+                        var hasStandard1 = !string.IsNullOrEmpty(platStandard1);
+                        var hasStandard2 = !string.IsNullOrEmpty(platStandard2);
+
+                        if (!hasAmeliore && !hasStandard1 && !hasStandard2)
                         {
-                            // Remplacer la formule existante
-                            formuleExistante.NomFormule = formule.NomFormule;
-                            formuleExistante.Entree = formule.Entree;
-                            formuleExistante.Plat = formule.Plat;
-                            formuleExistante.Garniture = formule.Garniture;
-                            formuleExistante.Dessert = formule.Dessert;
-                            formuleExistante.PlatStandard1 = formule.PlatStandard1;
-                            formuleExistante.GarnitureStandard1 = formule.GarnitureStandard1;
-                            formuleExistante.PlatStandard2 = formule.PlatStandard2;
-                            formuleExistante.GarnitureStandard2 = formule.GarnitureStandard2;
-                            formuleExistante.Feculent = formule.Feculent;
-                            formuleExistante.Legumes = formule.Legumes;
-                            formuleExistante.Marge = formule.Marge;
-                            formuleExistante.Statut = formule.Statut;
-                            formuleExistante.ModifiedOn = DateTime.Now;
-                            formuleExistante.ModifiedBy = User.Identity?.Name ?? "System";
-                        }
-                        else
-                        {
-                            _context.FormulesJour.Add(formule);
+                            erreurs.Add($"Ligne {rowNumber}: Au moins une formule doit être remplie");
+                            lignesErreur++;
+                            continue;
                         }
 
-                        lignesImportees++;
+                        // Créer les formules pour ce jour
+                        var formulesCreeesPourCeJour = 0;
+
+                        // 1. Formule Améliorée (si au moins un champ est rempli)
+                        if (hasAmeliore)
+                        {
+                            var formuleExistante = await _context.FormulesJour
+                                .FirstOrDefaultAsync(f => f.Date.Date == date.Date && f.NomFormule == "Amélioré" && f.Supprimer == 0);
+
+                            if (formuleExistante != null && !model.RemplacerExistantes)
+                            {
+                                erreurs.Add($"Ligne {rowNumber}: Une formule Améliorée existe déjà pour le {date:dd/MM/yyyy}");
+                            }
+                            else
+                            {
+                                var formule = new FormuleJour
+                                {
+                                    IdFormule = Guid.NewGuid(),
+                                    Date = date,
+                                    NomFormule = "Amélioré",
+                                    Entree = string.IsNullOrEmpty(entree) ? null : entree,
+                                    Plat = string.IsNullOrEmpty(plat) ? null : plat,
+                                    Garniture = string.IsNullOrEmpty(garniture) ? null : garniture,
+                                    Dessert = string.IsNullOrEmpty(dessert) ? null : dessert,
+                                    Feculent = string.IsNullOrEmpty(feculent) ? null : feculent,
+                                    Legumes = string.IsNullOrEmpty(legumes) ? null : legumes,
+                                    Marge = 15, // Marge par défaut pour Amélioré
+                                    Statut = 1,
+                                    CreatedOn = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "System"
+                                };
+
+                                if (formuleExistante != null && model.RemplacerExistantes)
+                                {
+                                    // Remplacer
+                                    formuleExistante.Entree = formule.Entree;
+                                    formuleExistante.Plat = formule.Plat;
+                                    formuleExistante.Garniture = formule.Garniture;
+                                    formuleExistante.Dessert = formule.Dessert;
+                                    formuleExistante.Feculent = formule.Feculent;
+                                    formuleExistante.Legumes = formule.Legumes;
+                                    formuleExistante.ModifiedOn = DateTime.Now;
+                                    formuleExistante.ModifiedBy = User.Identity?.Name ?? "System";
+                                }
+                                else
+                                {
+                                    _context.FormulesJour.Add(formule);
+                                }
+                                formulesCreeesPourCeJour++;
+                            }
+                        }
+
+                        // 2. Formule Standard 1 (si le plat est rempli)
+                        if (hasStandard1)
+                        {
+                            var formuleExistante = await _context.FormulesJour
+                                .FirstOrDefaultAsync(f => f.Date.Date == date.Date && f.NomFormule == "Standard 1" && f.Supprimer == 0);
+
+                            if (formuleExistante != null && !model.RemplacerExistantes)
+                            {
+                                erreurs.Add($"Ligne {rowNumber}: Une formule Standard 1 existe déjà pour le {date:dd/MM/yyyy}");
+                            }
+                            else
+                            {
+                                var formule = new FormuleJour
+                                {
+                                    IdFormule = Guid.NewGuid(),
+                                    Date = date,
+                                    NomFormule = "Standard 1",
+                                    PlatStandard1 = platStandard1,
+                                    GarnitureStandard1 = string.IsNullOrEmpty(garnitureStandard1) ? null : garnitureStandard1,
+                                    Feculent = string.IsNullOrEmpty(feculent) ? null : feculent,
+                                    Legumes = string.IsNullOrEmpty(legumes) ? null : legumes,
+                                    Marge = 0, // Marge par défaut pour Standard
+                                    Statut = 1,
+                                    CreatedOn = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "System"
+                                };
+
+                                if (formuleExistante != null && model.RemplacerExistantes)
+                                {
+                                    // Remplacer
+                                    formuleExistante.PlatStandard1 = formule.PlatStandard1;
+                                    formuleExistante.GarnitureStandard1 = formule.GarnitureStandard1;
+                                    formuleExistante.Feculent = formule.Feculent;
+                                    formuleExistante.Legumes = formule.Legumes;
+                                    formuleExistante.ModifiedOn = DateTime.Now;
+                                    formuleExistante.ModifiedBy = User.Identity?.Name ?? "System";
+                                }
+                                else
+                                {
+                                    _context.FormulesJour.Add(formule);
+                                }
+                                formulesCreeesPourCeJour++;
+                            }
+                        }
+
+                        // 3. Formule Standard 2 (si le plat est rempli)
+                        if (hasStandard2)
+                        {
+                            var formuleExistante = await _context.FormulesJour
+                                .FirstOrDefaultAsync(f => f.Date.Date == date.Date && f.NomFormule == "Standard 2" && f.Supprimer == 0);
+
+                            if (formuleExistante != null && !model.RemplacerExistantes)
+                            {
+                                erreurs.Add($"Ligne {rowNumber}: Une formule Standard 2 existe déjà pour le {date:dd/MM/yyyy}");
+                            }
+                            else
+                            {
+                                var formule = new FormuleJour
+                                {
+                                    IdFormule = Guid.NewGuid(),
+                                    Date = date,
+                                    NomFormule = "Standard 2",
+                                    PlatStandard2 = platStandard2,
+                                    GarnitureStandard2 = string.IsNullOrEmpty(garnitureStandard2) ? null : garnitureStandard2,
+                                    Feculent = string.IsNullOrEmpty(feculent) ? null : feculent,
+                                    Legumes = string.IsNullOrEmpty(legumes) ? null : legumes,
+                                    Marge = 0, // Marge par défaut pour Standard
+                                    Statut = 1,
+                                    CreatedOn = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "System"
+                                };
+
+                                if (formuleExistante != null && model.RemplacerExistantes)
+                                {
+                                    // Remplacer
+                                    formuleExistante.PlatStandard2 = formule.PlatStandard2;
+                                    formuleExistante.GarnitureStandard2 = formule.GarnitureStandard2;
+                                    formuleExistante.Feculent = formule.Feculent;
+                                    formuleExistante.Legumes = formule.Legumes;
+                                    formuleExistante.ModifiedOn = DateTime.Now;
+                                    formuleExistante.ModifiedBy = User.Identity?.Name ?? "System";
+                                }
+                                else
+                                {
+                                    _context.FormulesJour.Add(formule);
+                                }
+                                formulesCreeesPourCeJour++;
+                            }
+                        }
+
+                        formulesCreees += formulesCreeesPourCeJour;
                     }
                     catch (Exception ex)
                     {
@@ -951,7 +1071,7 @@ namespace Obeli_K.Controllers
                 {
                     await _context.SaveChangesAsync();
                     result.Success = true;
-                    result.Message = $"{lignesImportees} formules importées avec succès.";
+                    result.Message = $"{formulesCreees} formules importées avec succès (format simplifié : 1 ligne = 1 jour).";
                 }
                 else
                 {
@@ -959,7 +1079,7 @@ namespace Obeli_K.Controllers
                     result.Message = $"{lignesErreur} erreurs détectées. Import annulé.";
                 }
 
-                result.LignesImportees = lignesImportees;
+                result.LignesImportees = formulesCreees;
                 result.LignesErreur = lignesErreur;
                 result.Erreurs = erreurs;
             }
