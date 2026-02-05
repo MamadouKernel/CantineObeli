@@ -417,6 +417,73 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
+        /// Affiche l'historique des menus
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Historique(DateTime? dateDebut, DateTime? dateFin, string? nomFormule)
+        {
+            try
+            {
+                var query = _context.FormulesJour
+                    .Include(f => f.NomFormuleNavigation)
+                    .Where(f => f.Supprimer == 0);
+
+                // Filtrer par dates si spécifiées
+                if (dateDebut.HasValue)
+                    query = query.Where(f => f.Date >= dateDebut.Value);
+                
+                if (dateFin.HasValue)
+                    query = query.Where(f => f.Date <= dateFin.Value);
+
+                // Filtrer par nom de formule si spécifié
+                if (!string.IsNullOrEmpty(nomFormule))
+                    query = query.Where(f => f.NomFormule != null && f.NomFormule.Contains(nomFormule));
+
+                var formules = await query
+                    .OrderByDescending(f => f.Date)
+                    .Select(f => new FormuleJourViewModel
+                    {
+                        IdFormule = f.IdFormule,
+                        Date = f.Date,
+                        NomFormule = f.NomFormule,
+                        TypeFormuleId = f.TypeFormuleId,
+                        TypeFormuleNom = f.NomFormuleNavigation != null ? f.NomFormuleNavigation.Nom : null,
+                        Entree = f.Entree,
+                        Plat = f.Plat,
+                        Garniture = f.Garniture,
+                        Dessert = f.Dessert,
+                        PlatStandard1 = f.PlatStandard1,
+                        GarnitureStandard1 = f.GarnitureStandard1,
+                        PlatStandard2 = f.PlatStandard2,
+                        GarnitureStandard2 = f.GarnitureStandard2,
+                        Feculent = f.Feculent,
+                        Legumes = f.Legumes,
+                        Marge = f.Marge,
+                        Statut = f.Statut,
+                        Verrouille = f.Verrouille,
+                        Historique = f.Historique,
+                        CreatedOn = f.CreatedOn,
+                        CreatedBy = f.CreatedBy,
+                        ModifiedOn = f.ModifiedOn,
+                        ModifiedBy = f.ModifiedBy
+                    })
+                    .ToListAsync();
+
+                ViewBag.DateDebut = dateDebut?.ToString("yyyy-MM-dd");
+                ViewBag.DateFin = dateFin?.ToString("yyyy-MM-dd");
+                ViewBag.NomFormule = nomFormule;
+
+                return View(formules);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors du chargement de l'historique des formules");
+                TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement de l'historique.";
+                return View(new List<FormuleJourViewModel>());
+            }
+        }
+
+        /// <summary>
         /// Affiche le formulaire d'importation
         /// </summary>
         [HttpGet]
