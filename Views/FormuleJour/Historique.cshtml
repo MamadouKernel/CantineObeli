@@ -1,0 +1,369 @@
+@model IEnumerable<Obeli_K.Models.ViewModels.FormuleJourViewModel>
+
+@{
+    ViewData["Title"] = "Historique des Menus";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-history text-primary me-2"></i>
+                        Historique des Menus
+                    </h3>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Retour à la liste
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Filtres -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="dateDebut" class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="@ViewBag.DateDebut">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="dateFin" class="form-label">Date de fin</label>
+                                    <input type="date" class="form-control" id="dateFin" name="dateFin" value="@ViewBag.DateFin">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="nomFormule" class="form-label">Nom de formule</label>
+                                    <input type="text" class="form-control" id="nomFormule" name="nomFormule" 
+                                           value="@ViewBag.NomFormule" placeholder="Rechercher...">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">
+                                        <i class="fas fa-search me-1"></i>
+                                        Filtrer
+                                    </button>
+                                    <a asp-action="Historique" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Effacer
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        Total de menus
+                                    </h6>
+                                    <h3 class="mb-0">@Model.Count()</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-star me-2"></i>
+                                        Formules Améliorées
+                                    </h6>
+                                    <h3 class="mb-0">@Model.Count(f => !string.IsNullOrEmpty(f.Plat))</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-utensils me-2"></i>
+                                        Formules Standard
+                                    </h6>
+                                    <h3 class="mb-0">@Model.Count(f => !string.IsNullOrEmpty(f.PlatStandard1) || !string.IsNullOrEmpty(f.PlatStandard2))</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-lock me-2"></i>
+                                        Menus Verrouillés
+                                    </h6>
+                                    <h3 class="mb-0">@Model.Count(f => f.Verrouille)</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <!-- Timeline de l'historique -->
+                        <div class="timeline">
+                            @foreach (var formule in Model.OrderByDescending(f => f.Date))
+                            {
+                                <div class="timeline-item mb-4">
+                                    <div class="row">
+                                        <div class="col-md-2 text-end">
+                                            <div class="timeline-date">
+                                                <strong>@formule.Date.ToString("dd/MM/yyyy")</strong>
+                                                <br>
+                                                <small class="text-muted">@formule.Date.ToString("dddd", new System.Globalization.CultureInfo("fr-FR"))</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <h5 class="mb-0">
+                                                        @formule.NomFormule
+                                                        @if (formule.Verrouille)
+                                                        {
+                                                            <span class="badge bg-warning ms-2">
+                                                                <i class="fas fa-lock"></i> Verrouillé
+                                                            </span>
+                                                        }
+                                                        @if (formule.Statut == 1)
+                                                        {
+                                                            <span class="badge bg-success ms-2">Active</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-secondary ms-2">Inactive</span>
+                                                        }
+                                                    </h5>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a asp-action="Details" asp-route-id="@formule.IdFormule" 
+                                                           class="btn btn-outline-info" title="Voir les détails">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a asp-action="Edit" asp-route-id="@formule.IdFormule" 
+                                                           class="btn btn-outline-warning" title="Modifier">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <!-- Formule Améliorée -->
+                                                        @if (!string.IsNullOrEmpty(formule.Plat) || !string.IsNullOrEmpty(formule.Entree))
+                                                        {
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-warning">
+                                                                    <i class="fas fa-star me-2"></i>
+                                                                    Formule Améliorée
+                                                                </h6>
+                                                                <ul class="list-unstyled">
+                                                                    @if (!string.IsNullOrEmpty(formule.Entree))
+                                                                    {
+                                                                        <li>
+                                                                            <i class="fas fa-leaf text-success me-2"></i>
+                                                                            <strong>Entrée :</strong> @formule.Entree
+                                                                        </li>
+                                                                    }
+                                                                    @if (!string.IsNullOrEmpty(formule.Plat))
+                                                                    {
+                                                                        <li>
+                                                                            <i class="fas fa-drumstick-bite text-danger me-2"></i>
+                                                                            <strong>Plat :</strong> @formule.Plat
+                                                                        </li>
+                                                                    }
+                                                                    @if (!string.IsNullOrEmpty(formule.Garniture))
+                                                                    {
+                                                                        <li>
+                                                                            <i class="fas fa-seedling text-success me-2"></i>
+                                                                            <strong>Garniture :</strong> @formule.Garniture
+                                                                        </li>
+                                                                    }
+                                                                    @if (!string.IsNullOrEmpty(formule.Dessert))
+                                                                    {
+                                                                        <li>
+                                                                            <i class="fas fa-ice-cream text-info me-2"></i>
+                                                                            <strong>Dessert :</strong> @formule.Dessert
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                        }
+
+                                                        <!-- Formules Standard -->
+                                                        @if (!string.IsNullOrEmpty(formule.PlatStandard1) || !string.IsNullOrEmpty(formule.PlatStandard2))
+                                                        {
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-primary">
+                                                                    <i class="fas fa-utensils me-2"></i>
+                                                                    Formules Standard
+                                                                </h6>
+                                                                @if (!string.IsNullOrEmpty(formule.PlatStandard1))
+                                                                {
+                                                                    <div class="mb-2">
+                                                                        <strong>Standard 1 :</strong>
+                                                                        <ul class="list-unstyled ms-3">
+                                                                            <li>
+                                                                                <i class="fas fa-drumstick-bite text-danger me-2"></i>
+                                                                                @formule.PlatStandard1
+                                                                            </li>
+                                                                            @if (!string.IsNullOrEmpty(formule.GarnitureStandard1))
+                                                                            {
+                                                                                <li>
+                                                                                    <i class="fas fa-seedling text-success me-2"></i>
+                                                                                    @formule.GarnitureStandard1
+                                                                                </li>
+                                                                            }
+                                                                        </ul>
+                                                                    </div>
+                                                                }
+                                                                @if (!string.IsNullOrEmpty(formule.PlatStandard2))
+                                                                {
+                                                                    <div>
+                                                                        <strong>Standard 2 :</strong>
+                                                                        <ul class="list-unstyled ms-3">
+                                                                            <li>
+                                                                                <i class="fas fa-drumstick-bite text-danger me-2"></i>
+                                                                                @formule.PlatStandard2
+                                                                            </li>
+                                                                            @if (!string.IsNullOrEmpty(formule.GarnitureStandard2))
+                                                                            {
+                                                                                <li>
+                                                                                    <i class="fas fa-seedling text-success me-2"></i>
+                                                                                    @formule.GarnitureStandard2
+                                                                                </li>
+                                                                            }
+                                                                        </ul>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    <!-- Éléments communs -->
+                                                    @if (!string.IsNullOrEmpty(formule.Feculent) || !string.IsNullOrEmpty(formule.Legumes))
+                                                    {
+                                                        <div class="row mt-2">
+                                                            <div class="col-12">
+                                                                <small class="text-muted">
+                                                                    @if (!string.IsNullOrEmpty(formule.Feculent))
+                                                                    {
+                                                                        <span class="me-3">
+                                                                            <i class="fas fa-bread-slice me-1"></i>
+                                                                            <strong>Féculent :</strong> @formule.Feculent
+                                                                        </span>
+                                                                    }
+                                                                    @if (!string.IsNullOrEmpty(formule.Legumes))
+                                                                    {
+                                                                        <span>
+                                                                            <i class="fas fa-carrot me-1"></i>
+                                                                            <strong>Légumes :</strong> @formule.Legumes
+                                                                        </span>
+                                                                    }
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    <!-- Historique -->
+                                                    @if (!string.IsNullOrEmpty(formule.Historique))
+                                                    {
+                                                        <div class="row mt-3">
+                                                            <div class="col-12">
+                                                                <div class="alert alert-info mb-0">
+                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                    <strong>Note :</strong> @formule.Historique
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div class="card-footer text-muted">
+                                                    <small>
+                                                        @if (formule.CreatedOn.HasValue)
+                                                        {
+                                                            <span class="me-3">
+                                                                <i class="fas fa-plus-circle me-1"></i>
+                                                                Créé le @formule.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                @if (!string.IsNullOrEmpty(formule.CreatedBy))
+                                                                {
+                                                                    <text> par @formule.CreatedBy</text>
+                                                                }
+                                                            </span>
+                                                        }
+                                                        @if (formule.ModifiedOn.HasValue)
+                                                        {
+                                                            <span>
+                                                                <i class="fas fa-edit me-1"></i>
+                                                                Modifié le @formule.ModifiedOn.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                @if (!string.IsNullOrEmpty(formule.ModifiedBy))
+                                                                {
+                                                                    <text> par @formule.ModifiedBy</text>
+                                                                }
+                                                            </span>
+                                                        }
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun historique trouvé</h5>
+                            <p class="text-muted">Il n'y a actuellement aucun menu dans l'historique.</p>
+                            <a asp-action="Index" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Retour à la liste
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .timeline {
+            position: relative;
+        }
+
+        .timeline-item {
+            position: relative;
+        }
+
+        .timeline-date {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 16.666%;
+            top: 0;
+            bottom: -20px;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-item .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .timeline-item .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+    </style>
+}
