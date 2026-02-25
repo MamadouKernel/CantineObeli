@@ -1,0 +1,314 @@
+﻿@model IEnumerable<Obeli_K.Models.PointConsommation>
+
+@{
+    ViewData["Title"] = "Mes Points de Consommation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i>
+                            Mes Points de Consommation
+                        </h4>
+                        <div>
+                            @if (ViewBag.FacturationActive == true)
+                            {
+                                <span class="badge bg-danger text-white">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Facturation Activée
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success text-white">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Consommations Réelles Uniquement
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Filtres de date -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex gap-2">
+                                <div class="flex-grow-1">
+                                    <label class="form-label">Date de début</label>
+                                    <input type="date" name="dateDebut" class="form-control" value="@ViewBag.DateDebut" />
+                                </div>
+                                <div class="flex-grow-1">
+                                    <label class="form-label">Date de fin</label>
+                                    <input type="date" name="dateFin" class="form-control" value="@ViewBag.DateFin" />
+                                </div>
+                                <div class="d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i>
+                                        Filtrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Statistiques -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-receipt fa-2x mb-2"></i>
+                                    <h4>@ViewBag.TotalPoints</h4>
+                                    <small>Total Points</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-utensils fa-2x mb-2"></i>
+                                    <h4>@ViewBag.ConsommationsReelles</h4>
+                                    <small>Consommations Réelles</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                    <h4>@ViewBag.Facturations</h4>
+                                    <small>Facturations</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                    <h4>@ViewBag.MontantTotal.ToString("C")</h4>
+                                    <small>Montant Total</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Information sur le mode de facturation -->
+                    @if (ViewBag.FacturationActive == true)
+                    {
+                        <div class="alert alert-info border-info mb-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-info-circle fa-2x me-3 text-info"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-2">
+                                        <i class="fas fa-cog me-2"></i>
+                                        Mode Facturation Activée
+                                    </h5>
+                                    <p class="mb-2">
+                                        <strong>La facturation des commandes non consommées est activée.</strong>
+                                        Cette vue affiche toutes vos consommations et facturations.
+                                    </p>
+                                    <ul class="mb-0">
+                                        <li>✅ <strong>Consommations réelles</strong> : @ViewBag.ConsommationsReelles (récupérées au restaurant)</li>
+                                        <li>❌ <strong>Facturations</strong> : @ViewBag.Facturations (commandes non récupérées après 24h)</li>
+                                        <li>📅 <strong>Délai de grâce</strong> : 24 heures avant la date de consommation</li>
+                                        <li>💰 <strong>Montant total</strong> : @ViewBag.MontantTotal.ToString("C")</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success border-success mb-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle fa-2x me-3 text-success"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-2">
+                                        <i class="fas fa-utensils me-2"></i>
+                                        Mode Consommations Réelles
+                                    </h5>
+                                    <p class="mb-2">
+                                        <strong>La facturation des commandes non consommées est désactivée.</strong>
+                                        Cette vue affiche uniquement vos consommations réelles (repas récupérés au restaurant).
+                                    </p>
+                                    <ul class="mb-0">
+                                        <li>✅ <strong>Consommations réelles</strong> : @ViewBag.ConsommationsReelles (récupérées au restaurant)</li>
+                                        <li>💰 <strong>Montant total</strong> : @ViewBag.MontantTotal.ToString("C")</li>
+                                        <li>ℹ️ <strong>Note</strong> : Les commandes non récupérées ne sont pas facturées</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Liste des points de consommation -->
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Formule</th>
+                                        <th>Plat</th>
+                                        <th>Quantité</th>
+                                        <th>Lieu</th>
+                                        <th>Montant</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var point in Model)
+                                    {
+                                        var estFacturation = point.LieuConsommation?.Contains("FACTURATION") == true;
+                                        var rowClass = estFacturation ? "table-danger" : "table-success";
+                                        
+                                        <tr class="@rowClass">
+                                            <td>
+                                                <span class="text-muted">@point.DateConsommation.ToString("dd/MM/yyyy HH:mm")</span>
+                                            </td>
+                                            <td>
+                                                @if (estFacturation)
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-receipt me-1"></i>
+                                                        Facturation
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-utensils me-1"></i>
+                                                        Consommation
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@point.TypeFormule</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">@point.NomPlat</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">@point.QuantiteConsommee</span>
+                                            </td>
+                                            <td>
+                                                @if (estFacturation)
+                                                {
+                                                    <span class="text-danger fw-bold">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        @point.LieuConsommation
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-success">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        @point.LieuConsommation
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold @(estFacturation ? "text-danger" : "text-success")">
+                                                    @{
+                                                        var montant = 0m;
+                                                        if (point.LieuConsommation?.Contains("FACTURATION") == true)
+                                                        {
+                                                            var match = System.Text.RegularExpressions.Regex.Match(point.LieuConsommation, @"\((\d+(?:\.\d+)?)\s*F\s*CFA\)");
+                                                            if (match.Success && decimal.TryParse(match.Groups[1].Value, out var montantFacture))
+                                                            {
+                                                                montant = montantFacture;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var typeFormule = point.TypeFormule ?? "Standard";
+                                                            var prixUnitaire = typeFormule.ToLower() switch
+                                                            {
+                                                                "amélioré" or "ameliore" => 550m,
+                                                                "standard" or "standard 1" or "standard 2" => 500m,
+                                                                _ => 500m
+                                                            };
+                                                            montant = point.QuantiteConsommee * prixUnitaire;
+                                                        }
+                                                    }
+                                                    @montant.ToString("C")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (estFacturation)
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-receipt me-1"></i>
+                                                        Facturé
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>
+                                                        Consommé
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun point de consommation trouvé</h5>
+                            <p class="text-muted">Aucun point de consommation n'a été trouvé pour la période sélectionnée.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .badge {
+        font-size: 0.8em;
+    }
+    
+    .table-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+    
+    .table-success {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+</style>

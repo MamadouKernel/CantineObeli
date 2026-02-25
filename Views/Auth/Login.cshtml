@@ -8,135 +8,276 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="~/css/site.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ô BELI · Connexion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+    :root{
+      --brand-bg:#faf8f5;       /* Fond très clair, légèrement chaud */
+      --brand-text:#0f1a2a;     /* Bleu nuit profond */
+      --brand-accent:#e65100;   /* Orange soutenu pour pointillés/bouton */
+      --brand-muted:#8892a6;    /* Texte secondaire */
+    }
+    .font-display{font-family:'Playfair Display',serif}
+    .font-sans{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    /* Arc pointillé - repositionné pour plus d'espace */
+    .dashed-arc{
+      position:absolute;
+      width:28rem; height:28rem;
+      border:2px dashed var(--brand-accent);
+      border-radius:9999px;
+      clip-path:path('M 448 224 A 224 224 0 1 1 224 0');
+      transform:translate(-15%, -4%);
+      opacity:.6;
+    }
+    
+    @@media (min-width: 1024px) {
+      .dashed-arc {
+        width:34rem; 
+        height:34rem;
+        clip-path:path('M 544 272 A 272 272 0 1 1 272 0');
+        transform:translate(-20%, -6%);
+        opacity:.7;
+      }
+    }
+    
+    @@media (min-width: 1280px) {
+      .dashed-arc {
+        width:40rem; 
+        height:40rem;
+        clip-path:path('M 640 320 A 320 320 0 1 1 320 0');
+        transform:translate(-25%, -8%);
+        opacity:.8;
+      }
+    }
+    
+    @@media (min-width: 1536px) {
+      .dashed-arc {
+        width:48rem; 
+        height:48rem;
+        clip-path:path('M 768 384 A 384 384 0 1 1 384 0');
+        transform:translate(-30%, -10%);
+      }
+    }
+    
+    /* Effet d'ombre douce pour images rondes */
+    .soft-shadow{box-shadow:0 10px 30px rgba(15,26,42,.15)}
+    
+    /* Animations personnalisées */
+    .animate-beautiful {
+      animation: beautiful-float 8s ease-in-out infinite;
+    }
+    
+    @@keyframes beautiful-float {
+      0% { 
+        transform: translateY(0px) rotate(0deg) scale(1);
+        filter: brightness(1) saturate(1);
+      }
+      25% { 
+        transform: translateY(-15px) rotate(1deg) scale(1.02);
+        filter: brightness(1.05) saturate(1.1);
+      }
+      50% { 
+        transform: translateY(-8px) rotate(-0.5deg) scale(1.01);
+        filter: brightness(1.1) saturate(1.2);
+      }
+      75% { 
+        transform: translateY(-20px) rotate(0.5deg) scale(1.03);
+        filter: brightness(1.05) saturate(1.1);
+      }
+      100% { 
+        transform: translateY(0px) rotate(0deg) scale(1);
+        filter: brightness(1) saturate(1);
+      }
+    }
+    
+    /* Effet de brillance */
+    .animate-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    
+
+    
+    .animate-shine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shine 3s ease-in-out infinite;
+      z-index: 1;
+    }
+    
+    @@keyframes shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+    
+    /* Améliorations responsive */
+    @@media (max-width: 640px) {
+      .font-display {
+        line-height: 1.2;
+      }
+      
+      .animate-beautiful {
+        animation-duration: 6s;
+      }
+      
+      /* Réduire les animations sur mobile pour les performances */
+      @@media (prefers-reduced-motion: reduce) {
+        .animate-beautiful,
+        .animate-shine::before {
+          animation: none;
+        }
+      }
+    }
+    
+    /* Améliorations desktop */
+    @@media (min-width: 1024px) {
+      .animate-beautiful {
+        animation-duration: 10s;
+      }
+      
+      /* Effet de parallaxe subtil sur desktop */
+      .dashed-arc {
+        animation: gentle-rotate 20s linear infinite;
+      }
+    }
+    
+    @@keyframes gentle-rotate {
+      from { transform: translate(-20%, -6%) rotate(0deg); }
+      to { transform: translate(-20%, -6%) rotate(360deg); }
+    }
+    
+    @@media (min-width: 1280px) {
+      @@keyframes gentle-rotate {
+        from { transform: translate(-25%, -8%) rotate(0deg); }
+        to { transform: translate(-25%, -8%) rotate(360deg); }
+      }
+    }
+    
+    @@media (min-width: 1536px) {
+      @@keyframes gentle-rotate {
+        from { transform: translate(-30%, -10%) rotate(0deg); }
+        to { transform: translate(-30%, -10%) rotate(360deg); }
+      }
+    }
+    
+    /* Amélioration de l'accessibilité */
+    @@media (max-height: 600px) {
+      .min-h-screen {
+        min-height: 100vh;
+      }
+    }
+    
+    /* Optimisations pour très grands écrans */
+    @@media (min-width: 1920px) {
+      body {
+        font-size: 18px;
+      }
+    }
+    
+
+    </style>
 </head>
-<body class="login-page">
-    <div class="login-container">
-        <div class="login-header">
-            <img src="~/images/logo.png" alt="Logo CIT" width="85%" />
-            <p class="login-subtitle">O'Beli - Gestion de la cantine CIT</p>
-        </div>        
-        <div class="login-body">
+<body class="bg-[var(--brand-bg)] text-[var(--brand-text)] font-sans antialiased min-h-screen">
+  <!-- Contenu principal -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 min-h-screen flex items-center py-8">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-24 items-center w-full">
+      <!-- Colonne gauche : Logo + Titre + Formulaire -->
+      <section class="order-2 lg:order-1 w-full lg:max-w-lg xl:max-w-xl">
+        <!-- Logo CIT intégré -->
+        <div class="mb-8 lg:mb-12">
+          <img src="~/images/log_cit.gif" alt="Logo CIT" class="w-32 sm:w-36 md:w-40 lg:w-48 xl:w-56 2xl:w-64 h-auto" />
+        </div>
+        
+        <h3 class="font-display text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl leading-tight">
+          <span class="block">Bienvenue sur</span>
+          <span class="block mt-2 sm:mt-4">Ô <span class="tracking-wide">BELI</span></span>
+        </h3>
+        <p class="mt-3 sm:mt-4 lg:mt-6 text-sm sm:text-base lg:text-lg xl:text-xl text-[var(--brand-muted)]">La solution de restauration de CIT</p>
+
             @if (TempData["error"] != null)
             {
-                <div class="alert alert-danger" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
+            <div class="mt-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+                <i class="bi bi-exclamation-triangle mr-2"></i>
                     @TempData["error"]
                 </div>
             }
             
             @if (TempData["success"] != null)
             {
-                <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>
+            <div class="mt-6 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700">
+                <i class="bi bi-check-circle mr-2"></i>
                     @TempData["success"]
                 </div>
             }
 
-            <form asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
-                
-                <div class="mb-3">
-                    <label asp-for="Matricule" class="form-label">
-                        <i class="bi bi-person me-2"></i>Matricule
-                    </label>
-                    <input asp-for="Matricule" class="form-control" placeholder="Votre matricule" required />
-                    <span asp-validation-for="Matricule" class="text-danger small"></span>
-                </div>
+        <form asp-action="Login" method="post" class="mt-4 sm:mt-6 lg:mt-8 w-full max-w-sm lg:max-w-md space-y-4 lg:space-y-6" id="loginForm">
+          @Html.AntiForgeryToken()
+                    
+          <div>
+            <label asp-for="Matricule" class="block text-sm lg:text-base font-medium mb-2 lg:mb-3">Matricule</label>
+            <input asp-for="Matricule" type="text" autocomplete="username" required
+                   class="w-full rounded-xl border border-slate-200 bg-white/70 backdrop-blur-sm px-4 lg:px-5 py-3 lg:py-4 text-base lg:text-lg outline-none focus:ring-4 focus:ring-[var(--brand-accent)]/20 focus:border-[var(--brand-accent)] transition-all duration-200 shadow-sm hover:shadow-md" 
+                   placeholder="Votre matricule" />
+            <span asp-validation-for="Matricule" class="text-red-500 text-sm mt-1 block"></span>
+          </div>
 
-                <div class="mb-3">
-                    <label asp-for="MotDePasse" class="form-label">
-                        <i class="bi bi-lock me-2"></i>Mot de passe
-                    </label>
-                    <div class="input-group">
-                        <input asp-for="MotDePasse" type="password" class="form-control" placeholder="Votre mot de passe" required id="passwordInput" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" id="togglePasswordBtn">
-                            <i class="bi bi-eye" id="passwordIcon"></i>
-                        </button>
-                    </div>
-                    <span asp-validation-for="MotDePasse" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3 form-check">
-                    <input asp-for="SeSouvenirDeMoi" class="form-check-input" />
-                    <label asp-for="SeSouvenirDeMoi" class="form-check-label">
-                        Se souvenir de moi
-                    </label>
-                </div>
-
-                <div class="d-grid mb-3">
-                    <button type="submit" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>
-                        Se connecter
-                    </button>
-                </div>
-
-                <div class="text-center">
-                    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
-                        <i class="bi bi-question-circle me-1"></i>
-                        Mot de passe oublié ?
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Mot de passe oublié -->
-    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-question-circle me-2"></i>
-                        Mot de passe oublié
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Contactez votre administrateur système pour réinitialiser votre mot de passe.</p>
-                    <p class="text-muted small">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Votre matricule : <strong>@User.Identity?.Name</strong>
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                </div>
+          <div>
+            <label asp-for="MotDePasse" class="block text-sm lg:text-base font-medium mb-2 lg:mb-3">Mot de passe</label>
+            <div class="relative">
+              <input asp-for="MotDePasse" type="password" id="password" autocomplete="current-password" required
+                     class="w-full rounded-xl border border-slate-200 bg-white/70 backdrop-blur-sm px-4 lg:px-5 py-3 lg:py-4 pr-12 lg:pr-14 text-base lg:text-lg outline-none focus:ring-4 focus:ring-[var(--brand-accent)]/20 focus:border-[var(--brand-accent)] transition-all duration-200 shadow-sm hover:shadow-md" 
+                     placeholder="Votre mot de passe" />
+              <button type="button" id="togglePassword" class="absolute right-3 lg:right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none p-1 lg:p-2 rounded-lg hover:bg-gray-100 transition-colors" onclick="togglePasswordVisibility()">
+                <i class="bi bi-eye text-lg lg:text-xl" id="eyeIcon"></i>
+              </button>
             </div>
+            <span asp-validation-for="MotDePasse" class="text-red-500 text-sm mt-1 block"></span>
+          </div>
+
+          <button type="submit"
+                  class="w-full rounded-2xl px-6 lg:px-8 py-3 lg:py-4 text-base lg:text-lg font-semibold bg-[var(--brand-text)] text-white hover:opacity-95 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-black/10 active:scale-[.98] transition-all duration-200 shadow-lg hover:shadow-xl">
+            Se Connecter
+          </button>
+        </form>
+      </section>
+
+      <!-- Colonne droite : Image principale avec plus d'espace -->
+      <section class="relative order-1 lg:order-2 w-full flex items-center justify-end py-8 lg:py-0 lg:pl-8 xl:pl-16">
+        <!-- Arc pointillé - repositionné -->
+        <div class="dashed-arc hidden lg:block"></div>
+
+        <!-- Image principale - plus éloignée -->
+        <div class="relative z-10 w-full max-w-xs sm:max-w-sm lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl animate-shine lg:ml-8 xl:ml-16">
+          <img src="~/images/contente/login/09.png" alt="O'Beli - Gestion de cantine" class="w-full h-auto object-cover animate-beautiful rounded-2xl lg:rounded-3xl shadow-2xl"/>
         </div>
+      </section>
     </div>
+  </main>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('passwordInput');
-            const passwordIcon = document.getElementById('passwordIcon');
-            const toggleBtn = document.getElementById('togglePasswordBtn');
-            
-            if (passwordInput.type === 'password') {
-                // Afficher le mot de passe
-                passwordInput.type = 'text';
-                passwordIcon.classList.remove('bi-eye');
-                passwordIcon.classList.add('bi-eye-slash');
-                toggleBtn.setAttribute('title', 'Masquer le mot de passe');
-            } else {
-                // Masquer le mot de passe
-                passwordInput.type = 'password';
-                passwordIcon.classList.remove('bi-eye-slash');
-                passwordIcon.classList.add('bi-eye');
-                toggleBtn.setAttribute('title', 'Afficher le mot de passe');
-            }
-        }
+      // Fonction pour afficher/masquer le mot de passe
+      function togglePasswordVisibility() {
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
         
-        // Initialisation au chargement de la page
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleBtn = document.getElementById('togglePasswordBtn');
-            toggleBtn.setAttribute('title', 'Afficher le mot de passe');
-        });
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          eyeIcon.className = 'bi bi-eye-slash text-lg lg:text-xl';
+        } else {
+          passwordField.type = 'password';
+          eyeIcon.className = 'bi bi-eye text-lg lg:text-xl';
+        }
+      }
     </script>
 </body>
 </html>

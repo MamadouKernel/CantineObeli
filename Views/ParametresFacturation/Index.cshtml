@@ -1,0 +1,438 @@
+﻿@{
+    ViewData["Title"] = "Paramètres de Facturation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    bool facturationActive = (bool)(ViewBag.FacturationActive ?? false);
+    int pourcentageFacturation = (int)(ViewBag.PourcentageFacturation ?? 100);
+    int nombreAbsencesGratuites = (int)(ViewBag.NombreAbsencesGratuites ?? 0);
+    int delaiAnnulationGratuite = (int)(ViewBag.DelaiAnnulationGratuite ?? 24);
+    bool facturationWeekend = (bool)(ViewBag.FacturationWeekend ?? false);
+    bool facturationJoursFeries = (bool)(ViewBag.FacturationJoursFeries ?? false);
+}
+
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                Paramètres de Facturation
+                            </h3>
+                            <small class="opacity-75">Configurez les règles de facturation des commandes non consommées</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages d'alerte -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Succès !</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Erreur !</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Information -->
+    <div class="alert alert-info shadow-sm mb-4">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>À propos :</strong> 
+        Ces paramètres permettent de configurer la facturation automatique des commandes qui n'ont pas été consommées. 
+        Cela encourage les utilisateurs à annuler leurs commandes à temps s'ils ne peuvent pas être présents.
+    </div>
+
+    <form asp-action="Update" method="post" id="facturationForm">
+        @Html.AntiForgeryToken()
+
+        <!-- Activation de la facturation -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-toggle-on me-2"></i>
+                            Activation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch p-3 bg-light rounded">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="facturationActive" 
+                                   name="facturationActive" 
+                                   value="true"
+                                   @(facturationActive ? "checked" : "")>
+                            <label class="form-check-label fw-semibold ms-2" for="facturationActive">
+                                <i class="fas fa-money-bill-wave me-1 text-primary"></i>
+                                Activer la facturation des commandes non consommées
+                            </label>
+                            <small class="form-text text-muted d-block mt-2 ms-5">
+                                Quand activé, les commandes non consommées seront facturées selon les règles définies ci-dessous.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paramètres de facturation -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-percentage me-2 text-primary"></i>
+                            Montant de la Facturation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <label for="pourcentageFacturation" class="form-label fw-semibold">
+                            <i class="fas fa-dollar-sign me-1 text-primary"></i>
+                            Pourcentage à facturer
+                        </label>
+                        <div class="input-group input-group-lg mb-3">
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="pourcentageFacturation" 
+                                   name="pourcentageFacturation" 
+                                   value="@pourcentageFacturation" 
+                                   min="0" 
+                                   max="100" 
+                                   required>
+                            <span class="input-group-text">
+                                <i class="fas fa-percent"></i>
+                            </span>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Pourcentage du prix de la commande à facturer (0% = gratuit, 100% = prix complet)
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-gift me-2 text-primary"></i>
+                            Absences Gratuites
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <label for="nombreAbsencesGratuites" class="form-label fw-semibold">
+                            <i class="fas fa-heart me-1 text-primary"></i>
+                            Nombre d'absences gratuites par mois
+                        </label>
+                        <input type="number" 
+                               class="form-control form-control-lg mb-3" 
+                               id="nombreAbsencesGratuites" 
+                               name="nombreAbsencesGratuites" 
+                               value="@nombreAbsencesGratuites" 
+                               min="0" 
+                               required>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Nombre de commandes non consommées tolérées gratuitement chaque mois par utilisateur
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Délai d'annulation -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock me-2 text-primary"></i>
+                            Délai d'Annulation Gratuite
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <label for="delaiAnnulationGratuite" class="form-label fw-semibold">
+                            <i class="fas fa-hourglass-half me-1 text-primary"></i>
+                            Délai en heures avant la consommation
+                        </label>
+                        <div class="input-group input-group-lg mb-3">
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="delaiAnnulationGratuite" 
+                                   name="delaiAnnulationGratuite" 
+                                   value="@delaiAnnulationGratuite" 
+                                   min="0" 
+                                   required>
+                            <span class="input-group-text">heures</span>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Si l'utilisateur annule sa commande avant ce délai, elle ne sera pas facturée
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options spéciales -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cog me-2 text-primary"></i>
+                            Options Spéciales
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch p-3 bg-light rounded mb-3">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="facturationWeekend" 
+                                   name="facturationWeekend" 
+                                   value="true"
+                                   @(facturationWeekend ? "checked" : "")>
+                            <label class="form-check-label fw-semibold ms-2" for="facturationWeekend">
+                                <i class="fas fa-calendar-week me-1 text-primary"></i>
+                                Facturer les commandes non consommées le <strong>week-end</strong>
+                            </label>
+                            <small class="form-text text-muted d-block mt-2 ms-5">
+                                Si désactivé, les commandes du samedi et dimanche ne seront jamais facturées
+                            </small>
+                        </div>
+
+                        <div class="form-check form-switch p-3 bg-light rounded">
+                            <input class="form-check-input" 
+                                   type="checkbox" 
+                                   id="facturationJoursFeries" 
+                                   name="facturationJoursFeries" 
+                                   value="true"
+                                   @(facturationJoursFeries ? "checked" : "")>
+                            <label class="form-check-label fw-semibold ms-2" for="facturationJoursFeries">
+                                <i class="fas fa-calendar-day me-1 text-primary"></i>
+                                Facturer les commandes non consommées les <strong>jours fériés</strong>
+                            </label>
+                            <small class="form-text text-muted d-block mt-2 ms-5">
+                                Si désactivé, les commandes des jours fériés ne seront jamais facturées
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Récapitulatif -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-check me-2 text-primary"></i>
+                            Résumé des Règles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                <strong id="summary-active">Facturation DÉSACTIVÉE</strong>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                Facturation à <strong id="summary-percentage">@pourcentageFacturation%</strong> du prix
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                <strong id="summary-free">@nombreAbsencesGratuites</strong> absence(s) gratuite(s) par mois
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                Annulation gratuite jusqu'à <strong id="summary-delay">@delaiAnnulationGratuite</strong> heure(s) avant
+                            </li>
+                            <li class="mb-2" id="summary-weekend-li">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                Week-end : <strong id="summary-weekend">Non facturé</strong>
+                            </li>
+                            <li id="summary-holidays-li">
+                                <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem;"></i>
+                                Jours fériés : <strong id="summary-holidays">Non facturé</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boutons -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>
+                        Enregistrer les paramètres
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        });
+
+        // Mettre à jour le résumé en temps réel
+        function updateSummary() {
+            const active = document.getElementById('facturationActive').checked;
+            const percentage = document.getElementById('pourcentageFacturation').value;
+            const free = document.getElementById('nombreAbsencesGratuites').value;
+            const delay = document.getElementById('delaiAnnulationGratuite').value;
+            const weekend = document.getElementById('facturationWeekend').checked;
+            const holidays = document.getElementById('facturationJoursFeries').checked;
+
+            const summaryActive = document.getElementById('summary-active');
+            summaryActive.textContent = active ? 'Facturation ACTIVÉE' : 'Facturation DÉSACTIVÉE';
+            summaryActive.style.color = active ? '#28a745' : '#dc3545';
+            
+            document.getElementById('summary-percentage').textContent = percentage + '%';
+            document.getElementById('summary-free').textContent = free;
+            document.getElementById('summary-delay').textContent = delay;
+            
+            const summaryWeekend = document.getElementById('summary-weekend');
+            summaryWeekend.textContent = weekend ? 'Facturé' : 'Non facturé';
+            summaryWeekend.style.color = weekend ? '#dc3545' : '#28a745';
+            
+            const summaryHolidays = document.getElementById('summary-holidays');
+            summaryHolidays.textContent = holidays ? 'Facturé' : 'Non facturé';
+            summaryHolidays.style.color = holidays ? '#dc3545' : '#28a745';
+        }
+
+        // Écouter les changements
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSummary();
+            
+            document.getElementById('facturationActive').addEventListener('change', updateSummary);
+            document.getElementById('pourcentageFacturation').addEventListener('input', updateSummary);
+            document.getElementById('nombreAbsencesGratuites').addEventListener('input', updateSummary);
+            document.getElementById('delaiAnnulationGratuite').addEventListener('input', updateSummary);
+            document.getElementById('facturationWeekend').addEventListener('change', updateSummary);
+            document.getElementById('facturationJoursFeries').addEventListener('change', updateSummary);
+        });
+
+        // Form validation
+        document.getElementById('facturationForm').addEventListener('submit', function(e) {
+            const pourcentage = parseInt(document.getElementById('pourcentageFacturation').value);
+            const absences = parseInt(document.getElementById('nombreAbsencesGratuites').value);
+            const delai = parseInt(document.getElementById('delaiAnnulationGratuite').value);
+            
+            if (pourcentage < 0 || pourcentage > 100) {
+                e.preventDefault();
+                alert('Le pourcentage de facturation doit être entre 0 et 100.');
+                return false;
+            }
+            
+            if (absences < 0) {
+                e.preventDefault();
+                alert('Le nombre d\'absences gratuites ne peut pas être négatif.');
+                return false;
+            }
+            
+            if (delai < 0) {
+                e.preventDefault();
+                alert('Le délai d\'annulation ne peut pas être négatif.');
+                return false;
+            }
+        });
+    </script>
+
+    <style>
+        .card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .form-control-lg,
+        .input-group-lg .form-control {
+            border-radius: 8px;
+            border: 2px solid #e5e5e5;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-lg:focus,
+        .input-group-lg .form-control:focus {
+            border-color: #EDAC00;
+            box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
+        }
+
+        .form-check-input:checked {
+            background-color: #EDAC00;
+            border-color: #EDAC00;
+        }
+
+        .form-check-input {
+            width: 3rem;
+            height: 1.5rem;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .list-unstyled li {
+            padding: 0.5rem 0;
+        }
+
+        @@media (max-width: 768px) {
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+    </style>
+}

@@ -1,0 +1,115 @@
+﻿@model Obeli_K.Models.PrestataireCantine
+@{
+    ViewData["Title"] = "Nouveau Prestataire";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-plus me-2"></i>
+                        Nouveau Prestataire
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Créer un nouveau prestataire de cantine
+                    </p>
+                </div>
+                <div>
+                    <a href="@Url.Action("List")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nom" class="form-label">
+                                        <i class="fas fa-building me-2"></i>
+                                        Nom du prestataire *
+                                    </label>
+                                    <input asp-for="Nom" class="form-control" placeholder="Nom de l'entreprise ou du prestataire" required>
+                                    <span asp-validation-for="Nom" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Contact" class="form-label">
+                                        <i class="fas fa-user me-2"></i>
+                                        Personne de contact
+                                    </label>
+                                    <input asp-for="Contact" class="form-control" placeholder="Nom de la personne de contact">
+                                    <span asp-validation-for="Contact" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        Email
+                                    </label>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="email@exemple.com">
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Telephone" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>
+                                        Téléphone
+                                    </label>
+                                    <input asp-for="Telephone" class="form-control" placeholder="+225 XX XX XX XX XX">
+                                    <span asp-validation-for="Telephone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="Adresse" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        Adresse
+                                    </label>
+                                    <textarea asp-for="Adresse" class="form-control" rows="3" placeholder="Adresse complète du prestataire"></textarea>
+                                    <span asp-validation-for="Adresse" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="@Url.Action("List")" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Créer le prestataire
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

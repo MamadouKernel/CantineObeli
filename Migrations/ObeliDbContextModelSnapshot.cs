@@ -58,9 +58,6 @@ namespace Obeli_K.Migrations
                     b.Property<DateTime?>("DateReceptionUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DirectionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("GroupeNonCitId")
                         .HasColumnType("uniqueidentifier");
 
@@ -125,8 +122,6 @@ namespace Obeli_K.Migrations
 
                     b.HasKey("IdCommande");
 
-                    b.HasIndex("DirectionId");
-
                     b.HasIndex("GroupeNonCitId");
 
                     b.HasIndex("IdFormule");
@@ -183,45 +178,6 @@ namespace Obeli_K.Migrations
                     b.ToTable("ConfigurationsCommande");
                 });
 
-            modelBuilder.Entity("Obeli_K.Models.Departement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("Supprimer")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Departements");
-                });
-
             modelBuilder.Entity("Obeli_K.Models.Direction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -243,6 +199,10 @@ namespace Obeli_K.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -255,6 +215,10 @@ namespace Obeli_K.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Responsable")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("Supprimer")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -263,6 +227,72 @@ namespace Obeli_K.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Directions");
+                });
+
+            modelBuilder.Entity("Obeli_K.Models.ExportCommandePrestataire", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Commentaires")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateDebut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateExport")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ExportEffectue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NomFichier")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Supprimer")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<long>("TailleFichier")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("UtilisateurId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DateExport");
+
+                    b.HasIndex("UtilisateurId");
+
+                    b.HasIndex("DateDebut", "DateFin");
+
+                    b.ToTable("ExportCommandesPrestataire");
                 });
 
             modelBuilder.Entity("Obeli_K.Models.Fonction", b =>
@@ -355,6 +385,12 @@ namespace Obeli_K.Migrations
                     b.Property<int?>("Marge")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MargeJourRestante")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MargeNuitRestante")
+                        .HasColumnType("int");
+
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -377,6 +413,12 @@ namespace Obeli_K.Migrations
                     b.Property<string>("PlatStandard2")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("QuotaJourRestant")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuotaNuitRestant")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Statut")
                         .HasColumnType("int");
@@ -405,6 +447,10 @@ namespace Obeli_K.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CodeGroupe")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -427,6 +473,15 @@ namespace Obeli_K.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("QuotaJournalier")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuotaNuit")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RestrictionFormuleStandard")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Supprimer")
                         .ValueGeneratedOnAdd()
@@ -497,6 +552,60 @@ namespace Obeli_K.Migrations
                     b.ToTable("PointsConsommation");
                 });
 
+            modelBuilder.Entity("Obeli_K.Models.PrestataireCantine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Adresse")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Contact")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Supprimer")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Telephone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nom");
+
+                    b.ToTable("PrestataireCantines");
+                });
+
             modelBuilder.Entity("Obeli_K.Models.QuotaJournalier", b =>
                 {
                     b.Property<Guid>("Id")
@@ -553,6 +662,62 @@ namespace Obeli_K.Migrations
                         .IsUnique();
 
                     b.ToTable("QuotasJournaliers");
+                });
+
+            modelBuilder.Entity("Obeli_K.Models.Service", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("DirectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Responsable")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Supprimer")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DirectionId");
+
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("Obeli_K.Models.TypeFormule", b =>
@@ -615,7 +780,7 @@ namespace Obeli_K.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("DepartementId")
+                    b.Property<Guid?>("DirectionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -676,6 +841,9 @@ namespace Obeli_K.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int?>("Site")
                         .HasColumnType("int");
 
@@ -691,20 +859,17 @@ namespace Obeli_K.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartementId");
+                    b.HasIndex("DirectionId");
 
                     b.HasIndex("FonctionId");
+
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("Utilisateurs");
                 });
 
             modelBuilder.Entity("Obeli_K.Models.Commande", b =>
                 {
-                    b.HasOne("Obeli_K.Models.Direction", "Direction")
-                        .WithMany()
-                        .HasForeignKey("DirectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Obeli_K.Models.GroupeNonCit", "GroupeNonCit")
                         .WithMany("Commandes")
                         .HasForeignKey("GroupeNonCitId")
@@ -721,11 +886,20 @@ namespace Obeli_K.Migrations
                         .HasForeignKey("UtilisateurId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Direction");
-
                     b.Navigation("FormuleJour");
 
                     b.Navigation("GroupeNonCit");
+
+                    b.Navigation("Utilisateur");
+                });
+
+            modelBuilder.Entity("Obeli_K.Models.ExportCommandePrestataire", b =>
+                {
+                    b.HasOne("Obeli_K.Models.Utilisateur", "Utilisateur")
+                        .WithMany()
+                        .HasForeignKey("UtilisateurId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Utilisateur");
                 });
@@ -770,27 +944,43 @@ namespace Obeli_K.Migrations
                     b.Navigation("GroupeNonCit");
                 });
 
+            modelBuilder.Entity("Obeli_K.Models.Service", b =>
+                {
+                    b.HasOne("Obeli_K.Models.Direction", "Direction")
+                        .WithMany("Services")
+                        .HasForeignKey("DirectionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Direction");
+                });
+
             modelBuilder.Entity("Obeli_K.Models.Utilisateur", b =>
                 {
-                    b.HasOne("Obeli_K.Models.Departement", "Departement")
-                        .WithMany("Utilisateurs")
-                        .HasForeignKey("DepartementId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("Obeli_K.Models.Direction", "Direction")
+                        .WithMany()
+                        .HasForeignKey("DirectionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Obeli_K.Models.Fonction", "Fonction")
                         .WithMany("Utilisateurs")
                         .HasForeignKey("FonctionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Departement");
+                    b.HasOne("Obeli_K.Models.Service", "Service")
+                        .WithMany("Utilisateurs")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Direction");
 
                     b.Navigation("Fonction");
+
+                    b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("Obeli_K.Models.Departement", b =>
+            modelBuilder.Entity("Obeli_K.Models.Direction", b =>
                 {
-                    b.Navigation("Utilisateurs");
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("Obeli_K.Models.Fonction", b =>
@@ -806,6 +996,11 @@ namespace Obeli_K.Migrations
             modelBuilder.Entity("Obeli_K.Models.GroupeNonCit", b =>
                 {
                     b.Navigation("Commandes");
+                });
+
+            modelBuilder.Entity("Obeli_K.Models.Service", b =>
+                {
+                    b.Navigation("Utilisateurs");
                 });
 
             modelBuilder.Entity("Obeli_K.Models.TypeFormule", b =>

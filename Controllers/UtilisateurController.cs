@@ -8,10 +8,16 @@ using Obeli_K.Models.Enums;
 using Obeli_K.Models.ViewModels;
 using Obeli_K.Services.Security;
 using Obeli_K.Services.Users;
+using Obeli_K.Services;
 
 namespace Obeli_K.Controllers
 {
-    [Authorize(Roles = "Administrateur,RessourcesHumaines")]
+    /// <summary>
+    /// Contrôleur pour la gestion des utilisateurs du système.
+    /// Permet la création, modification, suppression et import en masse des utilisateurs.
+    /// Accessible uniquement aux administrateurs et RH.
+    /// </summary>
+    [Authorize(Roles = "Administrateur,RH")]
     public class UtilisateurController : Controller
     {
         private readonly ObeliDbContext _context;
@@ -19,6 +25,13 @@ namespace Obeli_K.Controllers
         private readonly IPasswordHasher _passwordHasher;
         private readonly ILogger<UtilisateurController> _logger;
 
+        /// <summary>
+        /// Initialise une nouvelle instance du contrôleur d'utilisateurs.
+        /// </summary>
+        /// <param name="context">Contexte de base de données Obeli</param>
+        /// <param name="userService">Service de gestion des utilisateurs</param>
+        /// <param name="passwordHasher">Service de hachage des mots de passe</param>
+        /// <param name="logger">Service de journalisation</param>
         public UtilisateurController(ObeliDbContext context, IUserService userService, IPasswordHasher passwordHasher, ILogger<UtilisateurController> logger)
         {
             _context = context;
@@ -27,14 +40,14 @@ namespace Obeli_K.Controllers
             _logger = logger;
         }
 
-        // Populate the ViewBag with the list of departments and functions
+        // Populate the ViewBag with the list of directions and functions
         private async Task PopulateViewBags()
         {
-            var departements = await _context.Departements
+            var directions = await _context.Directions
                 .Where(d => d.Supprimer == 0)
                 .ToListAsync();
-            ViewBag.Departements = new SelectList(departements, "Id", "Nom");
-            _logger.LogInformation("Chargement de {Count} départements", departements.Count);
+            ViewBag.Directions = new SelectList(directions, "Id", "Nom");
+            _logger.LogInformation("Chargement de {Count} directions", directions.Count);
 
             var fonctions = await _context.Fonctions
                 .Where(f => f.Supprimer == 0)
@@ -42,16 +55,16 @@ namespace Obeli_K.Controllers
             ViewBag.Fonctions = new SelectList(fonctions, "Id", "Nom");
             _logger.LogInformation("Chargement de {Count} fonctions", fonctions.Count);
 
-            // Rôles disponibles
+            // R�les disponibles
             var roles = new List<object>
             {
                 new { Value = RoleType.Admin.ToString(), Text = "Admin" },
                 new { Value = RoleType.RH.ToString(), Text = "RH" },
-                new { Value = RoleType.Employe.ToString(), Text = "Employé" },
+                new { Value = RoleType.Employe.ToString(), Text = "Employ�" },
                 new { Value = RoleType.PrestataireCantine.ToString(), Text = "Prestataire Cantine" }
             };
             ViewBag.Roles = new SelectList(roles, "Value", "Text");
-            _logger.LogInformation("Chargement de {Count} rôles", roles.Count);
+            _logger.LogInformation("Chargement de {Count} r�les", roles.Count);
         }
 
         public IActionResult Index()
@@ -60,20 +73,20 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Affiche le formulaire de création d'utilisateur
+        /// Affiche le formulaire de cr�ation d'utilisateur
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             try
             {
-                _logger.LogInformation("Chargement du formulaire de création d'utilisateur");
+                _logger.LogInformation("Chargement du formulaire de cr�ation d'utilisateur");
                 await PopulateViewBags();
                 return View();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur lors du chargement du formulaire de création d'utilisateur");
+                _logger.LogError(ex, "Erreur lors du chargement du formulaire de cr�ation d'utilisateur");
                 TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement du formulaire.";
                 return RedirectToAction(nameof(Index));
             }
@@ -84,53 +97,53 @@ namespace Obeli_K.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateUtilisateurViewModel model)
         {
-            _logger.LogInformation("=== DÉBUT CRÉATION UTILISATEUR ===");
+            _logger.LogInformation("=== D�BUT CR�ATION UTILISATEUR ===");
             
             if (model == null)
             {
-                _logger.LogWarning("Les données utilisateur sont manquantes.");
-                ModelState.AddModelError("", "Les données utilisateur sont manquantes.");
+                _logger.LogWarning("Les donn�es utilisateur sont manquantes.");
+                ModelState.AddModelError("", "Les donn�es utilisateur sont manquantes.");
                 await PopulateViewBags();
                 return View();
             }
 
-            _logger.LogInformation("Données reçues - Nom: {Nom}, Prenoms: {Prenoms}, UserName: {UserName}, Email: {Email}, DepartementId: {DepartementId}, FonctionId: {FonctionId}, Role: {Role}, Site: {Site}", 
-                model.Nom, model.Prenoms, model.UserName, model.Email, model.DepartementId, model.FonctionId, model.Role, model.Site);
+            _logger.LogInformation("Donn�es re�ues - Nom: {Nom}, Prenoms: {Prenoms}, UserName: {UserName}, Email: {Email}, DirectionId: {DirectionId}, FonctionId: {FonctionId}, Role: {Role}, Site: {Site}", 
+                model.Nom, model.Prenoms, model.UserName, model.Email, model.DirectionId, model.FonctionId, model.Role, model.Site);
             _logger.LogInformation("Mot de passe fourni: {HasPassword}, Confirmation: {HasConfirmation}", 
                 !string.IsNullOrEmpty(model.MotDePasse), !string.IsNullOrEmpty(model.ConfirmerMotDePasse));
 
             try
             {
-                // ==== Étape 1 : Validation des champs ====
+                // ==== �tape 1 : Validation des champs ====
 
                 if (string.IsNullOrWhiteSpace(model.Nom))
                     ModelState.AddModelError(nameof(model.Nom), "Le nom est obligatoire.");
 
                 if (string.IsNullOrWhiteSpace(model.Prenoms))
-                    ModelState.AddModelError(nameof(model.Prenoms), "Les prénoms sont obligatoires.");
+                    ModelState.AddModelError(nameof(model.Prenoms), "Les pr�noms sont obligatoires.");
 
                 if (string.IsNullOrWhiteSpace(model.UserName))
                     ModelState.AddModelError(nameof(model.UserName), "Le matricule est obligatoire.");
 
-                if (model.DepartementId == Guid.Empty)
-                    ModelState.AddModelError(nameof(model.DepartementId), "Le département est obligatoire.");
+                if (model.DirectionId == Guid.Empty)
+                    ModelState.AddModelError(nameof(model.DirectionId), "Le d�partement est obligatoire.");
 
                 if (string.IsNullOrWhiteSpace(model.MotDePasse))
                     ModelState.AddModelError(nameof(model.MotDePasse), "Le mot de passe est requis.");
                 else if (model.MotDePasse.Length < 6)
-                    ModelState.AddModelError(nameof(model.MotDePasse), "Le mot de passe doit contenir au moins 6 caractères.");
+                    ModelState.AddModelError(nameof(model.MotDePasse), "Le mot de passe doit contenir au moins 6 caract�res.");
 
                 if (model.MotDePasse != model.ConfirmerMotDePasse)
                     ModelState.AddModelError(nameof(model.ConfirmerMotDePasse), "Les mots de passe ne correspondent pas.");
 
-                // ==== Étape 2 : Vérifications en base ====
+                // ==== �tape 2 : V�rifications en base ====
 
                 if (!string.IsNullOrWhiteSpace(model.UserName))
                 {
                     bool userNameExists = await _context.Utilisateurs
                         .AnyAsync(u => u.UserName == model.UserName && u.Supprimer == 0);
                     if (userNameExists)
-                        ModelState.AddModelError(nameof(model.UserName), "Ce matricule est déjà utilisé.");
+                        ModelState.AddModelError(nameof(model.UserName), "Ce matricule est d�j� utilis�.");
                 }
 
                 if (!string.IsNullOrWhiteSpace(model.Email))
@@ -138,15 +151,15 @@ namespace Obeli_K.Controllers
                     bool emailExists = await _context.Utilisateurs
                         .AnyAsync(u => u.Email == model.Email && u.Supprimer == 0);
                     if (emailExists)
-                        ModelState.AddModelError(nameof(model.Email), "Cette adresse email est déjà utilisée.");
+                        ModelState.AddModelError(nameof(model.Email), "Cette adresse email est d�j� utilis�e.");
                 }
 
-                if (model.DepartementId != Guid.Empty)
+                if (model.DirectionId != Guid.Empty)
                 {
-                    bool deptExists = await _context.Departements
-                        .AnyAsync(d => d.Id == model.DepartementId && d.Supprimer == 0);
+                    bool deptExists = await _context.Directions
+                        .AnyAsync(d => d.Id == model.DirectionId && d.Supprimer == 0);
                     if (!deptExists)
-                        ModelState.AddModelError(nameof(model.DepartementId), "Le département sélectionné n'existe pas.");
+                        ModelState.AddModelError(nameof(model.DirectionId), "Le d�partement s�lectionn� n'existe pas.");
                 }
 
                 if (model.FonctionId.HasValue && model.FonctionId != Guid.Empty)
@@ -154,14 +167,14 @@ namespace Obeli_K.Controllers
                     bool fonctionExists = await _context.Fonctions
                         .AnyAsync(f => f.Id == model.FonctionId && f.Supprimer == 0);
                     if (!fonctionExists)
-                        ModelState.AddModelError(nameof(model.FonctionId), "La fonction sélectionnée n'existe pas.");
+                        ModelState.AddModelError(nameof(model.FonctionId), "La fonction s�lectionn�e n'existe pas.");
                 }
 
-                // ==== Étape 3 : Retour si erreurs ====
+                // ==== �tape 3 : Retour si erreurs ====
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Échec de validation du formulaire utilisateur.");
+                    _logger.LogWarning("�chec de validation du formulaire utilisateur.");
                     foreach (var error in ModelState)
                     {
                         if (error.Value.Errors.Count > 0)
@@ -174,7 +187,7 @@ namespace Obeli_K.Controllers
                     return View(model);
                 }
 
-                // ==== Étape 4 : Construction de l'entité ====
+                // ==== �tape 4 : Construction de l'entit� ====
 
                 var nouvelUtilisateur = new Utilisateur
                 {
@@ -188,7 +201,8 @@ namespace Obeli_K.Controllers
                     MotDePasseHash = _passwordHasher.HashPassword(model.MotDePasse),
                     MustResetPassword = true,
                     Role = model.Role,
-                    DepartementId = model.DepartementId,
+                    DirectionId = model.DirectionId,
+                    ServiceId = model.ServiceId,
                     FonctionId = model.FonctionId,
                     Site = model.Site,
                     CreatedAt = DateTime.UtcNow,
@@ -198,21 +212,21 @@ namespace Obeli_K.Controllers
                     Supprimer = 0
                 };
 
-                // ==== Étape 5 : Sauvegarde ====
+                // ==== �tape 5 : Sauvegarde ====
 
-                _logger.LogInformation("Sauvegarde de l'utilisateur en base de données...");
+                _logger.LogInformation("Sauvegarde de l'utilisateur en base de donn�es...");
                 _context.Utilisateurs.Add(nouvelUtilisateur);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Utilisateur sauvegardé avec succès !");
+                _logger.LogInformation("Utilisateur sauvegard� avec succ�s !");
 
-                _logger.LogInformation("Utilisateur créé avec succès : {UserName}", nouvelUtilisateur.UserName);
-                TempData["SuccessMessage"] = $"L'utilisateur {nouvelUtilisateur.Nom} {nouvelUtilisateur.Prenoms} a été créé avec succès.";
+                _logger.LogInformation("Utilisateur cr�� avec succ�s : {UserName}", nouvelUtilisateur.UserName);
+                TempData["SuccessMessage"] = $"L'utilisateur {nouvelUtilisateur.Nom} {nouvelUtilisateur.Prenoms} a �t� cr�� avec succ�s.";
                 return RedirectToAction(nameof(List));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur lors de la création de l'utilisateur : {Message}", ex.Message);
-                TempData["ErrorMessage"] = "Une erreur est survenue lors de la création de l'utilisateur.";
+                _logger.LogError(ex, "Erreur lors de la cr�ation de l'utilisateur : {Message}", ex.Message);
+                TempData["ErrorMessage"] = "Une erreur est survenue lors de la cr�ation de l'utilisateur.";
                 await PopulateViewBags();
                 return View(model);
             }
@@ -221,13 +235,13 @@ namespace Obeli_K.Controllers
 
 
         /// <summary>
-        /// Traite la création d'un nouvel utilisateur
+        /// Traite la cr�ation d'un nouvel utilisateur
         /// </summary>
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         //public async Task<IActionResult> Create(Utilisateur utilisateur, string motDePasse, string confirmerMotDePasse)
         //{
-        //    _logger.LogInformation("=== CRÉATION UTILISATEUR DÉBUT ===");
+        //    _logger.LogInformation("=== CR�ATION UTILISATEUR D�BUT ===");
 
         //    try
         //    {
@@ -236,70 +250,70 @@ namespace Obeli_K.Controllers
         //            ModelState.AddModelError("Nom", "Le nom est obligatoire.");
 
         //        if (string.IsNullOrWhiteSpace(utilisateur.Prenoms))
-        //            ModelState.AddModelError("Prenoms", "Les prénoms sont obligatoires.");
+        //            ModelState.AddModelError("Prenoms", "Les pr�noms sont obligatoires.");
 
         //        if (string.IsNullOrWhiteSpace(utilisateur.UserName))
         //            ModelState.AddModelError("UserName", "Le matricule est obligatoire.");
 
-        //        if (utilisateur.DepartementId == Guid.Empty)
-        //            ModelState.AddModelError("DepartementId", "Le département est obligatoire.");
+        //        if (utilisateur.DirectionId == Guid.Empty)
+        //            ModelState.AddModelError("DirectionId", "Le d�partement est obligatoire.");
 
         //        if (string.IsNullOrWhiteSpace(motDePasse))
         //            ModelState.AddModelError("motDePasse", "Le mot de passe est requis.");
         //        else if (motDePasse.Length < 6)
-        //            ModelState.AddModelError("motDePasse", "Le mot de passe doit contenir au moins 6 caractères.");
+        //            ModelState.AddModelError("motDePasse", "Le mot de passe doit contenir au moins 6 caract�res.");
 
         //        if (motDePasse != confirmerMotDePasse)
         //            ModelState.AddModelError("confirmerMotDePasse", "Les mots de passe ne correspondent pas.");
 
-        //        // 2. Vérifier l'unicité du matricule
+        //        // 2. V�rifier l'unicit� du matricule
         //        if (!string.IsNullOrWhiteSpace(utilisateur.UserName))
         //        {
         //            var matriculeExiste = await _context.Utilisateurs
         //                .AnyAsync(u => u.UserName == utilisateur.UserName && u.Supprimer == 0);
         //            if (matriculeExiste)
-        //                ModelState.AddModelError("UserName", "Ce matricule est déjà utilisé.");
+        //                ModelState.AddModelError("UserName", "Ce matricule est d�j� utilis�.");
         //        }
 
-        //        // 3. Vérifier l'unicité de l'email (si fourni)
+        //        // 3. V�rifier l'unicit� de l'email (si fourni)
         //        if (!string.IsNullOrWhiteSpace(utilisateur.Email))
         //        {
         //            var emailExiste = await _context.Utilisateurs
         //                .AnyAsync(u => u.Email == utilisateur.Email && u.Supprimer == 0);
         //            if (emailExiste)
-        //                ModelState.AddModelError("Email", "Cette adresse email est déjà utilisée.");
+        //                ModelState.AddModelError("Email", "Cette adresse email est d�j� utilis�e.");
         //        }
 
-        //        // 4. Vérifier que le département existe
-        //        if (utilisateur.DepartementId != Guid.Empty)
+        //        // 4. V�rifier que le d�partement existe
+        //        if (utilisateur.DirectionId != Guid.Empty)
         //        {
-        //            var departementExiste = await _context.Departements
-        //                .AnyAsync(d => d.Id == utilisateur.DepartementId && d.Supprimer == 0);
-        //            if (!departementExiste)
-        //                ModelState.AddModelError("DepartementId", "Le département sélectionné n'existe pas.");
+        //            var DirectionExiste = await _context.Directions
+        //                .AnyAsync(d => d.Id == utilisateur.DirectionId && d.Supprimer == 0);
+        //            if (!DirectionExiste)
+        //                ModelState.AddModelError("DirectionId", "Le d�partement s�lectionn� n'existe pas.");
         //        }
 
-        //        // 5. Vérifier que la fonction existe (si fournie)
+        //        // 5. V�rifier que la fonction existe (si fournie)
         //        if (utilisateur.FonctionId.HasValue && utilisateur.FonctionId != Guid.Empty)
         //        {
         //            var fonctionExiste = await _context.Fonctions
         //                .AnyAsync(f => f.Id == utilisateur.FonctionId && f.Supprimer == 0);
         //            if (!fonctionExiste)
-        //                ModelState.AddModelError("FonctionId", "La fonction sélectionnée n'existe pas.");
+        //                ModelState.AddModelError("FonctionId", "La fonction s�lectionn�e n'existe pas.");
         //        }
 
-        //        // 6. Si erreurs de validation, retourner à la vue
+        //        // 6. Si erreurs de validation, retourner � la vue
         //        if (!ModelState.IsValid)
         //        {
-        //            _logger.LogWarning("Erreurs de validation détectées");
+        //            _logger.LogWarning("Erreurs de validation d�tect�es");
         //            await PopulateViewBags();
         //            return View(utilisateur);
         //        }
 
-        //        // 7. Créer l'utilisateur
+        //        // 7. Cr�er l'utilisateur
         //        var nouvelUtilisateur = new Utilisateur
         //        {
-        //            // ID généré automatiquement par le modèle
+        //            // ID g�n�r� automatiquement par le mod�le
         //            Nom = utilisateur.Nom.Trim(),
         //            Prenoms = utilisateur.Prenoms.Trim(),
         //            UserName = utilisateur.UserName.Trim(),
@@ -308,13 +322,13 @@ namespace Obeli_K.Controllers
         //            Lieu = string.IsNullOrWhiteSpace(utilisateur.Lieu) ? null : utilisateur.Lieu.Trim(),
         //            CodeCommande = string.IsNullOrWhiteSpace(utilisateur.CodeCommande) ? null : utilisateur.CodeCommande.Trim(),
 
-        //            // Sécurité
+        //            // S�curit�
         //            MotDePasseHash = _passwordHasher.HashPassword(motDePasse),
         //            MustResetPassword = true,
 
-        //            // Rôles et affectations
+        //            // R�les et affectations
         //            Role = utilisateur.Role,
-        //            DepartementId = utilisateur.DepartementId,
+        //            DirectionId = utilisateur.DirectionId,
         //            FonctionId = utilisateur.FonctionId,
         //            Site = utilisateur.Site,
 
@@ -331,13 +345,13 @@ namespace Obeli_K.Controllers
         //        _context.Utilisateurs.Add(nouvelUtilisateur);
         //        await _context.SaveChangesAsync();
 
-        //        _logger.LogInformation("Utilisateur créé avec succès - ID: {Id}, Nom: {Nom}", nouvelUtilisateur.Id, nouvelUtilisateur.Nom);
-        //        TempData["SuccessMessage"] = $"L'utilisateur {nouvelUtilisateur.Nom} {nouvelUtilisateur.Prenoms} a été créé avec succès.";
+        //        _logger.LogInformation("Utilisateur cr�� avec succ�s - ID: {Id}, Nom: {Nom}", nouvelUtilisateur.Id, nouvelUtilisateur.Nom);
+        //        TempData["SuccessMessage"] = $"L'utilisateur {nouvelUtilisateur.Nom} {nouvelUtilisateur.Prenoms} a �t� cr�� avec succ�s.";
         //        return RedirectToAction(nameof(List));
         //    }
         //    catch (Exception ex)
         //    {
-        //        _logger.LogError(ex, "Erreur lors de la création de l'utilisateur: {Message}", ex.Message);
+        //        _logger.LogError(ex, "Erreur lors de la cr�ation de l'utilisateur: {Message}", ex.Message);
         //        TempData["ErrorMessage"] = $"Erreur: {ex.Message}";
         //        await PopulateViewBags();
         //        return View(utilisateur);
@@ -353,7 +367,7 @@ namespace Obeli_K.Controllers
             try
             {
                 var utilisateurs = await _context.Utilisateurs
-                    .Include(u => u.Departement)
+                    .Include(u => u.Direction)
                     .Include(u => u.Fonction)
                     .Where(u => u.Supprimer == 0)
                     .OrderBy(u => u.Nom)
@@ -370,7 +384,7 @@ namespace Obeli_K.Controllers
                         u.Role,
                         u.Lieu,
                         u.Site,
-                        DepartementNom = u.Departement != null ? u.Departement.Nom : "N/A",
+                        DirectionNom = u.Direction != null ? u.Direction.Nom : "N/A",
                         FonctionNom = u.Fonction != null ? u.Fonction.Nom : "N/A",
                         u.CreatedAt
                     })
@@ -388,7 +402,7 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Affiche les détails d'un utilisateur
+        /// Affiche les d�tails d'un utilisateur
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
@@ -396,7 +410,7 @@ namespace Obeli_K.Controllers
             try
             {
                 var utilisateur = await _context.Utilisateurs
-                    .Include(u => u.Departement)
+                    .Include(u => u.Direction)
                     .Include(u => u.Fonction)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Supprimer == 0);
 
@@ -410,14 +424,14 @@ namespace Obeli_K.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur lors du chargement des détails de l'utilisateur {UserId}", id);
-                TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement des détails.";
+                _logger.LogError(ex, "Erreur lors du chargement des d�tails de l'utilisateur {UserId}", id);
+                TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement des d�tails.";
                 return RedirectToAction(nameof(List));
             }
         }
 
         /// <summary>
-        /// Affiche le formulaire d'édition d'un utilisateur
+        /// Affiche le formulaire d'�dition d'un utilisateur
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -445,17 +459,28 @@ namespace Obeli_K.Controllers
                     Lieu = utilisateur.Lieu,
                     CodeCommande = utilisateur.CodeCommande,
                     Role = utilisateur.Role,
-                    DepartementId = utilisateur.DepartementId,
+                    DirectionId = utilisateur.DirectionId,
+                    ServiceId = utilisateur.ServiceId,
                     FonctionId = utilisateur.FonctionId,
                     Site = utilisateur.Site
                 };
 
                 await PopulateViewBags();
+                
+                // Charger les services si une direction est sélectionnée
+                if (utilisateur.DirectionId.HasValue)
+                {
+                    var services = await _context.Services
+                        .Where(s => s.DirectionId == utilisateur.DirectionId && s.Supprimer == 0)
+                        .ToListAsync();
+                    ViewBag.Services = new SelectList(services, "Id", "Nom");
+                }
+                
                 return View(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erreur lors du chargement de l'utilisateur pour édition {UserId}", id);
+                _logger.LogError(ex, "Erreur lors du chargement de l'utilisateur pour �dition {UserId}", id);
                 TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement de l'utilisateur.";
                 return RedirectToAction(nameof(List));
             }
@@ -468,7 +493,7 @@ namespace Obeli_K.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, EditUtilisateurViewModel model)
         {
-            _logger.LogInformation("=== DÉBUT MODIFICATION UTILISATEUR ===");
+            _logger.LogInformation("=== D�BUT MODIFICATION UTILISATEUR ===");
             _logger.LogInformation("Modification utilisateur ID: {Id}, Nom: {Nom}, UserName: {UserName}", 
                 id, model?.Nom, model?.UserName);
 
@@ -476,14 +501,14 @@ namespace Obeli_K.Controllers
             {
                 if (model == null)
                 {
-                    _logger.LogWarning("Les données utilisateur sont manquantes.");
-                    TempData["ErrorMessage"] = "Les données utilisateur sont manquantes.";
+                    _logger.LogWarning("Les donn�es utilisateur sont manquantes.");
+                    TempData["ErrorMessage"] = "Les donn�es utilisateur sont manquantes.";
                     return RedirectToAction(nameof(List));
                 }
 
                 if (id != model.Id)
                 {
-                    _logger.LogWarning("Identifiant utilisateur invalide. ID attendu: {ExpectedId}, ID reçu: {ReceivedId}", id, model.Id);
+                    _logger.LogWarning("Identifiant utilisateur invalide. ID attendu: {ExpectedId}, ID re�u: {ReceivedId}", id, model.Id);
                     TempData["ErrorMessage"] = "Identifiant utilisateur invalide.";
                     return RedirectToAction(nameof(List));
                 }
@@ -503,59 +528,41 @@ namespace Obeli_K.Controllers
                     ModelState.AddModelError(nameof(model.Nom), "Le nom est obligatoire.");
 
                 if (string.IsNullOrWhiteSpace(model.Prenoms))
-                    ModelState.AddModelError(nameof(model.Prenoms), "Les prénoms sont obligatoires.");
+                    ModelState.AddModelError(nameof(model.Prenoms), "Les pr�noms sont obligatoires.");
 
                 if (string.IsNullOrWhiteSpace(model.UserName))
                     ModelState.AddModelError(nameof(model.UserName), "Le matricule est obligatoire.");
 
-                if (model.DepartementId == Guid.Empty)
-                    ModelState.AddModelError(nameof(model.DepartementId), "Le département est obligatoire.");
+                if (model.DirectionId == Guid.Empty)
+                    ModelState.AddModelError(nameof(model.DirectionId), "Le d�partement est obligatoire.");
 
-                // Validation du changement de mot de passe (si fourni)
+                // Validation du changement de mot de passe (optionnel)
                 if (!string.IsNullOrWhiteSpace(model.NouveauMotDePasse))
                 {
                     if (model.NouveauMotDePasse.Length < 6)
-                        ModelState.AddModelError(nameof(model.NouveauMotDePasse), "Le mot de passe doit contenir au moins 6 caractères.");
+                        ModelState.AddModelError(nameof(model.NouveauMotDePasse), "Le mot de passe doit contenir au moins 6 caract�res.");
 
                     if (model.NouveauMotDePasse != model.ConfirmerNouveauMotDePasse)
                         ModelState.AddModelError(nameof(model.ConfirmerNouveauMotDePasse), "Les mots de passe ne correspondent pas.");
                 }
 
-                // Vérifier si l'email existe déjà (sauf pour l'utilisateur actuel)
+                // V�rifier si l'email existe d�j� (sauf pour l'utilisateur actuel)
                 if (!string.IsNullOrWhiteSpace(model.Email) && 
                     await _context.Utilisateurs.AnyAsync(u => u.Email == model.Email && u.Id != id && u.Supprimer == 0))
                 {
-                    ModelState.AddModelError(nameof(model.Email), "Cette adresse email est déjà utilisée.");
+                    ModelState.AddModelError(nameof(model.Email), "Cette adresse email est d�j� utilis�e.");
                 }
 
-                // Vérifier si le matricule (UserName) existe déjà (sauf pour l'utilisateur actuel)
+                // V�rifier si le matricule (UserName) existe d�j� (sauf pour l'utilisateur actuel)
                 if (!string.IsNullOrWhiteSpace(model.UserName) && 
                     await _context.Utilisateurs.AnyAsync(u => u.UserName == model.UserName && u.Id != id && u.Supprimer == 0))
                 {
-                    ModelState.AddModelError(nameof(model.UserName), "Ce matricule est déjà utilisé.");
-                }
-
-                // Vérifier que le département existe
-                if (model.DepartementId != Guid.Empty)
-                {
-                    bool deptExists = await _context.Departements
-                        .AnyAsync(d => d.Id == model.DepartementId && d.Supprimer == 0);
-                    if (!deptExists)
-                        ModelState.AddModelError(nameof(model.DepartementId), "Le département sélectionné n'existe pas.");
-                }
-
-                // Vérifier que la fonction existe (si fournie)
-                if (model.FonctionId.HasValue && model.FonctionId != Guid.Empty)
-                {
-                    bool fonctionExists = await _context.Fonctions
-                        .AnyAsync(f => f.Id == model.FonctionId && f.Supprimer == 0);
-                    if (!fonctionExists)
-                        ModelState.AddModelError(nameof(model.FonctionId), "La fonction sélectionnée n'existe pas.");
+                    ModelState.AddModelError(nameof(model.UserName), "Ce matricule est d�j� utilis�.");
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Échec de validation du formulaire de modification utilisateur.");
+                    _logger.LogWarning("�chec de validation du formulaire de modification utilisateur.");
                     foreach (var error in ModelState)
                     {
                         if (error.Value.Errors.Count > 0)
@@ -568,34 +575,34 @@ namespace Obeli_K.Controllers
                     return View(model);
                 }
 
-                // Mettre à jour les propriétés
+                // Mettre � jour les propri�t�s
                 existingUser.Nom = model.Nom.Trim();
                 existingUser.Prenoms = model.Prenoms.Trim();
                 existingUser.UserName = model.UserName.Trim();
                 existingUser.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
                 existingUser.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
                 existingUser.Lieu = string.IsNullOrWhiteSpace(model.Lieu) ? null : model.Lieu.Trim();
-                existingUser.CodeCommande = string.IsNullOrWhiteSpace(model.CodeCommande) ? null : model.CodeCommande.Trim();
                 existingUser.Role = model.Role;
-                existingUser.DepartementId = model.DepartementId;
+                existingUser.DirectionId = model.DirectionId;
+                existingUser.ServiceId = model.ServiceId;
                 existingUser.FonctionId = model.FonctionId;
                 existingUser.Site = model.Site;
                 existingUser.ModifiedAt = DateTime.UtcNow;
                 existingUser.ModifiedBy = User.Identity?.Name ?? "System";
 
-                // Mettre à jour le mot de passe si fourni
+                // Mettre � jour le mot de passe si fourni
                 if (!string.IsNullOrWhiteSpace(model.NouveauMotDePasse))
                 {
                     existingUser.MotDePasseHash = _passwordHasher.HashPassword(model.NouveauMotDePasse);
-                    existingUser.MustResetPassword = false; // L'utilisateur a défini un nouveau mot de passe
-                    _logger.LogInformation("Mot de passe mis à jour pour l'utilisateur {UserName}", existingUser.UserName);
+                    existingUser.MustResetPassword = false; // L'utilisateur a d�fini un nouveau mot de passe
+                    _logger.LogInformation("Mot de passe mis � jour pour l'utilisateur {UserName}", existingUser.UserName);
                 }
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Utilisateur modifié avec succès: {UserName} par {ModifiedBy}", 
+                _logger.LogInformation("Utilisateur modifi� avec succ�s: {UserName} par {ModifiedBy}", 
                     existingUser.UserName, User.Identity?.Name);
-                TempData["SuccessMessage"] = $"L'utilisateur {existingUser.Nom} {existingUser.Prenoms} a été modifié avec succès.";
+                TempData["SuccessMessage"] = $"L'utilisateur {existingUser.Nom} {existingUser.Prenoms} a �t� modifi� avec succ�s.";
 
                 return RedirectToAction(nameof(List));
             }
@@ -633,8 +640,8 @@ namespace Obeli_K.Controllers
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Utilisateur supprimé: {utilisateur.UserName} par {User.Identity?.Name}");
-                TempData["SuccessMessage"] = $"L'utilisateur {utilisateur.Nom} {utilisateur.Prenoms} a été supprimé avec succès.";
+                _logger.LogInformation($"Utilisateur supprim�: {utilisateur.UserName} par {User.Identity?.Name}");
+                TempData["SuccessMessage"] = $"L'utilisateur {utilisateur.Nom} {utilisateur.Prenoms} a �t� supprim� avec succ�s.";
 
                 return RedirectToAction(nameof(List));
             }
@@ -643,6 +650,79 @@ namespace Obeli_K.Controllers
                 _logger.LogError(ex, "Erreur lors de la suppression de l'utilisateur {UserId}", id);
                 TempData["ErrorMessage"] = "Une erreur est survenue lors de la suppression de l'utilisateur.";
                 return RedirectToAction(nameof(List));
+            }
+        }
+
+        /// <summary>
+        /// Affiche le formulaire de réinitialisation de mot de passe
+        /// </summary>
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Traite la réinitialisation de mot de passe
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Les données sont manquantes.");
+                return View();
+            }
+
+            try
+            {
+                var matricules = model.Matricules
+                    ?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(m => m.Trim())
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .ToList();
+
+                if (matricules == null || !matricules.Any())
+                {
+                    ModelState.AddModelError(nameof(model.Matricules), "Aucun matricule valide trouvé.");
+                    return View(model);
+                }
+
+                var utilisateurs = await _context.Utilisateurs
+                    .Where(u => matricules.Contains(u.UserName) && u.Supprimer == 0)
+                    .ToListAsync();
+
+                if (!utilisateurs.Any())
+                {
+                    return View(model);
+                }
+
+                var defaultPassword = model.NouveauMotDePasse ?? "Welcome2024!";
+                var hashedPassword = _passwordHasher.HashPassword(defaultPassword);
+                var updatedCount = 0;
+
+                foreach (var utilisateur in utilisateurs)
+                {
+                    utilisateur.MotDePasseHash = hashedPassword;
+                    utilisateur.MustResetPassword = true;
+                    utilisateur.ModifiedAt = DateTime.UtcNow;
+                    utilisateur.ModifiedBy = User.Identity?.Name ?? "System";
+                    updatedCount++;
+                }
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("{Count} mots de passe réinitialisés par {User}", updatedCount, User.Identity?.Name);
+                TempData["SuccessMessage"] = $"{updatedCount} mot(s) de passe réinitialisé(s) avec succès.";
+
+                return RedirectToAction(nameof(List));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la réinitialisation des mots de passe");
+                TempData["ErrorMessage"] = "Une erreur est survenue lors de la réinitialisation des mots de passe.";
+                return View(model);
             }
         }
     }

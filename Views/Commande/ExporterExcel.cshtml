@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Exporter en Excel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-excel me-2"></i>
+                        Exporter les commandes en Excel
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="ExporterExcel" asp-controller="Commande">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date de début</label>
+                                <input type="date" name="dateDebut" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date de fin</label>
+                                <input type="date" name="dateFin" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Statut</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="Precommander">Précommandée</option>
+                                    <option value="Consommee">Consommée</option>
+                                    <option value="Annulee">Annulée</option>
+                                    <option value="Facturee">Facturée</option>
+                                    <option value="Exemptee">Exemptée</option>
+                                    <option value="Indisponible">Indisponible</option>
+                                    <option value="NonRecuperer">Non Récupérée</option>
+                                </select>
+                            </div>
+                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label">Matricule utilisateur</label>
+                                    <input type="text" name="matricule" class="form-control" placeholder="Optionnel" />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-download me-2"></i>Télécharger Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.ReportingDashboardViewModel
+﻿@model Obeli_K.Models.ViewModels.ReportingDashboardViewModel
 @{
     ViewData["Title"] = "Tableau de Bord - Reporting";
     var role = User?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
@@ -10,28 +10,29 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
                         <h3 class="mb-0">
                             <i class="fas fa-chart-line me-2"></i>
-                            Tableau de Bord - Reporting Avancé
+                            <span class="d-none d-sm-inline">Tableau de bord - reporting avancé</span>
+                            <span class="d-sm-none">Tableau de bord</span>
                         </h3>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filtersModal">
+                        <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-lg-auto">
+                            <button type="button" class="btn btn-light w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#filtersModal">
                                 <i class="fas fa-filter me-1"></i>
                                 Filtres
                             </button>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                            <div class="btn-group w-100 w-sm-auto">
+                                <button type="button" class="btn btn-success dropdown-toggle w-100" data-bs-toggle="dropdown">
                                     <i class="fas fa-download me-1"></i>
                                     Exporter
                                 </button>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <form asp-action="ExporterCsv" method="post" class="d-inline">
                                             <input type="hidden" asp-for="DateDebut" />
                                             <input type="hidden" asp-for="DateFin" />
                                             <input type="hidden" asp-for="Site" />
-                                            <input type="hidden" asp-for="DepartementId" />
+                                            <input type="hidden" asp-for="DirectionId" />
                                             <input type="hidden" asp-for="FonctionId" />
                                             <button type="submit" class="dropdown-item">
                                                 <i class="fas fa-file-csv me-2"></i>CSV
@@ -43,7 +44,7 @@
                                             <input type="hidden" asp-for="DateDebut" />
                                             <input type="hidden" asp-for="DateFin" />
                                             <input type="hidden" asp-for="Site" />
-                                            <input type="hidden" asp-for="DepartementId" />
+                                            <input type="hidden" asp-for="DirectionId" />
                                             <input type="hidden" asp-for="FonctionId" />
                                             <button type="submit" class="dropdown-item">
                                                 <i class="fas fa-file-pdf me-2"></i>PDF
@@ -70,7 +71,7 @@
                         </div>
                     </div>
                     <h4 class="text-primary mb-1">@Model.Indicateurs.NombreTotalCommandes</h4>
-                    <p class="text-muted mb-0">Total Commandes</p>
+                    <p class="text-muted mb-0">Total des commandes</p>
                     <small class="text-muted">@Model.DateDebut.ToString("dd/MM") - @Model.DateFin.ToString("dd/MM")</small>
                 </div>
             </div>
@@ -85,7 +86,7 @@
                         </div>
                     </div>
                     <h4 class="text-success mb-1">@Model.Indicateurs.TauxParticipation%</h4>
-                    <p class="text-muted mb-0">Taux de Participation</p>
+                    <p class="text-muted mb-0">Taux de participation</p>
                     <small class="text-muted">Utilisateurs actifs</small>
                 </div>
             </div>
@@ -100,7 +101,7 @@
                         </div>
                     </div>
                     <h4 class="text-warning mb-1">@Model.Indicateurs.VolumeSurplus</h4>
-                    <p class="text-muted mb-0">Volume Surplus</p>
+                    <p class="text-muted mb-0">Volume surplus</p>
                     <small class="text-muted">Commandes annulées</small>
                 </div>
             </div>
@@ -115,7 +116,7 @@
                         </div>
                     </div>
                     <h4 class="text-info mb-1">@Model.Indicateurs.RepartitionParFormule.Count</h4>
-                    <p class="text-muted mb-0">Types de Formules</p>
+                    <p class="text-muted mb-0">Types des formules</p>
                     <small class="text-muted">Standard & Améliorée</small>
                 </div>
             </div>
@@ -130,7 +131,7 @@
                 <div class="card-header bg-white border-0">
                     <h5 class="mb-0 text-primary">
                         <i class="fas fa-chart-pie me-2"></i>
-                        Répartition par Formule
+                        Répartition par formule
                     </h5>
                 </div>
                 <div class="card-body">
@@ -155,7 +156,7 @@
                 <div class="card-header bg-white border-0">
                     <h5 class="mb-0 text-primary">
                         <i class="fas fa-building me-2"></i>
-                        Commandes par Site
+                        Commandes par site
                     </h5>
                 </div>
                 <div class="card-body">
@@ -177,28 +178,28 @@
 
     <!-- Tableaux détaillés -->
     <div class="row mb-4">
-        <!-- Commandes par département -->
+        <!-- Commandes par Direction -->
         <div class="col-lg-6 mb-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0">
                     <h5 class="mb-0 text-primary">
                         <i class="fas fa-sitemap me-2"></i>
-                        Commandes par Département
+                        Commandes par Direction
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.Indicateurs.CommandesParDepartement.Any())
+                    @if (Model.Indicateurs.CommandesParDirection.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Département</th>
+                                        <th>Direction</th>
                                         <th class="text-end">Commandes</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.Indicateurs.CommandesParDepartement.OrderByDescending(x => x.Value))
+                                    @foreach (var item in Model.Indicateurs.CommandesParDirection.OrderByDescending(x => x.Value))
                                     {
                                         <tr>
                                             <td>@item.Key</td>
@@ -228,7 +229,7 @@
                 <div class="card-header bg-white border-0">
                     <h5 class="mb-0 text-primary">
                         <i class="fas fa-clock me-2"></i>
-                        Commandes par Période
+                        Commandes par période
                     </h5>
                 </div>
                 <div class="card-body">
@@ -280,7 +281,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <i class="fas fa-filter me-2"></i>
-                        Filtres du Tableau de Bord
+                        Filtres du tableau de bord
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -309,10 +310,10 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label asp-for="DepartementId" class="form-label"></label>
-                            <select asp-for="DepartementId" class="form-select">
-                                <option value="">Tous les départements</option>
-                                @foreach (var dept in Model.Departements)
+                            <label asp-for="DirectionId" class="form-label"></label>
+                            <select asp-for="DirectionId" class="form-select">
+                                <option value="">Tous les Directions</option>
+                                @foreach (var dept in Model.Directions)
                                 {
                                     <option value="@dept.Id">@dept.Nom</option>
                                 }

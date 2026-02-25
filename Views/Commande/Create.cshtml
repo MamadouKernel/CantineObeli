@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.CommandeParSemaineViewModel
+﻿@model Obeli_K.Models.ViewModels.CommandeParSemaineViewModel
 
 @{
     ViewData["Title"] = "Passez vos commandes";
@@ -30,6 +30,46 @@
     }
     else
     {
+        <!-- Filtre de période -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Sélectionner la période
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" asp-action="Create">
+                            <div class="row align-items-end">
+                                <div class="col-md-4">
+                                    <label for="dateDebut" class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="dateDebut" name="dateDebut" 
+                                           value="@ViewBag.DateDebut?.ToString("yyyy-MM-dd")" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="dateFin" class="form-label">Date de fin</label>
+                                    <input type="date" class="form-control" id="dateFin" name="dateFin" 
+                                           value="@ViewBag.DateFin?.ToString("yyyy-MM-dd")" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>
+                                        Voir les menus
+                                    </button>
+                                    <a href="@Url.Action("Create")" class="btn btn-secondary ms-2">
+                                        <i class="fas fa-calendar-week me-2"></i>
+                                        Semaine courante
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- En-tête avec titre et dates -->
         <div class="row mb-4">
             <div class="col-12">
@@ -42,23 +82,51 @@
                         du @Model.DateDebutSemaine.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
                         au @Model.DateFinSemaine.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
                     </h3>
+                    @if (ViewBag.DateDebut != null && ViewBag.DateFin != null)
+                    {
+                        <p class="text-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Période sélectionnée : @ViewBag.DateDebut.ToString("dd/MM/yyyy") - @ViewBag.DateFin.ToString("dd/MM/yyyy")
+                        </p>
+                    }
                 </div>
             </div>
         </div>
-    }
-    else
-    {
+        
         <div class="row">
         <!-- Colonne principale - Menus par jour -->
         <div class="col-lg-8">
             @foreach (var jour in Model.JoursSemaine)
             {
+                var dateConsommation = jour.Date;
+                var maintenant = DateTime.Now;
+                // Calcul du délai : 48h avant 12h00 de la date de consommation
+                var dateConsommationA12H = dateConsommation.Date.AddHours(12); // Date de consommation à 12h00
+                var delaiCommande = dateConsommationA12H.AddHours(-48); // 48h avant 12h00
+                var peutCommander = maintenant <= delaiCommande;
+                var delaiAnnulation = dateConsommation.AddHours(-24);
+                var estSemaineCourante = dateConsommation >= DateTime.Today && dateConsommation <= DateTime.Today.AddDays(6);
                 <div class="card mb-4 border-0 shadow-sm">
-                    <div class="card-header bg-warning text-dark">
+                    <div class="card-header @(peutCommander ? "bg-warning text-dark" : "bg-danger text-white")">
                         <h4 class="card-title mb-0">
                             <i class="fas fa-calendar-day me-2"></i>
                             @jour.NomJour @jour.Date.ToString("dd/MM")
                         </h4>
+                        @if (estSemaineCourante)
+                        {
+                            <small class="d-block mt-1">
+                                @if (peutCommander)
+                                {
+                                    <i class="fas fa-clock me-1"></i>
+                                    <strong>Commande possible jusqu'au @delaiCommande.ToString("dd/MM/yyyy à HH:mm")</strong>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-ban me-1"></i>
+                                    <strong>Commande fermée (délai de 48h avant 12h dépassé)</strong>
+                                }
+                            </small>
+                        }
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -110,7 +178,7 @@
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">Garniture:</small><br>
-                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard1) ? "Non spécifié" : formule.GarnitureStandard1)</strong>
+                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard1) ? "Non spécifiée" : formule.GarnitureStandard1)</strong>
                                                 </div>
                                             }
                                             else if (formule.TypeFormule == "Standard2")
@@ -122,7 +190,7 @@
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">Garniture:</small><br>
-                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard2) ? "Non spécifié" : formule.GarnitureStandard2)</strong>
+                                                    <strong>@(string.IsNullOrEmpty(formule.GarnitureStandard2) ? "Non spécifiée" : formule.GarnitureStandard2)</strong>
                                                 </div>
                                             }
                                             
@@ -154,14 +222,28 @@
                                                         <option value="1">Soir</option>
                                                     </select>
                                                 </div>
-                                                <button type="button" 
-                                                        class="btn btn-warning btn-sm w-100 commander-btn"
-                                                        data-formule-id="@formule.IdFormule"
-                                                        data-date="@jour.Date.ToString("yyyy-MM-dd")"
-                                                        data-type-formule="@formule.TypeFormule">
-                                                    <i class="fas fa-shopping-cart me-1"></i>
-                                                    Commander
-                                                </button>
+                                                <div class="d-flex gap-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input menu-radio" 
+                                                               type="radio" 
+                                                               name="menu_@jour.Date.ToString("yyyy-MM-dd")"
+                                                               data-formule-id="@formule.IdFormule"
+                                                               data-date="@jour.Date.ToString("yyyy-MM-dd")"
+                                                               data-type-formule="@formule.TypeFormule"
+                                                               id="radio_@formule.IdFormule">
+                                                        <label class="form-check-label small" for="radio_@formule.IdFormule">
+                                                            Sélectionner
+                                                        </label>
+                                                    </div>
+                                                    <button type="button" 
+                                                            class="btn btn-warning btn-sm flex-grow-1 commander-btn"
+                                                            data-formule-id="@formule.IdFormule"
+                                                            data-date="@jour.Date.ToString("yyyy-MM-dd")"
+                                                            data-type-formule="@formule.TypeFormule">
+                                                        <i class="fas fa-shopping-cart me-1"></i>
+                                                        Commander
+                                                    </button>
+                                                </div>
                                             }
                                             else
                                             {
@@ -186,6 +268,23 @@
 
         <!-- Colonne droite - Mes Commandes -->
         <div class="col-lg-4">
+            <!-- Bouton Commander la sélection -->
+            <div class="card border-0 shadow-sm mb-3" id="selectionCard" style="display: none;">
+                <div class="card-header" style="background-color: #EDAC00; color: #fff;">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-check-square me-2"></i>
+                        Sélection (<span id="selectionCount">0</span>)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="selectionList" class="mb-3"></div>
+                    <button type="button" class="btn btn-success w-100" id="commanderSelectionBtn">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Commander la sélection
+                    </button>
+                </div>
+            </div>
+            
             <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
                 <div class="card-header bg-warning text-dark">
                     <h4 class="card-title mb-0">
@@ -213,9 +312,48 @@
                                 {
                                     @foreach (var commande in commandesDuJour)
                                     {
-                                        <div class="small text-success">
-                                            <i class="fas fa-check-circle me-1"></i>
-                                            @commande.NomPlat (@(commande.PeriodeService == Obeli_K.Enums.Periode.Jour ? "Midi" : "Soir"))
+                                        <div class="commande-card d-flex align-items-center mb-2 p-2 rounded" 
+                                             style="background-color: rgba(237, 172, 0, 0.1); transition: all 0.3s ease;">
+                                            <img class="commande-image me-2 rounded shadow-sm" 
+                                                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #EDAC00;"
+                                                 alt="@commande.NomPlat">
+                                            <div class="flex-grow-1">
+                                                <div class="small fw-bold" style="color: #A32D18;">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    @commande.NomPlat
+                                                </div>
+                                                <div class="small" style="color: #EDAC00;">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    @(commande.PeriodeService == Obeli_K.Enums.Periode.Jour ? "Midi" : "Soir")
+                                                </div>
+                                            </div>
+                                            <div class="ms-2">
+                                                @{
+                                                    var dateConsommationCmd = commande.DateConsommation;
+                                                    var maintenantCmd = DateTime.Now;
+                                                    var delaiAnnulationCmd = dateConsommationCmd.AddHours(-24);
+                                                    var peutAnnulerCmd = maintenantCmd <= delaiAnnulationCmd && dateConsommationCmd.Date >= DateTime.Today;
+                                                    var estAdminCmd = User.IsInRole("Administrateur");
+                                                }
+                                                @if (peutAnnulerCmd || estAdminCmd)
+                                                {
+                                                    <button type="button" 
+                                                            class="btn btn-danger btn-sm annuler-commande-btn"
+                                                            data-commande-id="@commande.IdCommande"
+                                                            data-code-commande="@commande.CodeCommande"
+                                                            data-date-consommation="@commande.DateConsommation.ToString("yyyy-MM-dd HH:mm")"
+                                                            title="@(estAdminCmd ? "Annuler (Mode Admin)" : $"Annuler jusqu'au {delaiAnnulationCmd:dd/MM/yyyy à HH:mm}")"
+                                                            style="font-size: 12px; padding: 5px 8px;">
+                                                        <i class="fas fa-times"></i> Annuler
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary" title="Annulation fermée (délai de 24h dépassé)">
+                                                        <i class="fas fa-lock"></i> Fermé
+                                                    </span>
+                                                }
+                                            </div>
                                         </div>
                                     }
                                 }
@@ -237,6 +375,7 @@
             </div>
         </div>
     </div>
+    }
 </div>
 
 <!-- Modal de confirmation -->
@@ -279,7 +418,170 @@
     @Html.AntiForgeryToken()
     <script>
         $(document).ready(function() {
+            // Liste des images disponibles pour les formules
+            const imagesFormules = [
+                '/images/contente/formulesJour/italian.jpg',
+                '/images/contente/formulesJour/japanese.jpg',
+                '/images/contente/formulesJour/nouille.jpg',
+                '/images/contente/formulesJour/pomme.jpg',
+                '/images/contente/formulesJour/poulet.jpg',
+                '/images/contente/formulesJour/riz.jpg',
+                '/images/contente/formulesJour/soupe.jpg'
+            ];
+
+            // Fonction pour obtenir une image aléatoire
+            function getRandomImage() {
+                const randomIndex = Math.floor(Math.random() * imagesFormules.length);
+                return imagesFormules[randomIndex];
+            }
+
+            // Assigner des images aléatoires à toutes les commandes
+            $('.commande-image').each(function() {
+                $(this).attr('src', getRandomImage());
+            });
+
+            // Effet de survol sur les cartes de commandes
+            $('.commande-card').hover(
+                function() {
+                    $(this).css({
+                        'background-color': 'rgba(237, 172, 0, 0.2)',
+                        'transform': 'scale(1.02)',
+                        'box-shadow': '0 4px 8px rgba(237, 172, 0, 0.3)'
+                    });
+                },
+                function() {
+                    $(this).css({
+                        'background-color': 'rgba(237, 172, 0, 0.1)',
+                        'transform': 'scale(1)',
+                        'box-shadow': 'none'
+                    });
+                }
+            );
+
             let commandeEnCours = null;
+            let menusSelectionnes = [];
+
+            // Gestion de la sélection des menus
+            $('.menu-radio').change(function() {
+                updateSelection();
+            });
+
+            function updateSelection() {
+                menusSelectionnes = [];
+                $('.menu-radio:checked').each(function() {
+                    const radio = $(this);
+                    const formuleId = radio.data('formule-id');
+                    const date = radio.data('date');
+                    const typeFormule = radio.data('type-formule');
+                    const periode = radio.closest('.card-footer').find('.periode-select').val();
+                    const periodeText = periode === '0' ? 'Midi' : 'Soir';
+                    
+                    // Trouver le nom du plat
+                    const card = radio.closest('.card');
+                    const nomPlat = card.find('.card-header h6').text().trim();
+                    
+                    menusSelectionnes.push({
+                        formuleId: formuleId,
+                        date: date,
+                        periode: parseInt(periode),
+                        typeFormule: typeFormule,
+                        periodeText: periodeText,
+                        nomPlat: nomPlat
+                    });
+                });
+                
+                // Mettre à jour l'affichage
+                if (menusSelectionnes.length > 0) {
+                    $('#selectionCard').show();
+                    $('#selectionCount').text(menusSelectionnes.length);
+                    
+                    let html = '';
+                    menusSelectionnes.forEach(function(menu) {
+                        const dateFormatee = new Date(menu.date).toLocaleDateString('fr-FR', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short'
+                        });
+                        html += `<div class="small mb-2 p-2 rounded" style="background-color: rgba(237, 172, 0, 0.1);">
+                            <strong>${menu.nomPlat}</strong><br>
+                            <i class="fas fa-calendar me-1"></i>${dateFormatee} - ${menu.periodeText}
+                        </div>`;
+                    });
+                    $('#selectionList').html(html);
+                } else {
+                    $('#selectionCard').hide();
+                }
+            }
+
+            // Commander la sélection
+            $('#commanderSelectionBtn').click(function() {
+                if (menusSelectionnes.length === 0) {
+                    showAlert('warning', 'Veuillez sélectionner au moins un menu');
+                    return;
+                }
+
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>En cours...');
+
+                // Créer les commandes une par une
+                let commandesReussies = 0;
+                let commandesEchouees = 0;
+                let messages = [];
+
+                function creerCommandeSuivante(index) {
+                    if (index >= menusSelectionnes.length) {
+                        // Toutes les commandes ont été traitées
+                        btn.prop('disabled', false).html('<i class="fas fa-shopping-cart me-2"></i>Commander la sélection');
+                        
+                        if (commandesReussies > 0) {
+                            showAlert('success', `${commandesReussies} commande(s) créée(s) avec succès`);
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            var messageErreur = 'Aucune commande n\'a pu être créée';
+                            if (messages.length > 0) {
+                                messageErreur += ': ' + messages.join('; ');
+                            }
+                            showAlert('danger', messageErreur);
+                        }
+                        return;
+                    }
+
+                    const menu = menusSelectionnes[index];
+                    
+                    $.ajax({
+                        url: '@Url.Action("CreateCommandeSemaine", "Commande")',
+                        type: 'POST',
+                        data: {
+                            idFormule: menu.formuleId,
+                            dateConsommation: menu.date,
+                            periode: menu.periode,
+                            typeFormule: menu.typeFormule,
+                            site: null,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                commandesReussies++;
+                            } else {
+                                commandesEchouees++;
+                                messages.push(response.message);
+                            }
+                        },
+                        error: function() {
+                            commandesEchouees++;
+                        },
+                        complete: function() {
+                            // Passer à la commande suivante
+                            creerCommandeSuivante(index + 1);
+                        }
+                    });
+                }
+
+                // Démarrer la création des commandes
+                creerCommandeSuivante(0);
+            });
 
             // Gestion du clic sur le bouton Commander
             $('.commander-btn').click(function() {
@@ -390,6 +692,46 @@
                     $(this).removeClass('btn-lg').addClass('btn-lg');
                 }
             );
+
+            // Gestion de l'annulation des commandes
+            $('.annuler-commande-btn').click(function() {
+                const btn = $(this);
+                const commandeId = btn.data('commande-id');
+                const codeCommande = btn.data('code-commande');
+                const dateConsommation = btn.data('date-consommation');
+                
+                // Confirmation avant annulation
+                if (!confirm(`Êtes-vous sûr de vouloir annuler la commande ${codeCommande} pour le ${new Date(dateConsommation).toLocaleDateString('fr-FR')} ?`)) {
+                    return;
+                }
+                
+                // Désactiver le bouton pendant la requête
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Annulation...');
+                
+                $.ajax({
+                    url: '@Url.Action("AnnulerMaCommande", "Commande")',
+                    type: 'POST',
+                    data: { idCommande: commandeId },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            // Recharger la page pour mettre à jour l'affichage
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('danger', response.message);
+                            // Réactiver le bouton
+                            btn.prop('disabled', false).html('<i class="fas fa-times me-1"></i>Annuler');
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'Erreur lors de l\'annulation de la commande');
+                        // Réactiver le bouton
+                        btn.prop('disabled', false).html('<i class="fas fa-times me-1"></i>Annuler');
+                    }
+                });
+            });
         });
     </script>
     }

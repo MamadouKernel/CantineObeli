@@ -1,4 +1,4 @@
-@model Obeli_K.Models.Utilisateur
+﻿@model Obeli_K.Models.Utilisateur
 @{
     ViewData["Title"] = "Mon Profil";
 }
@@ -111,9 +111,9 @@
                                         <div class="col-sm-6 mb-3">
                                             <div class="info-item">
                                                 <label class="info-label">
-                                                    <i class="fas fa-building"></i>Département
+                                                    <i class="fas fa-building"></i>Direction
                                                 </label>
-                                                <div class="info-value">@(Model.Departement?.Nom ?? "Non renseigné")</div>
+                                                <div class="info-value">@(Model.Direction?.Nom ?? "Non renseigné")</div>
                                             </div>
                                         </div>
                                         <div class="col-sm-6 mb-3">

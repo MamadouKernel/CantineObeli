@@ -11,10 +11,20 @@ namespace Obeli_K.Models
         [StringLength(500)] public string? Description { get; set; }
 
         // Gestion des quotas pour les groupes spéciaux (ex: Douaniers)
-        // Temporairement commenté pour éviter les erreurs de colonnes manquantes
-        // public int? QuotaJournalier { get; set; } // Quota fixe de plats par jour
-        // public bool RestrictionFormuleStandard { get; set; } = false; // Limite aux formules standard uniquement
-        // public string? CodeGroupe { get; set; } // Code commun pour les commandes groupées
+        [Display(Name = "Quota Journalier")]
+        [Range(0, int.MaxValue, ErrorMessage = "Le quota doit être positif")]
+        public int? QuotaJournalier { get; set; } // Quota fixe de plats par jour
+        
+        [Display(Name = "Quota Nuit")]
+        [Range(0, int.MaxValue, ErrorMessage = "Le quota doit être positif")]
+        public int? QuotaNuit { get; set; } // Quota fixe de plats par nuit
+        
+        [Display(Name = "Restriction Formule Standard")]
+        public bool RestrictionFormuleStandard { get; set; } = false; // Limite aux formules standard uniquement
+        
+        [StringLength(10)]
+        [Display(Name = "Code Groupe")]
+        public string? CodeGroupe { get; set; } // Code commun pour les commandes groupées
 
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }

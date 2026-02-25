@@ -1,0 +1,159 @@
+﻿@model List<Obeli_K.Models.FormuleJour>
+@{
+    ViewData["Title"] = "Gestion des marges - Formules";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-calculator me-2"></i>
+                        Gestion des marges - Formules
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Période du @ViewBag.DateDebut?.ToString("dd/MM/yyyy") au @ViewBag.DateFin?.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+                <div>
+                    <a href="@Url.Action("GenererCommande", new { showQuantities = true })" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire de gestion des marges -->
+    <form method="post" action="@Url.Action("SauvegarderMarges", "PrestataireCantine")">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="dateDebut" value="@ViewBag.DateDebut?.ToString("yyyy-MM-dd")" />
+        <input type="hidden" name="dateFin" value="@ViewBag.DateFin?.ToString("yyyy-MM-dd")" />
+
+        <!-- Messages d'information -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Tableau des formules -->
+        <div class="row">
+            <div class="col-12">
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Aucune formule trouvée</h5>
+                        <p class="text-muted">Aucune formule trouvée pour la période sélectionnée.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Formule</th>
+                                    <th>Plat</th>
+                                    <th>Garniture</th>
+                                    <th>Entrée</th>
+                                    <th>Dessert</th>
+                                    <th class="text-center">Marge Actuelle</th>
+                                    <th class="text-center">Nouvelle Marge</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    var formule = Model[i];
+                                    <tr>
+                                        <input type="hidden" name="model[@i].IdFormule" value="@formule.IdFormule" />
+                                        <td class="fw-bold">@formule.Date.ToString("dd/MM/yyyy")</td>
+                                        <td class="text-primary">@formule.NomFormule</td>
+                                        <td>@(formule.Plat ?? "")</td>
+                                        <td>@(formule.Garniture ?? "")</td>
+                                        <td>@(formule.Entree ?? "")</td>
+                                        <td>@(formule.Dessert ?? "")</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">@(formule.Marge ?? 0)</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" 
+                                                   name="model[@i].Marge" 
+                                                   class="form-control form-control-sm text-center" 
+                                                   min="0" 
+                                                   max="1000"
+                                                   value="@(formule.Marge ?? 0)"
+                                                   style="width: 80px;" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <!-- Boutons d'action -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i>Sauvegarder Les Marges
+                        </button>
+                        <a href="@Url.Action("GenererCommande", new { showQuantities = true })" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Validation simple des champs de marge
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[name$=".Marge"]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const value = parseInt(this.value);
+                    if (value < 0) {
+                        this.value = 0;
+                    } else if (value > 1000) {
+                        this.value = 1000;
+                    }
+                });
+            });
+        });
+    </script>
+}

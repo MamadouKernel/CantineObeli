@@ -42,12 +42,11 @@ namespace Obeli_K.Models
         // Rattachements
         public RoleType Role { get; set; }
 
-        public Guid DepartementId { get; set; }
-        public virtual Departement? Departement { get; set; }
+        public Guid? DirectionId { get; set; }
+        public virtual Direction? Direction { get; set; }
 
-    // Temporairement commenté pour éviter les erreurs de colonnes manquantes
-    // public Guid? ServiceId { get; set; }
-    // public virtual Service? Service { get; set; }
+        public Guid? ServiceId { get; set; }
+        public virtual Service? Service { get; set; }
 
         public Guid? FonctionId { get; set; }
         public virtual Fonction? Fonction { get; set; }

@@ -7,10 +7,14 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/menu-images.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     
     <style>
@@ -37,26 +41,26 @@
         
         /* Navigation */
         .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #ffc107 100%) !important;
+            background: #3b85c2 !important;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-bottom: 3px solid var(--secondary-color);
         }
         
         .navbar-brand {
-            color: #A32D18 !important;
+            color: #ffffff !important;
             font-weight: 700;
             font-size: 1.5rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .navbar-brand:hover {
-            color: var(--accent-color) !important;
+            color: #f0f0f0 !important;
             transform: scale(1.05);
             transition: all 0.3s ease;
         }
         
         .nav-link {
-            color: #A32D18 !important;
+            color: #ffffff !important;
             font-weight: 600;
             padding: 0.75rem 1rem !important;
             border-radius: 6px;
@@ -66,8 +70,8 @@
         }
         
         .nav-link:hover {
-            background-color: rgba(163, 45, 24, 0.1);
-            color: var(--accent-color) !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #f0f0f0 !important;
             transform: translateY(-1px);
         }
         
@@ -76,6 +80,8 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             padding: 0.5rem 0;
+            max-height: 70vh;
+            overflow-y: auto;
         }
         
         .dropdown-item {
@@ -88,6 +94,43 @@
             background-color: var(--light-gray);
             color: var(--secondary-color);
             transform: translateX(5px);
+        }
+        
+        /* Menu Paramètres scrollable */
+        .parametres-menu {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        /* Scrollbar personnalisée pour les menus */
+        .dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dropdown-menu::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .dropdown-menu::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .dropdown-menu::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Indicateur de scroll pour le menu Paramètres */
+        .parametres-menu::after {
+            content: "↓ Plus d'options ↓";
+            display: block;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            background: linear-gradient(to bottom, transparent, #f8f9fa);
+            border-top: 1px solid #e9ecef;
         }
         
         /* Boutons */
@@ -198,6 +241,86 @@
             .navbar-brand {
                 font-size: 1.3rem;
             }
+            
+            /* Navigation mobile améliorée */
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+            
+            .nav-link {
+                padding: 0.75rem 1rem !important;
+                margin: 0.25rem 0;
+                border-radius: 8px;
+                font-size: 1.1rem;
+            }
+            
+            .dropdown-menu {
+                position: static !important;
+                transform: none !important;
+                border: none;
+                box-shadow: none;
+                background: rgba(255, 255, 255, 0.95);
+                margin: 0.5rem 0;
+                border-radius: 12px;
+                max-height: 50vh;
+            }
+            
+            .dropdown-item {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                border-radius: 8px;
+                margin: 0.25rem;
+            }
+            
+            /* Menu paramètres mobile */
+            .parametres-menu {
+                max-height: 40vh;
+            }
+            
+            /* Boutons plus grands sur mobile */
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .btn-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Cards responsive */
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                border-radius: var(--border-radius);
+            }
+            
+            /* Formulaires mobile */
+            .form-control, .form-select {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+            
+            .form-control-lg, .form-select-lg {
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+            
+            /* Headers responsive */
+            h1, h2, h3 {
+                font-size: calc(1.2rem + 0.5vw);
+            }
+            
+            /* Espacement mobile */
+            .mt-4 { margin-top: 1.5rem !important; }
+            .mb-4 { margin-bottom: 1.5rem !important; }
+            .py-4 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
         }
     </style>
 </head>
@@ -220,13 +343,26 @@
                     <ul class="navbar-nav me-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Dashboard -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="@Url.Action("Index", "Home")">
-                                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                                </a>
-                            </li>
-                            
+                            <!-- Liens directs pour Admin et RH uniquement -->
+                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        Menus
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "FormuleJour")">
+                                            <i class="fas fa-list me-2"></i>Liste des Menus
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Create", "FormuleJour")">
+                                            <i class="fas fa-plus me-2"></i>Créer
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Import", "FormuleJour")">
+                                            <i class="fas fa-file-import me-2"></i>Importer
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            }
                             
                             <!-- Commandes Dropdown -->
                             <li class="nav-item dropdown">
@@ -234,9 +370,27 @@
                                     <i class="fas fa-shopping-cart me-1"></i>Commandes
                                 </a>
                                 <ul class="dropdown-menu">
-                                    @if (User.IsInRole("PrestataireCantine") && !User.IsInRole("Administrateur") && !User.IsInRole("RessourcesHumaines"))
+                                    @if (User.IsInRole("PrestataireCantine") && !User.IsInRole("Administrateur") && !User.IsInRole("RH"))
                                     {
-                                        <!-- Menu simplifié pour les prestataires uniquement (sans admin/RH) -->
+                                        <!-- Menu complet pour les prestataires uniquement (sans admin/RH) -->
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-plus-circle me-1"></i>Création
+                                        </h6></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("CreerCommandeInstantanee", "Commande")">
+                                            <i class="fas fa-bolt me-2"></i>Commande Instantanée
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("CreerCommandeDouaniers", "Commande")">
+                                            <i class="fas fa-shield-alt me-2"></i>Commande des Douaniers
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("ValiderCommandeDouaniers", "Commande")">
+                                            <i class="fas fa-shield-check me-2"></i>Validation Douaniers
+                                        </a></li>
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-list me-1"></i>Gestion
+                                        </h6></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "Commande")">
                                             <i class="fas fa-list me-2"></i>Liste des Commandes
                                         </a></li>
@@ -246,122 +400,248 @@
                                     }
                                     else
                                     {
-                                        <!-- Menu complet pour Admin, RH, Employé -->
-                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Commande")">
-                                            <i class="fas fa-list me-2"></i>Liste des Commandes
-                                        </a></li>
+                                        <!-- Section: Création de commandes -->
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-plus-circle me-1"></i>Création
+                                        </h6></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Create", "Commande")">
-                                            <i class="fas fa-plus me-2"></i>Nouvelle Commande
+                                            <i class="fas fa-shopping-cart me-2"></i>Passer une commande
                                         </a></li>
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines") || User.IsInRole("PrestataireCantine"))
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH") || User.IsInRole("PrestataireCantine"))
                                         {
                                             <li><a class="dropdown-item" href="@Url.Action("CreerCommandeInstantanee", "Commande")">
                                                 <i class="fas fa-bolt me-2"></i>Commande Instantanée
                                             </a></li>
                                         }
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines"))
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
                                         {
                                             <li><a class="dropdown-item" href="@Url.Action("CreerCommandeGroupee", "Commande")">
                                                 <i class="fas fa-users me-2"></i>Commande Groupée
                                             </a></li>
                                         }
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("PrestataireCantine"))
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH") || User.IsInRole("PrestataireCantine"))
                                         {
+                                            <li><a class="dropdown-item" href="@Url.Action("CreerCommandeDouaniers", "Commande")">
+                                                <i class="fas fa-shield-alt me-2"></i>Commande des Douaniers
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("ValiderCommandeDouaniers", "Commande")">
+                                                <i class="fas fa-shield-check me-2"></i>Validation Douaniers
+                                            </a></li>
+                                        }
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        <!-- Section: Consommation personnelle -->
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-user me-1"></i>Suivi de Consommation
+                                        </h6></li>
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH") || User.IsInRole("Employe"))
+                                        {
+                                            <li><a class="dropdown-item" href="@Url.Action("MesPointsConsommation", "Commande")">
+                                                <i class="fas fa-chart-line me-2"></i>Mes Points de Consommation
+                                            </a></li>
+                                        }
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        <!-- Section: Récapitulatif et historique -->
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-chart-pie me-1"></i>Récapitulatif & Historique
+                                        </h6></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Commande", new { status = "Consommee,Precommander" })">
+                                            <i class="fas fa-history me-2"></i>Historique
+                                        </a></li>
+                                        
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            
+                                            <!-- Section: Point Consommation CIT -->
+                                            <li><h6 class="dropdown-header">
+                                                <i class="fas fa-chart-bar me-1"></i>Points de Consommation
+                                            </h6></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("PointConsommationCIT", "PointsConsommation")">
+                                                <i class="fas fa-chart-bar me-2"></i>Point Consommation CIT
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Reporting")">
+                                                <i class="fas fa-chart-line me-2"></i>Repporting
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("CumulPointsConsommation", "Commande")">
+                                                <i class="fas fa-chart-pie me-2"></i>Statistiques des Consommations
+                                            </a></li>
+                                            
+                                            <li><hr class="dropdown-divider"></li>
+                                            
+                                            <!-- Section: Point financier -->
+                                            <li><h6 class="dropdown-header">
+                                                <i class="fas fa-money-bill-wave me-1"></i>Point Financier
+                                            </h6></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("Index", "Extraction")">
+                                                <i class="fas fa-file-export me-2"></i>Extraction Commandes
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="@Url.Action("ExporterExcel", "Commande")">
+                                                <i class="fas fa-file-excel me-2"></i>Exporter en Excel
+                                            </a></li>
+                                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                                            {
+                                                <li><a class="dropdown-item" href="@Url.Action("Index", "GestionMarges")">
+                                                    <i class="fas fa-sliders-h me-2"></i>Gestion des Marges
+                                                </a></li>
+                                            }
+                                        }
+                                        
+                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH") || User.IsInRole("PrestataireCantine"))
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            
+                                            <!-- Section: Vérification -->
+                                            <li><h6 class="dropdown-header">
+                                                <i class="fas fa-search me-1"></i>Vérification
+                                            </h6></li>
                                             <li><a class="dropdown-item" href="@Url.Action("VerifierCommande", "Commande")">
                                                 <i class="fas fa-search me-2"></i>Vérifier une commande
                                             </a></li>
                                         }
+                                        
                                         <li><hr class="dropdown-divider"></li>
+                                        
+                                        <!-- Section: Filtres rapides -->
+                                        <li><h6 class="dropdown-header">
+                                            <i class="fas fa-filter me-1"></i>Filtres Rapides
+                                        </h6></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "Commande", new { status = "Precommander" })">
                                             <i class="fas fa-clock me-2"></i>Commandes Précommandées
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Commande", new { status = "Consommee" })">
-                                            <i class="fas fa-check-circle me-2"></i>Commandes Consommées
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "Commande", new { status = "Annulee" })">
                                             <i class="fas fa-times-circle me-2"></i>Commandes Annulées
                                         </a></li>
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines") || User.IsInRole("Employe"))
-                                        {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="@Url.Action("Index", "PointsConsommation")">
-                                                <i class="fas fa-chart-line me-2"></i>Points de Consommation
-                                            </a></li>
-                                        }
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines"))
-                                        {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="@Url.Action("Index", "Extraction")">
-                                                <i class="fas fa-file-export me-2"></i>Extraction Commandes
-                                            </a></li>
-                                            <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Reporting")">
-                                                <i class="fas fa-chart-line me-2"></i>Tableau de Bord
-                                            </a></li>
-                                        }
-                                        @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines") || User.IsInRole("PrestataireCantine"))
-                                        {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="@Url.Action("ExporterExcel", "Commande")">
-                                                <i class="fas fa-file-excel me-2"></i>Exporter en Excel
-                                            </a></li>
-                                        }
                                     }
                                 </ul>
                             </li>
                             
-                            
-                            <!-- Formules - Visible seulement pour les administrateurs et RH -->
-                            @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines"))
+                            <!-- Menus Dropdown pour PrestataireCantine -->
+                            @if (User.IsInRole("PrestataireCantine") && !User.IsInRole("Administrateur") && !User.IsInRole("RH"))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-utensils me-1"></i>Formules
+                                        <i class="fas fa-utensils me-1"></i>Menus
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "FormuleJour")">
-                                            <i class="fas fa-list me-2"></i>Liste des Formules
+                                            <i class="fas fa-list me-2"></i>Liste des Menus
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Create", "FormuleJour")">
-                                            <i class="fas fa-plus me-2"></i>Nouvelle Formule
+                                            <i class="fas fa-plus me-2"></i>Créer un Menu
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Import", "FormuleJour")">
-                                            <i class="fas fa-file-import me-2"></i>Importer des Formules
+                                            <i class="fas fa-file-import me-2"></i>Importer des Menus
                                         </a></li>
                                     </ul>
                                 </li>
                             }
                             
-                            <!-- Paramètres Dropdown -->
-                            @if (User.IsInRole("Administrateur") || User.IsInRole("RessourcesHumaines"))
+                            <!-- Visiteur -->
+                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-cog me-1"></i>Paramètres
+                                        <i class="fas fa-user-plus me-1"></i>Visiteur
                                     </a>
                                     <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="@Url.Action("List", "Visiteur")">
+                                            <i class="fas fa-plus me-2"></i>Nouvelle commande
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Commands", "Visiteur")">
+                                            <i class="fas fa-list me-2"></i>Liste des commandes
+                                        </a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                        @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-handshake me-1"></i>Prestataires
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("GenererCommande", "PrestataireCantine")">
+                                            <i class="fas fa-file-invoice me-2"></i>Générer une commande
+                                        </a>
+                                    </li>
+                                    <!--<li>
+                                        <a class="dropdown-item" href="@Url.Action("Exportations", "PrestataireCantine")">
+                                            <i class="fas fa-download me-2"></i>Exportation
+                                        </a>
+                                    </li>-->
+                                </ul>
+                            </li>
+                        }
+                        
+                            
+                            <!-- Paramètres Dropdown -->
+                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="parametresDropdown">
+                                        <i class="fas fa-cog me-1"></i>Paramètres
+                                    </a>
+                                    <ul class="dropdown-menu parametres-menu" aria-labelledby="parametresDropdown">
                                         <li><a class="dropdown-item" href="@Url.Action("List", "Utilisateur")">
-                                            <i class="fas fa-users me-2"></i>Gestion Utilisateurs
+                                            <i class="fas fa-users me-2"></i>Gestion des utilisateurs
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Create", "Utilisateur")">
-                                            <i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur
+                                            <i class="fas fa-user-plus me-2"></i>Nouvel utilisateur
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("ResetPassword", "Utilisateur")">
+                                            <i class="fas fa-key me-2"></i>Réinitialiser mot de passe
                                         </a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("List", "Departement")">
-                                            <i class="fas fa-building me-2"></i>Gestion Départements
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")">
+                                            <i class="fas fa-database me-2 text-danger"></i>Administration DB
                                         </a></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Create", "Departement")">
-                                            <i class="fas fa-plus me-2"></i>Nouveau Département
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("List", "Direction")">
+                                            <i class="fas fa-building me-2"></i>Gestion des directions
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Create", "Direction")">
+                                            <i class="fas fa-plus me-2"></i>Nouvelle direction
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("List", "Service")">
+                                            <i class="fas fa-sitemap me-2"></i>Gestion des services
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Create", "Service")">
+                                            <i class="fas fa-plus me-2"></i>Nouveau service
                                         </a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="@Url.Action("List", "Fonction")">
-                                            <i class="fas fa-briefcase me-2"></i>Gestion Fonctions
+                                            <i class="fas fa-briefcase me-2"></i>Gestion des fonctions
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Create", "Fonction")">
-                                            <i class="fas fa-plus me-2"></i>Nouvelle Fonction
+                                            <i class="fas fa-plus me-2"></i>Nouvelle fonction
                                         </a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "ConfigurationCommande")">
-                                            <i class="fas fa-clock me-2"></i>Configuration Commandes
+                                            <i class="fas fa-clock me-2"></i>Configuration des commandes
+                                        </a></li>
+                        <li><a class="dropdown-item" href="@Url.Action("Index", "ParametresFacturation")">
+                            <i class="fas fa-cogs me-2"></i>Paramètres de la facturation
+                        </a></li>
+                        <li><a class="dropdown-item" href="@Url.Action("Index", "Facturation")">
+                            <i class="fas fa-money-bill-wave me-2"></i>Gestion de la facturation
+                        </a></li>
+                        <li><a class="dropdown-item" href="@Url.Action("Index", "DiagnosticFacturation")">
+                            <i class="fas fa-stethoscope me-2"></i>Diagnostic de la facturation
+                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "GroupeNonCit")">
+                                            <i class="fas fa-users me-2"></i>Quotas Permanents des Groupes
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "FacturationAutomatique")">
+                                            <i class="fas fa-money-bill-wave me-2"></i>Facturation automatique
                                         </a></li>
                                     </ul>
                                 </li>

@@ -1,231 +1,282 @@
-@model Obeli_K.Models.ViewModels.FormuleJourViewModel
+﻿@model Obeli_K.Models.ViewModels.CreateMultiDayFormuleViewModel
 
 @{
     ViewData["Title"] = "Nouvelle Formule";
+    var dateDebut = ViewBag.DateDebut as DateTime?;
+    var dateFin = ViewBag.DateFin as DateTime?;
 }
 
-<div class="container-fluid">
-    <div class="row">
+<style>
+    .form-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 40px;
+        margin: 20px auto;
+        max-width: 1000px;
+    }
+    
+    .date-header {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1a365d;
+        text-align: center;
+        margin-bottom: 40px;
+        text-transform: capitalize;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1a365d;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #EDAC00;
+    }
+    
+    .form-section {
+        margin-bottom: 40px;
+        padding: 25px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border-left: 5px solid #EDAC00;
+    }
+    
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .form-control:focus {
+        border-color: #EDAC00;
+        box-shadow: 0 0 0 3px rgba(237, 172, 0, 0.1);
+        outline: none;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #EDAC00, #f4c430);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(237, 172, 0, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .info-note {
+        background: linear-gradient(135deg, #e6f3ff, #f0f8ff);
+        border: 1px solid #b3d9ff;
+        border-radius: 12px;
+        padding: 15px;
+        color: #1a365d;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+    
+    .hidden-fields {
+        display: none;
+    }
+    
+    .day-section {
+        margin-bottom: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .day-header {
+        background: linear-gradient(135deg, #4a90e2, #357abd);
+        color: white;
+        padding: 15px 25px;
+        font-size: 1.3rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        margin: 0;
+    }
+    
+    .day-section .form-section {
+        margin-bottom: 0;
+        border-radius: 0;
+        border-left: none;
+        background: #f8f9fa;
+    }
+    
+    .day-section .form-section:last-child {
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+</style>
+
+<div class="container-fluid" style="background: linear-gradient(135deg, #f7fafc, #edf2f7); min-height: 100vh; padding: 20px 0;">
+    <div class="row justify-content-center">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-plus-circle text-warning me-2"></i>
-                        Nouvelle Formule
-                    </h3>
+            <div class="form-container">
+                <div class="date-header">
+                    Création du menu
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                
+                <form asp-action="CreateMultiDay" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <!-- Champs cachés pour la création en lot -->
+                    <div class="hidden-fields">
+                        <input asp-for="DateDebut" type="date" />
+                        <input asp-for="DateFin" type="date" />
+                        <input asp-for="NomFormule" />
+                        <input asp-for="Statut" value="1" />
+                        <input asp-for="ExclureWeekends" type="checkbox" />
+                        <input asp-for="RemplacerExistantes" type="checkbox" />
+                    </div>
+
+                    @for (int i = 0; i < Model.Formules.Count; i++)
+                    {
+                        var formule = Model.Formules[i];
+                        var dayName = formule.Date.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"));
                         
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="Date" class="form-label"></label>
-                                    <input asp-for="Date" type="date" class="form-control" />
-                                    <span asp-validation-for="Date" class="text-danger"></span>
-                                </div>
+                        <div class="day-section">
+                            <div class="day-header">
+                                @dayName
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="NomFormule" class="form-label"></label>
-                                    <input asp-for="NomFormule" class="form-control" placeholder="Nom de la formule" />
-                                    <span asp-validation-for="NomFormule" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label asp-for="TypeFormuleId" class="form-label"></label>
-                                    <select asp-for="TypeFormuleId" class="form-select" asp-items="ViewBag.TypeFormules">
-                                        <option value="">Sélectionner un type de formule</option>
-                                    </select>
-                                    <span asp-validation-for="TypeFormuleId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input asp-for="Verrouille" class="form-check-input" />
-                                        <label asp-for="Verrouille" class="form-check-label"></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Formule Améliorée -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-star me-2"></i>
-                                    Formule Améliorée
-                                </h5>
-                            </div>
-                            <div class="card-body">
+                            
+                            <!-- Section Amélioré -->
+                            <div class="form-section">
+                                <div class="section-title">Amélioré</div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label asp-for="Entree" class="form-label"></label>
-                                            <input asp-for="Entree" class="form-control" placeholder="Entrée" />
-                                            <span asp-validation-for="Entree" class="text-danger"></span>
+                                            <label class="form-label">Entrée</label>
+                                            <input asp-for="Formules[i].Entree" class="form-control" placeholder="Entrée" />
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label asp-for="Plat" class="form-label"></label>
-                                            <input asp-for="Plat" class="form-control" placeholder="Plat principal" />
-                                            <span asp-validation-for="Plat" class="text-danger"></span>
+                                            <label class="form-label">Féculent</label>
+                                            <input asp-for="Formules[i].Feculent" class="form-control" placeholder="Féculent" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Plat</label>
+                                            <input asp-for="Formules[i].Plat" class="form-control" placeholder="Plat principal" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label asp-for="Garniture" class="form-label"></label>
-                                            <input asp-for="Garniture" class="form-control" placeholder="Garniture" />
-                                            <span asp-validation-for="Garniture" class="text-danger"></span>
+                                            <label class="form-label">Dessert</label>
+                                            <input asp-for="Formules[i].Dessert" class="form-control" placeholder="Dessert" />
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label asp-for="Dessert" class="form-label"></label>
-                                            <input asp-for="Dessert" class="form-control" placeholder="Dessert" />
-                                            <span asp-validation-for="Dessert" class="text-danger"></span>
+                                            <label class="form-label">Légumes</label>
+                                            <input asp-for="Formules[i].Legumes" class="form-control" placeholder="Légumes" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Garniture</label>
+                                            <input asp-for="Formules[i].Garniture" class="form-control" placeholder="Garniture" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Formule Standard 1 -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-utensils me-2"></i>
-                                    Formule Standard 1
-                                </h5>
-                            </div>
-                            <div class="card-body">
+                            <!-- Section Standard 1 -->
+                            <div class="form-section">
+                                <div class="section-title">Standard 1</div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label asp-for="PlatStandard1" class="form-label"></label>
-                                            <input asp-for="PlatStandard1" class="form-control" placeholder="Plat standard 1" />
-                                            <span asp-validation-for="PlatStandard1" class="text-danger"></span>
+                                            <label class="form-label">Garniture</label>
+                                            <input asp-for="Formules[i].GarnitureStandard1" class="form-control" placeholder="Garniture" />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label asp-for="GarnitureStandard1" class="form-label"></label>
-                                            <input asp-for="GarnitureStandard1" class="form-control" placeholder="Garniture standard 1" />
-                                            <span asp-validation-for="GarnitureStandard1" class="text-danger"></span>
+                                            <label class="form-label">Plat</label>
+                                            <input asp-for="Formules[i].PlatStandard1" class="form-control" placeholder="Plat principal" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Formule Standard 2 -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-utensils me-2"></i>
-                                    Formule Standard 2
-                                </h5>
-                            </div>
-                            <div class="card-body">
+                            <!-- Section Standard 2 -->
+                            <div class="form-section">
+                                <div class="section-title">Standard 2</div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label asp-for="PlatStandard2" class="form-label"></label>
-                                            <input asp-for="PlatStandard2" class="form-control" placeholder="Plat standard 2" />
-                                            <span asp-validation-for="PlatStandard2" class="text-danger"></span>
+                                            <label class="form-label">Garniture</label>
+                                            <input asp-for="Formules[i].GarnitureStandard2" class="form-control" placeholder="Garniture" />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label asp-for="GarnitureStandard2" class="form-label"></label>
-                                            <input asp-for="GarnitureStandard2" class="form-control" placeholder="Garniture standard 2" />
-                                            <span asp-validation-for="GarnitureStandard2" class="text-danger"></span>
+                                            <label class="form-label">Plat</label>
+                                            <input asp-for="Formules[i].PlatStandard2" class="form-control" placeholder="Plat principal" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Champs cachés pour chaque formule -->
+                            <input asp-for="Formules[i].Date" type="hidden" />
+                            <input asp-for="Formules[i].NomFormule" type="hidden" />
+                            <input asp-for="Formules[i].Statut" type="hidden" />
+                            <input asp-for="Formules[i].Verrouille" type="hidden" />
                         </div>
+                    }
 
-                        <!-- Champs communs -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-leaf me-2"></i>
-                                    Éléments Communs
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="Feculent" class="form-label"></label>
-                                            <input asp-for="Feculent" class="form-control" placeholder="Féculent" />
-                                            <span asp-validation-for="Feculent" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="Legumes" class="form-label"></label>
-                                            <input asp-for="Legumes" class="form-control" placeholder="Légumes" />
-                                            <span asp-validation-for="Legumes" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="Marge" class="form-label"></label>
-                                            <input asp-for="Marge" type="number" min="0" max="100" class="form-control" placeholder="Marge (%)" />
-                                            <span asp-validation-for="Marge" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="Statut" class="form-label"></label>
-                                            <select asp-for="Statut" class="form-select">
-                                                <option value="">Sélectionner un statut</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
-                                            </select>
-                                            <span asp-validation-for="Statut" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Historique -->
-                        <div class="mb-3">
-                            <label asp-for="Historique" class="form-label"></label>
-                            <textarea asp-for="Historique" class="form-control" rows="3" placeholder="Historique ou notes"></textarea>
-                            <span asp-validation-for="Historique" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between">
-                                    <a asp-action="Index" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-1"></i>
-                                        Retour à la liste
-                                    </a>
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-save me-1"></i>
-                                        Créer la formule
-                                    </button>
-                                </div>
+                    <!-- Boutons d'action -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Retour à la liste
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Créer les formules
+                                </button>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -233,4 +284,27 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Définir les dates par défaut si elles ne sont pas définies
+            const dateDebutInput = document.querySelector('input[name="DateDebut"]');
+            const dateFinInput = document.querySelector('input[name="DateFin"]');
+            
+            if (!dateDebutInput.value) {
+                const today = new Date();
+                dateDebutInput.value = today.toISOString().split('T')[0];
+            }
+            
+            if (!dateFinInput.value) {
+                const today = new Date();
+                dateFinInput.value = today.toISOString().split('T')[0];
+            }
+            
+            // Définir le nom de la formule par défaut
+            const nomFormuleInput = document.querySelector('input[name="NomFormule"]');
+            if (!nomFormuleInput.value) {
+                nomFormuleInput.value = 'Formule du jour';
+            }
+        });
+    </script>
 }

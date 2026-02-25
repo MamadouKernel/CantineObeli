@@ -1,0 +1,486 @@
+﻿@{
+    ViewData["Title"] = "Gestion de la Facturation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var resultatFacturation = ViewBag.ResultatFacturation as Obeli_K.Models.ViewModels.FacturationResult;
+    var dateDebut = ViewBag.DateDebut as string;
+    var dateFin = ViewBag.DateFin as string;
+}
+
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                Gestion de la Facturation
+                            </h3>
+                            <small class="opacity-75">Analyse et application de la facturation des commandes non consommées</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages d'alerte -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Succès !</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Erreur !</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Attention !</strong> @TempData["WarningMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Information :</strong> @TempData["InfoMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filtres de période -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2 text-primary"></i>
+                        Période d'analyse
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="dateDebut" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-1 text-primary"></i>
+                                Date de début
+                            </label>
+                            <input type="date" class="form-control form-control-lg" id="dateDebut" name="dateDebut" 
+                                   value="@dateDebut" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dateFin" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-check me-1 text-primary"></i>
+                                Date de fin
+                            </label>
+                            <input type="date" class="form-control form-control-lg" id="dateFin" name="dateFin" 
+                                   value="@dateFin" required>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search me-2"></i>
+                                Analyser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (resultatFacturation != null)
+    {
+        <!-- Résumé de la facturation -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2 text-primary"></i>
+                            Résumé de la Facturation
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="text-center p-4 bg-light rounded border">
+                                    <h2 class="@(resultatFacturation.FacturationActive ? "text-success" : "text-danger") mb-2">
+                                        <i class="fas fa-toggle-@(resultatFacturation.FacturationActive ? "on" : "off")"></i>
+                                    </h2>
+                                    <h6 class="text-muted mb-1">Facturation</h6>
+                                    <p class="mb-0 fw-bold">@(resultatFacturation.FacturationActive ? "ACTIVÉE" : "DÉSACTIVÉE")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-4 bg-light rounded border">
+                                    <h2 class="text-primary mb-2">@resultatFacturation.NombreCommandesFacturables</h2>
+                                    <h6 class="text-muted mb-1">Commandes Facturables</h6>
+                                    <p class="mb-0 text-success fw-bold">@resultatFacturation.MontantTotalAFacturer.ToString("C")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-4 bg-light rounded border">
+                                    <h2 class="text-secondary mb-2">@resultatFacturation.NombreCommandesNonFacturables</h2>
+                                    <h6 class="text-muted mb-1">Non Facturables</h6>
+                                    <p class="mb-0 text-muted">Exemptées</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-4 bg-light rounded border">
+                                    <h2 class="text-info mb-2">@resultatFacturation.PourcentageFacturation%</h2>
+                                    <h6 class="text-muted mb-1">Taux de Facturation</h6>
+                                    <p class="mb-0 text-muted">@resultatFacturation.NombreAbsencesGratuites absences gratuites</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Règles appliquées -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs me-2 text-primary"></i>
+                            Règles Appliquées
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-3">
+                                        <i class="fas fa-percentage me-2 text-primary"></i>
+                                        <strong>Pourcentage :</strong> @resultatFacturation.PourcentageFacturation% du montant
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-gift me-2 text-primary"></i>
+                                        <strong>Absences gratuites :</strong> @resultatFacturation.NombreAbsencesGratuites par utilisateur/mois
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-3">
+                                        <i class="fas fa-calendar-week me-2 @(resultatFacturation.FacturationWeekend ? "text-success" : "text-warning")"></i>
+                                        <strong>Week-end :</strong> @(resultatFacturation.FacturationWeekend ? "Facturé" : "Non facturé")
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-calendar-day me-2 @(resultatFacturation.FacturationJoursFeries ? "text-success" : "text-warning")"></i>
+                                        <strong>Jours fériés :</strong> @(resultatFacturation.FacturationJoursFeries ? "Facturé" : "Non facturé")
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes facturables -->
+        @if (resultatFacturation.CommandesFacturables.Any())
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Commandes Facturables (@resultatFacturation.CommandesFacturables.Count)
+                            </h5>
+                            <span class="badge bg-light text-success fs-6 px-3 py-2">
+                                Total: @resultatFacturation.MontantTotalAFacturer.ToString("C")
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-success">
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Utilisateur</th>
+                                            <th>Date Consommation</th>
+                                            <th>Formule</th>
+                                            <th>Montant Original</th>
+                                            <th>Montant à Facturer</th>
+                                            <th>Retard</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var cmd in resultatFacturation.CommandesFacturables)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <code class="bg-light px-2 py-1 rounded">@cmd.Commande.CodeCommande</code>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.DateCommande.ToString("dd/MM/yyyy")</small>
+                                                </td>
+                                                <td>
+                                                    <strong>@cmd.Commande.NomUtilisateur</strong>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.EmailUtilisateur</small>
+                                                </td>
+                                                <td>
+                                                    @cmd.Commande.DateConsommation.ToString("dd/MM/yyyy")
+                                                    <br>
+                                                    <span class="badge bg-warning text-dark">@cmd.Commande.DateConsommation.ToString("dddd")</span>
+                                                    @if (cmd.Commande.EstWeekend)
+                                                    {
+                                                        <span class="badge bg-info ms-1">Week-end</span>
+                                                    }
+                                                    @if (cmd.Commande.EstJourFerie)
+                                                    {
+                                                        <span class="badge bg-danger ms-1">Férié</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <strong>@cmd.Commande.NomFormule</strong>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.Plat</small>
+                                                </td>
+                                                <td>@cmd.MontantOriginal.ToString("C")</td>
+                                                <td>
+                                                    <strong class="text-success">@cmd.MontantAFacturer.ToString("C")</strong>
+                                                    <br>
+                                                    <small class="text-muted">(@cmd.PourcentageApplique%)</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger">@cmd.Commande.NombreJoursRetard jour(s)</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Commandes non facturables -->
+        @if (resultatFacturation.CommandesNonFacturables.Any())
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-times-circle me-2"></i>
+                                Commandes Non Facturables (@resultatFacturation.CommandesNonFacturables.Count)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-warning">
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Utilisateur</th>
+                                            <th>Date Consommation</th>
+                                            <th>Formule</th>
+                                            <th>Motif</th>
+                                            <th>Retard</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var cmd in resultatFacturation.CommandesNonFacturables)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <code class="bg-light px-2 py-1 rounded">@cmd.Commande.CodeCommande</code>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.DateCommande.ToString("dd/MM/yyyy")</small>
+                                                </td>
+                                                <td>
+                                                    <strong>@cmd.Commande.NomUtilisateur</strong>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.EmailUtilisateur</small>
+                                                </td>
+                                                <td>
+                                                    @cmd.Commande.DateConsommation.ToString("dd/MM/yyyy")
+                                                    <br>
+                                                    <span class="badge bg-warning text-dark">@cmd.Commande.DateConsommation.ToString("dddd")</span>
+                                                    @if (cmd.Commande.EstWeekend)
+                                                    {
+                                                        <span class="badge bg-info ms-1">Week-end</span>
+                                                    }
+                                                    @if (cmd.Commande.EstJourFerie)
+                                                    {
+                                                        <span class="badge bg-danger ms-1">Férié</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <strong>@cmd.Commande.NomFormule</strong>
+                                                    <br>
+                                                    <small class="text-muted">@cmd.Commande.Plat</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-secondary">@cmd.Motif</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger">@cmd.Commande.NombreJoursRetard jour(s)</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Bouton d'application -->
+        @if (resultatFacturation.FacturationActive && resultatFacturation.CommandesFacturables.Any())
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <form method="post" asp-action="Appliquer" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir appliquer la facturation ? Cette action est irréversible.');">
+                                <input type="hidden" name="dateDebut" value="@dateDebut" />
+                                <input type="hidden" name="dateFin" value="@dateFin" />
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="fas fa-money-bill-wave me-2"></i>
+                                    Appliquer la Facturation (@resultatFacturation.CommandesFacturables.Count commandes)
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (!resultatFacturation.FacturationActive)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning shadow-sm">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Facturation désactivée.</strong>
+                        <a href="@Url.Action("Index", "ParametresFacturation")" class="alert-link">
+                            Activez-la dans les paramètres de facturation
+                        </a> pour pouvoir appliquer les factures.
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Sélectionnez une période pour analyser les commandes non consommées</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        });
+    </script>
+
+    <style>
+        .card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .form-control-lg {
+            border-radius: 8px;
+            border: 2px solid #e5e5e5;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-lg:focus {
+            border-color: #EDAC00;
+            box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        code {
+            font-size: 0.875rem;
+        }
+
+        @@media (max-width: 768px) {
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .btn-lg {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+}

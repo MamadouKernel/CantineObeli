@@ -1,7 +1,112 @@
-@using System.Globalization
+﻿@using System.Globalization
 @{
     var fr = CultureInfo.GetCultureInfo("fr-FR");
     string? role = User?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    
+    // Récupérer le nom complet de l'utilisateur connecté
+    string? nomComplet = User?.Identity?.Name ?? "Utilisateur";
+    string? prenom = User?.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+    string? nom = User?.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value;
+    
+    // Si on a le prénom et le nom séparément, les combiner
+    if (!string.IsNullOrEmpty(prenom) && !string.IsNullOrEmpty(nom))
+    {
+        nomComplet = $"{prenom} {nom}";
+    }
+    
+    // Message de bienvenue selon l'heure
+    var heureActuelle = DateTime.Now.Hour;
+    string messageHeure = heureActuelle < 12 ? "Bonjour" : 
+                          heureActuelle < 18 ? "Bon après-midi" : 
+                          "Bonsoir";
+    
+    // Citations et proverbes qui changent chaque jour
+    var citations = new List<string>
+    {
+        "La découverte d'un mets nouveau fait plus pour le bonheur du genre humain que la découverte d'une étoile. - Brillat-Savarin",
+        "On creuse sa tombe avec ses dents. - Proverbe français",
+        "Manger est un besoin de l'estomac, mais boire est un besoin de l'âme. - Proverbe français",
+        "Qui mange seul s'étouffe seul. - Proverbe africain",
+        "L'appétit vient en mangeant. - Proverbe français",
+        "Un repas sans fromage est une belle à qui il manque un œil. - Brillat-Savarin",
+        "Bien manger, c'est atteindre le ciel. - Proverbe chinois",
+        "La cuisine est un art qui nourrit le corps et l'âme. - Proverbe",
+        "Le ventre affamé n'a point d'oreilles. - Caton l'Ancien",
+        "Mangez pour vivre, ne vivez pas pour manger. - Socrate",
+        "La gastronomie est l'art d'utiliser la nourriture pour créer le bonheur. - Theodore Zeldin",
+        "À table, on ne vieillit pas. - Proverbe italien",
+        "Un bon repas doit commencer par la faim. - Proverbe français",
+        "La bonne cuisine est honnête, sincère et simple. - Élisabeth David",
+        "Dis-moi ce que tu manges, je te dirai qui tu es. - Brillat-Savarin",
+        "Le secret du bonheur est de savoir apprécier les petites choses. - Proverbe",
+        "La santé vient en mangeant. - Proverbe français",
+        "Un repas partagé est un repas doublé. - Proverbe",
+        "La cuisine, c'est quand les choses ont le goût de ce qu'elles sont. - Curnonsky",
+        "Manger bien, c'est commencer à être heureux. - Lin Yutang",
+        "La table est le seul endroit où l'on ne s'ennuie jamais pendant la première heure. - Brillat-Savarin",
+        "Un bon cuisinier est un sorcier qui dispense le bonheur. - Élise Bertrand",
+        "La nourriture est notre terrain d'entente, une expérience universelle. - James Beard",
+        "Manger c'est incorporer un territoire. - Jean Brunhes",
+        "La bonne nourriture est le fondement du véritable bonheur. - Auguste Escoffier",
+        "On ne peut penser bien, aimer bien, dormir bien, si on n'a pas dîné bien. - Virginia Woolf",
+        "La cuisine est un acte d'amour. - Proverbe",
+        "Un repas sans vin est comme un jour sans soleil. - Proverbe français",
+        "Le meilleur assaisonnement au monde, c'est la faim. - Cervantès",
+        "Partager un repas, c'est partager un moment de vie. - Proverbe"
+    };
+    
+    // Sélectionner une citation basée sur le jour de l'année pour qu'elle change chaque jour
+    int jourAnnee = DateTime.Now.DayOfYear;
+    string citationDuJour = citations[jourAnnee % citations.Count];
+    
+    // Déterminer la saison et les couleurs/icônes associées (Côte d'Ivoire)
+    int mois = DateTime.Now.Month;
+    string couleurSaison = "";
+    string iconeSaison = "";
+    string nomSaison = "";
+    string animationClass = "";
+    
+    // Saisons de la Côte d'Ivoire (climat tropical)
+    if (mois == 12 || mois >= 1 && mois <= 3) // Grande saison sèche (Décembre à Mars)
+    {
+        couleurSaison = "#FFA500"; // Orange chaud (soleil)
+        iconeSaison = "fa-sun";
+        nomSaison = "Grande Saison Sèche";
+        animationClass = "summer-animation";
+    }
+    else if (mois >= 4 && mois <= 7) // Grande saison des pluies (Avril à Juillet)
+    {
+        couleurSaison = "#4169E1"; // Bleu (pluie)
+        iconeSaison = "fa-cloud-rain";
+        nomSaison = "Grande Saison des Pluies";
+        animationClass = "rain-animation";
+    }
+    else if (mois >= 8 && mois <= 9) // Petite saison sèche (Août à Septembre)
+    {
+        couleurSaison = "#FFD700"; // Or (soleil)
+        iconeSaison = "fa-sun";
+        nomSaison = "Petite Saison Sèche";
+        animationClass = "summer-animation";
+    }
+    else // Petite saison des pluies (Octobre à Novembre)
+    {
+        couleurSaison = "#32CD32"; // Vert (végétation après pluie)
+        iconeSaison = "fa-cloud-sun-rain";
+        nomSaison = "Petite Saison des Pluies";
+        animationClass = "rain-animation";
+    }
+    
+    // Mapping des images pour chaque jour de la semaine
+    var imagesParJour = new Dictionary<DayOfWeek, string>
+    {
+        { DayOfWeek.Monday, "italian.jpg" },
+        { DayOfWeek.Tuesday, "japanese.jpg" },
+        { DayOfWeek.Wednesday, "nouille.jpg" },
+        { DayOfWeek.Thursday, "pomme.jpg" },
+        { DayOfWeek.Friday, "poulet.jpg" },
+        { DayOfWeek.Saturday, "riz.jpg" },
+        { DayOfWeek.Sunday, "soupe.jpg" }
+    };
 
     // Données communes (pour Admin/RH/Employé)
     var menusDyn = (IEnumerable<dynamic>)(ViewBag.MenuSemaineEnCours ?? Enumerable.Empty<dynamic>());
@@ -20,25 +125,185 @@
     int nbCmd = (int)(ViewBag.NombreCommandes ?? mesCmds.Count);
 }
 
+<!-- ==================== MESSAGE DE BIENVENUE ==================== -->
+<style>
+    .welcome-card {
+        background-color: @couleurSaison;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .welcome-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+    }
+    
+    /* Animation Saison Sèche - Rotation soleil */
+    @@keyframes summer-rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .summer-animation .season-icon {
+        animation: summer-rotate 20s linear infinite;
+    }
+    
+    /* Animation Saison des Pluies - Gouttes qui tombent */
+    @@keyframes rain-fall {
+        0% { transform: translateY(-10px); opacity: 1; }
+        100% { transform: translateY(10px); opacity: 0.3; }
+    }
+    
+    .rain-animation .season-icon {
+        animation: rain-fall 1.5s ease-in-out infinite;
+    }
+    
+    /* Animation gouttes de pluie qui tombent (pour saisons des pluies) */
+    .raindrops {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .raindrop {
+        position: absolute;
+        top: -10px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.2em;
+        animation: raindrop-fall linear infinite;
+    }
+    
+    @@keyframes raindrop-fall {
+        0% {
+            top: -10%;
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            top: 110%;
+            transform: translateX(50px);
+            opacity: 0.3;
+        }
+    }
+    
+    .raindrop:nth-child(1) { left: 10%; animation-duration: 1.5s; animation-delay: 0s; }
+    .raindrop:nth-child(2) { left: 25%; animation-duration: 1.8s; animation-delay: 0.3s; }
+    .raindrop:nth-child(3) { left: 40%; animation-duration: 1.3s; animation-delay: 0.6s; }
+    .raindrop:nth-child(4) { left: 55%; animation-duration: 1.7s; animation-delay: 0.2s; }
+    .raindrop:nth-child(5) { left: 70%; animation-duration: 1.4s; animation-delay: 0.5s; }
+    .raindrop:nth-child(6) { left: 85%; animation-duration: 1.6s; animation-delay: 0.1s; }
+    .raindrop:nth-child(7) { left: 15%; animation-duration: 1.9s; animation-delay: 0.4s; }
+    .raindrop:nth-child(8) { left: 30%; animation-duration: 1.2s; animation-delay: 0.7s; }
+    .raindrop:nth-child(9) { left: 45%; animation-duration: 1.5s; animation-delay: 0.2s; }
+    .raindrop:nth-child(10) { left: 60%; animation-duration: 1.8s; animation-delay: 0.5s; }
+    
+    .welcome-text {
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .season-badge {
+        background-color: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.85rem;
+        color: #ffffff;
+        font-weight: 500;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+</style>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm welcome-card @animationClass" style="position: relative;">
+            @if (nomSaison.Contains("Pluies"))
+            {
+                <div class="raindrops d-none d-md-block" aria-hidden="true">
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                    <div class="raindrop">💧</div>
+                </div>
+            }
+            <div class="card-body p-3 p-md-4" style="position: relative; z-index: 2;">
+                <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3">
+                    <div class="welcome-text flex-grow-1">
+                        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-3 gap-2">
+                            <h3 class="mb-0 fw-bold fs-4 fs-md-3">
+                                <i class="fas fa-utensils me-2"></i>
+                                @messageHeure, @nomComplet !
+                            </h3>
+                            <span class="season-badge">
+                                <i class="fas @iconeSaison me-1"></i>
+                                <span class="d-none d-sm-inline">@nomSaison</span>
+                                <span class="d-sm-none">@nomSaison.Split(' ')[0]</span>
+                            </span>
+                        </div>
+                        <p class="mb-3 fs-6 fs-md-5">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Bienvenue sur votre espace de commande de repas.
+                        </p>
+                        <div class="border-top border-white border-opacity-25 pt-3 mt-3 d-none d-md-block">
+                            <p class="mb-0 fst-italic" style="font-size: 0.95rem; color: #ffffff; opacity: 0.95;">
+                                <i class="fas fa-quote-left me-2"></i>
+                                @citationDuJour
+                            </p>
+                        </div>
+                    </div>
+                    <div class="d-none d-lg-block ms-4">
+                        <i class="fas @iconeSaison season-icon" style="font-size: 4rem; color: rgba(255, 255, 255, 0.7);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- ==================== VUE ADMIN / RH / EMPLOYÉ ==================== -->
 @if (role != "PrestataireCantine")
 {
     <div class="row">
         <!-- ========= Colonne gauche : Menus de la semaine ========= -->
-        <div class="col-lg-9 mb-4">
+        <div class="col-12 col-lg-9 mb-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 text-primary">
-                        <i class="fas fa-book-open me-2"></i>
-                        Menus de la Semaine en cours
-                    </h5>
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                        <h5 class="mb-0 text-primary">
+                            <i class="fas fa-book-open me-2"></i>
+                            <span class="d-none d-sm-inline">Menus de la semaine en cours</span>
+                            <span class="d-sm-none">Menus de la semaine</span>
+                        </h5>
+                        <a href="@Url.Action("Create", "Commande")" class="btn btn-info w-100 w-sm-auto">
+                            <i class="fas fa-shopping-cart me-2"></i>Commander
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-2 p-md-3">
                     @if (!menus.Any())
                     {
                         <div class="text-center py-5">
                             <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Aucun menu disponible pour cette semaine</h5>
+                            <h5 class="text-muted">Aucun menu disponible pour cette semaine.</h5>
                             <p class="text-muted">Les menus seront bientôt disponibles.</p>
                         </div>
                     }
@@ -47,6 +312,12 @@
                         @foreach (var groupe in menusParDate)
                         {
                             var dateDuJour = groupe.Key;
+                            
+                            // Calcul du délai de commande (48h avant 12h00 de la date de consommation)
+                            var maintenant = DateTime.Now;
+                            var dateConsommationA12H = dateDuJour.Date.AddHours(12); // Date de consommation à 12h00
+                            var delaiCommande = dateConsommationA12H.AddHours(-48); // 48h avant 12h00
+                            var peutCommander = maintenant <= delaiCommande;
 
                             // On n'affiche que les formules qui ont du contenu
                             var menusDuJour = groupe.Where(menu =>
@@ -68,11 +339,42 @@
                             .ToList();
 
                             <div class="card border-0 shadow-sm mb-4">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-calendar-day me-2"></i>
-                                        @dateDuJour.ToString("dddd dd/MM/yyyy", fr)
-                                    </h5>
+                                <div class="card-header @(peutCommander ? "bg-primary" : "bg-secondary") text-white position-relative overflow-hidden">
+                                    <div class="row align-items-center">
+                                        <div class="col-12 col-md-8">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-calendar-day me-2"></i>
+                                                <span class="d-none d-sm-inline">@dateDuJour.ToString("dddd dd/MM/yyyy", fr)</span>
+                                                <span class="d-sm-none">@dateDuJour.ToString("dd/MM/yyyy", fr)</span>
+                                            </h5>
+                                            @if (peutCommander)
+                                            {
+                                                <small class="text-white-50">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    <span class="d-none d-md-inline">Commandes acceptées jusqu'au @delaiCommande.ToString("dd/MM HH:mm")</span>
+                                                    <span class="d-md-none">Jusqu'au @delaiCommande.ToString("dd/MM HH:mm")</span>
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <small class="text-info">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    <span class="d-none d-md-inline">Délai de 48h avant 12h dépassé - Commande possible selon les règles</span>
+                                                    <span class="d-md-none">Délai dépassé</span>
+                                                </small>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-4 text-center text-md-end mt-2 mt-md-0">
+                                            @{
+                                                var jourSemaine = dateDuJour.DayOfWeek;
+                                                var nomImage = imagesParJour.ContainsKey(jourSemaine) ? imagesParJour[jourSemaine] : "poulet.jpg";
+                                            }
+                                            <img src="~/images/contente/formulesJour/@nomImage" 
+                                                 alt="Menu du jour" 
+                                                 class="menu-day-image"
+                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 3px solid rgba(255,255,255,0.4);">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="card-body">
@@ -87,14 +389,19 @@
                                             {
                                                 string titre = (string)(menu.TypeFormule ?? menu.NomFormule ?? "Formule");
 
-                                                <div class="col-md-4">
+                                                <div class="col-12 col-md-6 col-xl-4">
                                                     <div class="card border-0 shadow-sm h-100">
                                                         <div class="card-body">
                                                             <div class="d-flex justify-content-between align-items-start mb-3">
                                                                 <h6 class="card-title text-primary mb-0">@titre</h6>
-                                                                <span class="badge bg-warning text-dark">
-                                                                    @(((DateTime)menu.Date).ToString("dd/MM"))
-                                                                </span>
+                                                                <div class="d-flex flex-column align-items-end">
+                                                                    <span class="badge bg-warning text-dark mb-1">
+                                                                        @(((DateTime)menu.Date).ToString("dd/MM"))
+                                                                    </span>
+                                                                    <span class="badge bg-success">
+                                                                        <i class="fas fa-check me-1"></i>Disponible
+                                                                    </span>
+                                                                </div>
                                                             </div>
 
                                                             @* Affichages simples, sans helper *@
@@ -232,6 +539,24 @@
                                     int status = (int)c.StatusCommande; // 0=Précommandé, 1=Consommé, 2=Annulé
                                     string badge = status == 0 ? "bg-warning" : status == 1 ? "bg-success" : "bg-danger";
                                     string lib = status == 0 ? "Précommandé" : status == 1 ? "Consommé" : "Annulé";
+                                    
+                                    // Calcul des délais pour l'annulation (24h) et la commande (48h)
+                                    var dateConsommation = ((DateTime?)c.DateConsommation)?.Date ?? DateTime.Today;
+                                    var maintenant = DateTime.Now;
+                                    var delaiAnnulation = dateConsommation.AddHours(-24); // 24h avant (seconde par seconde)
+                                    // Calcul du délai : 48h avant 12h00 de la date de consommation
+                                    var dateConsommationA12H = dateConsommation.Date.AddHours(12); // Date de consommation à 12h00
+                                    var delaiCommande = dateConsommationA12H.AddHours(-48); // 48h avant 12h00
+                                    
+                                    // Vérifier que la date de consommation n'est pas encore passée
+                                    var datePassee = dateConsommation < DateTime.Today;
+                                    
+                                    // Les administrateurs peuvent annuler sans restriction de délai (sauf commandes consommées)
+                                    bool estAdmin = User.IsInRole("Administrateur");
+                                    var peutAnnuler = estAdmin 
+                                        ? (status == 0) // Admin: seulement si Précommandé
+                                        : (status == 0 && !datePassee && maintenant <= delaiAnnulation); // Non-Admin: règles normales
+                                    var peutCommander = maintenant <= delaiCommande;
 
                                     <div class="commande-item mb-2 p-3 border rounded-3">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -269,6 +594,55 @@
                                                     <i class="fas fa-exclamation-triangle me-1"></i>
                                                     <strong>Motif:</strong> @c.MotifAnnulation
                                                 </small>
+                                            </div>
+                                        }
+
+                                        @* Bouton d'annulation avec vérification des délais *@
+                                        @if (peutAnnuler)
+                                        {
+                                            <div class="mt-3">
+                                                <button type="button" 
+                                                        class="btn btn-danger btn-sm annuler-commande-btn"
+                                                        data-commande-id="@c.IdCommande"
+                                                        data-code-commande="@c.CodeCommande"
+                                                        data-date-consommation="@dateConsommation.ToString("yyyy-MM-dd HH:mm")"
+                                                        title="Annuler cette commande"
+                                                        style="font-size: 12px; padding: 5px 10px;">
+                                                    <i class="fas fa-times me-1"></i> Annuler
+                                                </button>
+                                                @if (estAdmin)
+                                                {
+                                                    <small class="text-success ms-2">
+                                                        <i class="fas fa-user-shield me-1"></i>
+                                                        Mode Administrateur (pas de restriction)
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted ms-2">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Annulation possible jusqu'au @delaiAnnulation.ToString("dd/MM HH:mm")
+                                                    </small>
+                                                }
+                                            </div>
+                                        }
+                                        else if (status == 0 && !peutAnnuler && !estAdmin)
+                                        {
+                                            <div class="mt-3">
+                                                @if (datePassee)
+                                                {
+                                                    <small class="text-danger">
+                                                        <i class="fas fa-calendar-times me-1"></i>
+                                                        Annulation non possible (date de consommation déjà passée: @dateConsommation.ToString("dd/MM/yyyy"))
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-danger">
+                                                        <i class="fas fa-ban me-1"></i>
+                                                        Annulation non possible (délai dépassé: 24h avant la consommation)
+                                                    </small>
+                                                }
                                             </div>
                                         }
                                     </div>
@@ -425,7 +799,19 @@
                                 var commandesMenu = prestataireCommandes.Where(c => c.FormuleNom?.ToString() == menu.NomFormule?.ToString()).ToList();
                                 var commandesJour = commandesMenu.Count(c => c.PeriodeService?.ToString() == "Jour");
                                 var commandesNuit = commandesMenu.Count(c => c.PeriodeService?.ToString() == "Nuit");
-                                var margeMenu = menu.Marge ?? 0;
+                                
+                                // Afficher les quotas restants au lieu du nombre de commandes
+                                var quotaJourRestant = menu.QuotaJourRestant ?? 0;
+                                var quotaNuitRestant = menu.QuotaNuitRestant ?? 0;
+                                
+                                // Utiliser directement les marges jour et nuit (indépendantes)
+                                var margeJourRestante = menu.MargeJourRestante ?? 0;
+                                var margeNuitRestante = menu.MargeNuitRestante ?? 0;
+                                
+                                // Calculer le total disponible pour chaque période
+                                var totalJour = quotaJourRestant + margeJourRestante;
+                                var totalNuit = quotaNuitRestant + margeNuitRestante;
+                                
                                 <div class="list-group-item border-0 px-0 mb-3">
                                     <div class="card border-warning">
                                         <div class="card-header bg-warning text-dark">
@@ -439,18 +825,34 @@
                                                 <div class="col-4">
                                                     <div class="border-end">
                                                         <h6 class="text-primary mb-1">Jour</h6>
-                                                        <span class="badge bg-primary fs-6">@commandesJour</span>
+                                                        <span class="badge bg-primary fs-6">@quotaJourRestant</span>
+                                                        @if (margeJourRestante > 0)
+                                                        {
+                                                            <br><small class="text-muted">Marge: @margeJourRestante</small>
+                                                        }
+                                                        @if (totalJour <= 0)
+                                                        {
+                                                            <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Épuisé</small>
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="border-end">
                                                         <h6 class="text-dark mb-1">Nuit</h6>
-                                                        <span class="badge bg-dark fs-6">@commandesNuit</span>
+                                                        <span class="badge bg-dark fs-6">@quotaNuitRestant</span>
+                                                        @if (margeNuitRestante > 0)
+                                                        {
+                                                            <br><small class="text-muted">Marge: @margeNuitRestante</small>
+                                                        }
+                                                        @if (totalNuit <= 0)
+                                                        {
+                                                            <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Épuisé</small>
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
-                                                    <h6 class="text-success mb-1">Marge</h6>
-                                                    <span class="badge bg-success fs-6">@margeMenu</span>
+                                                    <h6 class="text-success mb-1">Total</h6>
+                                                    <span class="badge bg-success fs-6">@(totalJour + totalNuit)</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -463,4 +865,64 @@
             </div>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Gestion des boutons d'annulation
+            $('.annuler-commande-btn').click(function() {
+                const btn = $(this);
+                const commandeId = btn.data('commande-id');
+                const codeCommande = btn.data('code-commande');
+                const dateConsommation = btn.data('date-consommation');
+                
+                if (!confirm(`Êtes-vous sûr de vouloir annuler la commande ${codeCommande} pour le ${new Date(dateConsommation).toLocaleDateString('fr-FR')} ?`)) {
+                    return;
+                }
+                
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Annulation...');
+                
+                $.ajax({
+                    url: '@Url.Action("AnnulerMaCommande", "Home")',
+                    type: 'POST',
+                    data: { idCommande: commandeId },
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('danger', response.message);
+                            btn.prop('disabled', false).html('<i class="fas fa-times me-1"></i> Annuler');
+                        }
+                    },
+                    error: function() {
+                        showAlert('danger', 'Erreur lors de l\'annulation de la commande');
+                        btn.prop('disabled', false).html('<i class="fas fa-times me-1"></i> Annuler');
+                    }
+                });
+            });
+        });
+
+        // Fonction pour afficher les alertes
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            
+            // Ajouter l'alerte en haut de la page
+            $('.container-fluid').first().prepend(alertHtml);
+            
+            // Supprimer automatiquement après 5 secondes
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        }
+    </script>
 }

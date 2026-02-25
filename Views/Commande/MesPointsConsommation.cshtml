@@ -1,0 +1,246 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Mes Points de Consommation";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header" style="background-color: #A32D18; color: white;">
+                    <h3 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Mes points de consommation
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Informations utilisateur -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-user me-2"></i>
+                        <strong>@Model.Utilisateur.NomComplet</strong> (@Model.Utilisateur.UserName)
+                        <br>
+                        <small>@Model.Utilisateur.Email</small>
+                    </div>
+
+                    <!-- Filtres de date -->
+                    <form method="get" class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="dateDebut" class="form-label">Date début</label>
+                            <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="@ViewBag.DateDebut">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dateFin" class="form-label">Date fin</label>
+                            <input type="date" class="form-control" id="dateFin" name="dateFin" value="@ViewBag.DateFin">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-filter me-1"></i>
+                                Filtrer
+                            </button>
+                            <a href="@Url.Action("MesPointsConsommation")" class="btn btn-secondary">
+                                <i class="fas fa-redo me-1"></i>
+                                Réinitialiser
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Statistiques -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card text-center" style="border-left: 4px solid #EDAC00;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-muted">Total des consommations</h5>
+                                    <h2 class="mb-0" style="color: #A32D18;">@Model.Statistiques.TotalConsommations</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graphiques -->
+                    <div class="row mb-4">
+                        <!-- Par Formule -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background-color: #EDAC00;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-utensils me-2"></i>
+                                        Répartition par formule
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.ParFormule.Count > 0)
+                                    {
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Formule</th>
+                                                    <th class="text-center">Nombre</th>
+                                                    <th class="text-end">Montant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.ParFormule)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <span class="badge" style="background-color: #A32D18;">@item.Formule</span>
+                                                        </td>
+                                                        <td class="text-center">@item.Nombre</td>
+                                                        <td class="text-end">@item.Montant.ToString("N0") FCFA</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Par Mois -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header" style="background-color: #59311F; color: white;">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        Répartition par mois
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.ParMois.Count > 0)
+                                    {
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mois</th>
+                                                    <th class="text-center">Nombre</th>
+                                                    <th class="text-end">Montant</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.ParMois)
+                                                {
+                                                    <tr>
+                                                        <td>@item.NomMois</td>
+                                                        <td class="text-center">@item.Nombre</td>
+                                                        <td class="text-end">@item.Montant.ToString("N0") FCFA</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste détaillée -->
+                    <div class="card">
+                        <div class="card-header" style="background-color: #A26D55; color: white;">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Détail des consommations
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.PointsConsommation.Count > 0)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Formule</th>
+                                                <th>Plat</th>
+                                                <th class="text-center">Quantité</th>
+                                                <th class="text-end">Coût</th>
+                                                <th>Lieu</th>
+                                                <th>Code</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var point in Model.PointsConsommation)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <i class="fas fa-calendar me-1" style="color: #EDAC00;"></i>
+                                                        @point.DateConsommation.ToString("dd/MM/yyyy")
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge" style="background-color: #A32D18;">
+                                                            @point.TypeFormule
+                                                        </span>
+                                                    </td>
+                                                    <td>@point.NomPlat</td>
+                                                    <td class="text-center">@point.QuantiteConsommee</td>
+                                                    <td class="text-end">
+                                                        <strong style="color: #EDAC00;">@point.Cout.ToString("N0") FCFA</strong>
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(point.LieuConsommation) && point.LieuConsommation.Contains("FACTURATION"))
+                                                        {
+                                                            <span class="badge bg-warning text-dark">
+                                                                <i class="fas fa-money-bill-wave me-1"></i>
+                                                                Facturée
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fas fa-map-marker-alt me-1" style="color: #59311F;"></i>
+                                                            @point.LieuConsommation
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(point.CodeCommande))
+                                                        {
+                                                            <small class="text-muted">@point.CodeCommande</small>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr style="background-color: #f8f9fa; font-weight: bold;">
+                                                <td colspan="3" class="text-end">TOTAL:</td>
+                                                <td class="text-center">@Model.Statistiques.TotalConsommations</td>
+                                                <td class="text-end" style="color: #A32D18;">
+                                                    @Model.Statistiques.TotalMontant.ToString("N0") FCFA
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Aucun point de consommation trouvé pour la période sélectionnée.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Initialiser les dates par défaut
+        $(document).ready(function() {
+            console.log('Page Mes Points de Consommation chargée');
+        });
+    </script>
+}
+

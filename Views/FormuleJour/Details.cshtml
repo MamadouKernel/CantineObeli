@@ -1,0 +1,420 @@
+﻿@model Obeli_K.Models.ViewModels.FormuleJourViewModel
+
+@{
+    ViewData["Title"] = "Détails de la Formule";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-utensils text-warning me-2"></i>
+                        Détails de la Formule
+                    </h3>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Edit" asp-route-id="@Model.IdFormule" class="btn btn-warning">
+                            <i class="fas fa-edit me-1"></i>
+                            Modifier
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour à la liste
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Informations générales -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informations Générales
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Date</label>
+                                <div class="form-control-plaintext">
+                                    <strong>@Model.Date.ToString("dddd dd/MM/yyyy", new System.Globalization.CultureInfo("fr-FR"))</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nom de la Formule</label>
+                                <div class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.NomFormule))
+                                    {
+                                        <span class="badge bg-primary fs-6">@Model.NomFormule</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non défini</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Type de Formule</label>
+                                <div class="form-control-plaintext">
+                                    @if (!string.IsNullOrEmpty(Model.TypeFormuleNom))
+                                    {
+                                        <span class="badge bg-info">@Model.TypeFormuleNom</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non défini</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Statut</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.Verrouille)
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-lock me-1"></i>
+                                            Verrouillée
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Active
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formule Améliorée -->
+                    @if (!string.IsNullOrEmpty(Model.Entree) || !string.IsNullOrEmpty(Model.Plat) || 
+                         !string.IsNullOrEmpty(Model.Garniture) || !string.IsNullOrEmpty(Model.Dessert))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-success mb-3">
+                                    <i class="fas fa-star me-2"></i>
+                                    Formule Améliorée
+                                </h5>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Entree))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Entrée</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-leaf text-success me-2"></i>
+                                        @Model.Entree
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Plat))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Plat Principal</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-drumstick-bite text-primary me-2"></i>
+                                        @Model.Plat
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Garniture))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Garniture</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-seedling text-warning me-2"></i>
+                                        @Model.Garniture
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Dessert))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Dessert</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-ice-cream text-danger me-2"></i>
+                                        @Model.Dessert
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Formule Standard -->
+                    @if (!string.IsNullOrEmpty(Model.PlatStandard1) || !string.IsNullOrEmpty(Model.PlatStandard2))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-info mb-3">
+                                    <i class="fas fa-utensils me-2"></i>
+                                    Formule Standard
+                                </h5>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.PlatStandard1))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Plat Standard 1</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-fish text-primary me-2"></i>
+                                        @Model.PlatStandard1
+                                        @if (!string.IsNullOrEmpty(Model.GarnitureStandard1))
+                                        {
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-plus me-1"></i>
+                                                <strong>Garniture:</strong> @Model.GarnitureStandard1
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.PlatStandard2))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Plat Standard 2</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-drumstick-bite text-success me-2"></i>
+                                        @Model.PlatStandard2
+                                        @if (!string.IsNullOrEmpty(Model.GarnitureStandard2))
+                                        {
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-plus me-1"></i>
+                                                <strong>Garniture:</strong> @Model.GarnitureStandard2
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Compléments -->
+                    @if (!string.IsNullOrEmpty(Model.Feculent) || !string.IsNullOrEmpty(Model.Legumes))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-warning mb-3">
+                                    <i class="fas fa-carrot me-2"></i>
+                                    Compléments
+                                </h5>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Feculent))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Féculent</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-bread-slice text-warning me-2"></i>
+                                        @Model.Feculent
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.Legumes))
+                            {
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Légumes</label>
+                                    <div class="form-control-plaintext bg-light p-3 rounded">
+                                        <i class="fas fa-leaf text-success me-2"></i>
+                                        @Model.Legumes
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Informations techniques -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-secondary mb-3">
+                                <i class="fas fa-cogs me-2"></i>
+                                Informations Techniques
+                            </h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Marge</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.Marge.HasValue && Model.Marge.Value > 0)
+                                    {
+                                        <span class="badge bg-warning">@Model.Marge%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Aucune marge</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Statut Technique</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.Statut.HasValue)
+                                    {
+                                        @if (Model.Statut.Value == 1)
+                                        {
+                                            <span class="badge bg-success">Actif</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactif</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non défini</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">ID Formule</label>
+                                <div class="form-control-plaintext">
+                                    <small class="text-muted font-monospace">@Model.IdFormule</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historique -->
+                    @if (!string.IsNullOrEmpty(Model.Historique))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-info mb-3">
+                                    <i class="fas fa-history me-2"></i>
+                                    Historique
+                                </h5>
+                                <div class="form-control-plaintext bg-light p-3 rounded">
+                                    <i class="fas fa-file-alt text-info me-2"></i>
+                                    @Model.Historique
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Informations d'audit -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="text-muted mb-3">
+                                <i class="fas fa-user-clock me-2"></i>
+                                Informations d'Audit
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Créé le</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.CreatedOn.HasValue)
+                                    {
+                                        <i class="fas fa-calendar-plus text-success me-2"></i>
+                                        @Model.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm")
+                                        @if (!string.IsNullOrEmpty(Model.CreatedBy))
+                                        {
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>
+                                                par @Model.CreatedBy
+                                            </small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non disponible</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Modifié le</label>
+                                <div class="form-control-plaintext">
+                                    @if (Model.ModifiedOn.HasValue)
+                                    {
+                                        <i class="fas fa-calendar-edit text-warning me-2"></i>
+                                        @Model.ModifiedOn.Value.ToString("dd/MM/yyyy HH:mm")
+                                        @if (!string.IsNullOrEmpty(Model.ModifiedBy))
+                                        {
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>
+                                                par @Model.ModifiedBy
+                                            </small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Jamais modifiée</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <form asp-action="Delete" method="post" class="d-inline" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formule ?');">
+                                <input type="hidden" name="id" value="@Model.IdFormule" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.IdFormule" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>
+                                Modifier
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}
+
+

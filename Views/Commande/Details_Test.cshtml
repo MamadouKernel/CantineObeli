@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.CommandeListViewModel
+﻿@model Obeli_K.Models.ViewModels.CommandeListViewModel
 
 @{
     ViewData["Title"] = "Détails de la Commande";
@@ -48,6 +48,12 @@
                                                     break;
                                                 case Obeli_K.Enums.StatutCommande.Annulee:
                                                     <span class="badge bg-danger fs-6">Annulée</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.Indisponible:
+                                                    <span class="badge bg-info fs-6">Indisponible</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.NonRecuperer:
+                                                    <span class="badge bg-secondary fs-6">Non récupérée</span>
                                                     break;
                                                 default:
                                                     <span class="badge bg-secondary fs-6">Précommandée</span>

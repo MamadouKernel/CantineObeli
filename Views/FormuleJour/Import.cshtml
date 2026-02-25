@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.ImportFormuleViewModel
+﻿@model Obeli_K.Models.ViewModels.ImportFormuleViewModel
 
 @{
     ViewData["Title"] = "Importer des Formules";
@@ -35,13 +35,23 @@
                     @if (TempData["ImportErrors"] != null)
                     {
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Erreurs d'importation :</h6>
-                            <ul class="mb-0">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Erreurs d'importation détectées :</h6>
+                            <div class="mt-3">
                                 @foreach (var error in (List<string>)TempData["ImportErrors"])
                                 {
-                                    <li>@error</li>
+                                    <div class="mb-2 p-2 bg-light border-start border-warning border-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-file-excel me-1"></i>
+                                            @error
+                                        </small>
+                                    </div>
                                 }
-                            </ul>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>💡 Conseil :</strong> Corrigez ces erreurs dans votre fichier Excel et relancez l'importation.
+                                </small>
+                            </div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
@@ -58,30 +68,12 @@
                                     <div class="form-text">Formats acceptés : .xlsx, .xls (recommandé : .xlsx)</div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="DateDebut" class="form-label"></label>
-                                            <input asp-for="DateDebut" type="date" class="form-control" />
-                                            <span asp-validation-for="DateDebut" class="text-danger"></span>
-                                            <div class="form-text">Filtrer les formules à partir de cette date (optionnel)</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label asp-for="DateFin" class="form-label"></label>
-                                            <input asp-for="DateFin" type="date" class="form-control" />
-                                            <span asp-validation-for="DateFin" class="text-danger"></span>
-                                            <div class="form-text">Filtrer les formules jusqu'à cette date (optionnel)</div>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <div class="mb-3">
                                     <div class="form-check">
                                         <input asp-for="RemplacerExistantes" class="form-check-input" />
                                         <label asp-for="RemplacerExistantes" class="form-check-label"></label>
-                                        <div class="form-text">Si une formule existe déjà pour une date, la remplacer</div>
+                                        @* <div class="form-text">Si une formule existe déjà pour une date, la remplacer</div> *@
                                     </div>
                                 </div>
 
@@ -96,7 +88,7 @@
                                 <div class="d-flex justify-content-between">
                                     <a asp-action="Index" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left me-1"></i>
-                                        Retour à la liste
+                                        Retour
                                     </a>
                                     <div>
                                         <a asp-action="DownloadTemplate" class="btn btn-info me-2">
@@ -121,32 +113,31 @@
                                     </h6>
                                 </div>
                                 <div class="card-body">
-                                    <h6>Format du fichier :</h6>
-                                    <p class="small">Le fichier doit contenir les colonnes suivantes :</p>
+                                    <h6>🎯 Comment ça marche :</h6>
+                                    <p class="small">Chaque ligne de votre fichier Excel = <strong>1 formule distincte</strong></p>
+                                    
+                                    <h6>📊 Types de formules :</h6>
                                     <ul class="small">
-                                        <li><strong>Date</strong> : Date de la formule (YYYY-MM-DD)</li>
-                                        <li><strong>NomFormule</strong> : Nom de la formule</li>
-                                        <li><strong>Entree</strong> : Entrée (formule améliorée)</li>
-                                        <li><strong>Plat</strong> : Plat principal (formule améliorée)</li>
-                                        <li><strong>Garniture</strong> : Garniture (formule améliorée)</li>
-                                        <li><strong>Dessert</strong> : Dessert (formule améliorée)</li>
-                                        <li><strong>PlatStandard1</strong> : Plat standard 1</li>
-                                        <li><strong>GarnitureStandard1</strong> : Garniture standard 1</li>
-                                        <li><strong>PlatStandard2</strong> : Plat standard 2</li>
-                                        <li><strong>GarnitureStandard2</strong> : Garniture standard 2</li>
-                                        <li><strong>Feculent</strong> : Féculent commun</li>
-                                        <li><strong>Legumes</strong> : Légumes communs</li>
-                                        <li><strong>Marge</strong> : Marge (0-100, peut être vide)</li>
-                                        <li><strong>Statut</strong> : Statut (1=actif, 0=inactif)</li>
+                                        <li><strong>Formule Améliorée</strong> : Entrée + Plat + Garniture + Dessert + Féculent + Légumes</li>
+                                        <li><strong>Formule Standard 1</strong> : PlatStandard1 + GarnitureStandard1</li>
+                                        <li><strong>Formule Standard 2</strong> : PlatStandard2 + GarnitureStandard2</li>
                                     </ul>
                                     
-                                    <h6 class="mt-3">Conseils :</h6>
+                                    <h6>✅ Règles importantes :</h6>
                                     <ul class="small">
-                                        <li>Téléchargez d'abord le modèle Excel (.xlsx) pour voir le format</li>
-                                        <li>Le modèle contient des exemples et des instructions détaillées</li>
-                                        <li>Les champs vides seront ignorés</li>
-                                        <li>Vérifiez les dates avant l'import</li>
-                                        <li>Les formules existantes peuvent être remplacées</li>
+                                        <li><strong>Date</strong> et <strong>NomFormule</strong> sont obligatoires</li>
+                                        <li><strong>Format de date</strong> : DD/MM/YYYY (ex: 15/01/2024) ou YYYY-MM-DD (ex: 2024-01-15)</li>
+                                        <li>Pour créer une formule, remplissez au moins un champ correspondant</li>
+                                        <li>Vous pouvez créer 1, 2 ou 3 formules par date</li>
+                                        <li>Les champs vides ne créent pas de formules vides</li>
+                                    </ul>
+                                    
+                                    <h6 class="mt-3">💡 Conseils :</h6>
+                                    <ul class="small">
+                                        <li>Téléchargez d’abord le modèle Excel pour voir des exemples</li>
+                                        <li>Le modèle montre comment créer 1, 2 ou 3 formules</li>
+                                        <li>Regroupez vos formules par date pour une meilleure organisation</li>
+                                        <li>Utilisez des noms cohérents : « Formule améliorée », « Formule standard 1 », etc.</li>
                                     </ul>
                                 </div>
                             </div>

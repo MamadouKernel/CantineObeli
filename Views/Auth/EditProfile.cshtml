@@ -1,4 +1,4 @@
-@model Obeli_K.Models.Utilisateur
+﻿@model Obeli_K.Models.Utilisateur
 @{
     ViewData["Title"] = "Modifier mes informations";
 }
@@ -141,20 +141,20 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group">
-                                            <label asp-for="DepartementId" class="form-label">
-                                                <i class="fas fa-building"></i>Département *
+                                            <label asp-for="DirectionId" class="form-label">
+                                                <i class="fas fa-building"></i>direction *
                                             </label>
-                                            <select asp-for="DepartementId" class="form-select" required>
-                                                <option value="">-- Sélectionner un département --</option>
-                                                @if (ViewBag.Departements != null)
+                                            <select asp-for="DirectionId" class="form-select" required>
+                                                <option value="">-- Sélectionner un direction --</option>
+                                                @if (ViewBag.Directions != null)
                                                 {
-                                                    @foreach (var departement in ViewBag.Departements)
+                                                    @foreach (var direction in ViewBag.Directions)
                                                     {
-                                                        <option value="@departement.Value">@departement.Text</option>
+                                                        <option value="@direction.Value">@direction.Text</option>
                                                     }
                                                 }
                                             </select>
-                                            <span asp-validation-for="DepartementId" class="text-danger"></span>
+                                            <span asp-validation-for="DirectionId" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -428,3 +428,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+

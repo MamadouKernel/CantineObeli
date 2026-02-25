@@ -1,4 +1,4 @@
-namespace Obeli_K.Models.ViewModels
+﻿namespace Obeli_K.Models.ViewModels
 {
     public class ReportingIndicateursViewModel
     {
@@ -33,9 +33,9 @@ namespace Obeli_K.Models.ViewModels
         public int VolumeSurplus { get; set; }
 
         /// <summary>
-        /// Commandes par département
+        /// Commandes par direction
         /// </summary>
-        public Dictionary<string, int> CommandesParDepartement { get; set; } = new();
+        public Dictionary<string, int> CommandesParDirection { get; set; } = new();
 
         /// <summary>
         /// Commandes par fonction

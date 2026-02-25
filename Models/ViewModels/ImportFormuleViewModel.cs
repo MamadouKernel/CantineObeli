@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Obeli_K.Models.ViewModels
 {
@@ -7,12 +7,6 @@ namespace Obeli_K.Models.ViewModels
         [Required(ErrorMessage = "Le fichier est obligatoire.")]
         [Display(Name = "Fichier Excel")]
         public IFormFile? FichierExcel { get; set; }
-
-        [Display(Name = "Date de début")]
-        public DateTime? DateDebut { get; set; }
-
-        [Display(Name = "Date de fin")]
-        public DateTime? DateFin { get; set; }
 
         [Display(Name = "Remplacer les formules existantes")]
         public bool RemplacerExistantes { get; set; } = false;

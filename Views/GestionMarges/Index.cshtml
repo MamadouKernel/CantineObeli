@@ -1,0 +1,194 @@
+﻿@model Obeli_K.Models.ViewModels.GestionMargesViewModel
+
+@{
+    ViewData["Title"] = "Gestion des Marges Jour et Nuit";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-sliders-h me-2"></i>
+                        Gestion des Marges Jour et Nuit
+                    </h4>
+                    <small class="opacity-75">Paramétrage des marges par période pour les RH et Administrateurs</small>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["InfoMessage"] != null)
+                    {
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @TempData["InfoMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Formulaire de sélection de période -->
+                    <form asp-action="ChargerFormules" method="post" class="mb-4">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label asp-for="DateDebut" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Date de début
+                                </label>
+                                <input asp-for="DateDebut" type="date" class="form-control" required />
+                                <span asp-validation-for="DateDebut" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DateFin" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Date de fin
+                                </label>
+                                <input asp-for="DateFin" type="date" class="form-control" required />
+                                <span asp-validation-for="DateFin" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>
+                                    Charger les formules
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tableau des formules avec marges -->
+                    @if (Model.Formules != null && Model.Formules.Any())
+                    {
+                        <form asp-action="SauvegarderMarges" method="post" id="formMarges">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="DateDebut" />
+                            <input type="hidden" asp-for="DateFin" />
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 10%;">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                Date
+                                            </th>
+                                            <th style="width: 15%;">
+                                                <i class="fas fa-utensils me-1"></i>
+                                                Type Formule
+                                            </th>
+                                            <th style="width: 20%;">
+                                                <i class="fas fa-drumstick-bite me-1"></i>
+                                                Plat
+                                            </th>
+                                            <th style="width: 12%;" class="text-center">
+                                                <i class="fas fa-sun me-1"></i>
+                                                Quota Jour
+                                            </th>
+                                            <th style="width: 12%;" class="text-center bg-warning bg-opacity-25">
+                                                <i class="fas fa-sun me-1"></i>
+                                                Marge Jour
+                                            </th>
+                                            <th style="width: 12%;" class="text-center">
+                                                <i class="fas fa-moon me-1"></i>
+                                                Quota Nuit
+                                            </th>
+                                            <th style="width: 12%;" class="text-center bg-info bg-opacity-25">
+                                                <i class="fas fa-moon me-1"></i>
+                                                Marge Nuit
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Formules.Count; i++)
+                                        {
+                                            var formule = Model.Formules[i];
+                                            <tr>
+                                                <input type="hidden" asp-for="Formules[i].IdFormule" />
+                                                <input type="hidden" asp-for="Formules[i].Date" />
+                                                <input type="hidden" asp-for="Formules[i].NomFormule" />
+                                                <input type="hidden" asp-for="Formules[i].Plat" />
+                                                <input type="hidden" asp-for="Formules[i].QuotaJourRestant" />
+                                                <input type="hidden" asp-for="Formules[i].QuotaNuitRestant" />
+
+                                                <td class="align-middle">
+                                                    <span class="fw-bold">@formule.Date.ToString("dd/MM/yyyy")</span>
+                                                </td>
+                                                <td class="align-middle">
+                                                    <span class="badge bg-primary">@formule.NomFormule</span>
+                                                </td>
+                                                <td class="align-middle">
+                                                    <small>@formule.Plat</small>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <span class="badge bg-secondary">@(formule.QuotaJourRestant ?? 0)</span>
+                                                </td>
+                                                <td class="align-middle text-center bg-warning bg-opacity-10">
+                                                    <input type="number" 
+                                                           asp-for="Formules[i].MargeJourRestante" 
+                                                           class="form-control form-control-sm text-center" 
+                                                           min="0" 
+                                                           max="1000"
+                                                           style="width: 100px; margin: 0 auto;" />
+                                                    <span asp-validation-for="Formules[i].MargeJourRestante" class="text-danger small"></span>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <span class="badge bg-dark">@(formule.QuotaNuitRestant ?? 0)</span>
+                                                </td>
+                                                <td class="align-middle text-center bg-info bg-opacity-10">
+                                                    <input type="number" 
+                                                           asp-for="Formules[i].MargeNuitRestante" 
+                                                           class="form-control form-control-sm text-center" 
+                                                           min="0" 
+                                                           max="1000"
+                                                           style="width: 100px; margin: 0 auto;" />
+                                                    <span asp-validation-for="Formules[i].MargeNuitRestante" class="text-danger small"></span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4 d-flex justify-content-between">
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Retour
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>
+                                    Sauvegarder les marges
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else if (Model.Formules != null && !Model.Formules.Any())
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune formule trouvée pour la période sélectionnée. Veuillez sélectionner une autre période.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

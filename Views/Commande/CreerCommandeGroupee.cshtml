@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.CommandeGroupeeViewModel
+﻿@model Obeli_K.Models.ViewModels.CommandeGroupeeViewModel
 
 @{
     ViewData["Title"] = "Créer une Commande Groupée";
@@ -38,156 +38,164 @@
                                 <div class="card-header bg-warning text-dark">
                                     <h5 class="card-title mb-0">
                                         <i class="fas fa-users me-2"></i>
-                                        Commande Groupée - Groupes non-CIT (Quantité Libre)
+                                        Commande Groupée - Visiteurs CIT (Quantité Libre)
                                     </h5>
                                 </div>
                                 <div class="card-body">
                                     <form asp-action="CreerCommandeGroupee" method="post">
                                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                                         
+                                        <!-- Information pour visiteurs -->
+                                        <div class="alert alert-info mb-4">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h6><i class="fas fa-info-circle me-2"></i>Commande groupée pour visiteurs CIT</h6>
+                                                    <p class="mb-0">
+                                                        Cette commande concerne uniquement les visiteurs de CIT. 
+                                                        La commande doit être créée au moins <strong>48h à l'avance</strong> de la date de début de consommation.
+                                                        <strong>Seules les formules améliorées sont disponibles pour les visiteurs.</strong>
+                                                        Vous pouvez sélectionner une formule pour chaque jour de la période.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="row">
-                                            <!-- Groupe non-CIT -->
-                                            <div class="col-md-4">
+                                            <!-- Étape 1: Direction -->
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label asp-for="GroupeNonCitId" class="form-label">
-                                                        <i class="fas fa-building me-1"></i>
-                                                        Groupe non-CIT
+                                                    <label asp-for="DirectionId" class="form-label">
+                                                        <i class="fas fa-sitemap me-1"></i>
+                                                        Direction d'accueil <span class="text-danger">*</span>
                                                     </label>
-                                                    <select asp-for="GroupeNonCitId" class="form-select" id="groupeSelect" asp-items="ViewBag.GroupesNonCit">
-                                                        <option value="">-- Sélectionner un groupe --</option>
+                                                    <select asp-for="DirectionId" class="form-select" id="directionSelect" asp-items="ViewBag.Directions" required>
+                                                        <option value="">-- Sélectionner une direction --</option>
                                                     </select>
-                                                    <span asp-validation-for="GroupeNonCitId" class="text-danger"></span>
+                                                    <span asp-validation-for="DirectionId" class="text-danger"></span>
                                                 </div>
                                             </div>
 
-                                            <!-- Date -->
-                                            <div class="col-md-4">
+                                            <!-- Étape 2: Nombre de visiteurs -->
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label asp-for="Date" class="form-label">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        Date de consommation
+                                                    <label asp-for="NombreVisiteurs" class="form-label">
+                                                        <i class="fas fa-users me-1"></i>
+                                                        Nombre de visiteurs <span class="text-danger">*</span>
                                                     </label>
-                                                    <input asp-for="Date" type="date" class="form-control" />
-                                                    <span asp-validation-for="Date" class="text-danger"></span>
+                                                    <input asp-for="NombreVisiteurs" class="form-control" type="number" min="1" max="1000" value="1" id="nombreVisiteursInput" />
+                                                    <span asp-validation-for="NombreVisiteurs" class="text-danger"></span>
+                                                    <small class="form-text text-muted">Nombre de visiteurs (1 à 1000)</small>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <!-- Période de service -->
-                                            <div class="col-md-4">
+                                        <div class="row">
+                                            <!-- Étape 3: Période de service -->
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label asp-for="PeriodeService" class="form-label">
                                                         <i class="fas fa-clock me-1"></i>
-                                                        Période de service
+                                                        Période de service <span class="text-danger">*</span>
                                                     </label>
-                                                    <select asp-for="PeriodeService" class="form-select">
+                                                    <select asp-for="PeriodeService" class="form-select" id="periodeSelect">
                                                         <option value="0">Jour</option>
                                                         <option value="1">Nuit</option>
                                                     </select>
                                                     <span asp-validation-for="PeriodeService" class="text-danger"></span>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div class="row">
-                                            <!-- Type de Formule -->
-                                            <div class="col-md-4">
-                                                <div class="mb-3">
-                                                    <label asp-for="TypeFormule" class="form-label">
-                                                        <i class="fas fa-utensils me-1"></i>
-                                                        Type de Formule
-                                                    </label>
-                                                    <select asp-for="TypeFormule" class="form-select" id="typeFormuleSelect">
-                                                        <option value="">-- Sélectionner un type --</option>
-                                                        <option value="Amélioré">Amélioré</option>
-                                                        <option value="Standard 1">Standard 1</option>
-                                                        <option value="Standard 2">Standard 2</option>
-                                                    </select>
-                                                    <span asp-validation-for="TypeFormule" class="text-danger"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Menu -->
+                                            <!-- Nom du groupe (optionnel) -->
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label asp-for="IdFormule" class="form-label">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        Menu
+                                                    <label asp-for="VisiteurNom" class="form-label">
+                                                        <i class="fas fa-user-friends me-1"></i>
+                                                        Nom du groupe
                                                     </label>
-                                                    <select asp-for="IdFormule" class="form-select" id="menuSelect">
-                                                        <option value="">-- Sélectionner un menu --</option>
-                                                    </select>
-                                                    <span asp-validation-for="IdFormule" class="text-danger"></span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Quantité -->
-                                            <div class="col-md-2">
-                                                <div class="mb-3">
-                                                    <label asp-for="Quantite" class="form-label">
-                                                        <i class="fas fa-hashtag me-1"></i>
-                                                        Quantité
-                                                    </label>
-                                                    <input asp-for="Quantite" class="form-control" type="number" min="1" max="1000" />
-                                                    <span asp-validation-for="Quantite" class="text-danger"></span>
+                                                    <input asp-for="VisiteurNom" class="form-control" placeholder="Ex: Groupe formation RH" />
+                                                    <span asp-validation-for="VisiteurNom" class="text-danger"></span>
+                                                    <small class="form-text text-muted">Optionnel</small>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="row">
-                                            <!-- Site -->
+                                            <!-- Date de début -->
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label asp-for="Site" class="form-label">
-                                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                                        Site
+                                                    <label asp-for="DateDebut" class="form-label">
+                                                        <i class="fas fa-calendar-alt me-1"></i>
+                                                        Date de début <span class="text-danger">*</span>
                                                     </label>
-                                                    <select asp-for="Site" class="form-select">
-                                                        <option value="">-- Sélectionner --</option>
-                                                        <option value="0">CIT Terminal</option>
-                                                        <option value="1">CIT Billing</option>
-                                                    </select>
-                                                    <span asp-validation-for="Site" class="text-danger"></span>
+                                                    <input asp-for="DateDebut" type="date" class="form-control" id="dateDebutSelect" min="@DateTime.Today.AddDays(2).ToString("yyyy-MM-dd")" />
+                                                    <span asp-validation-for="DateDebut" class="text-danger"></span>
+                                                    <small class="form-text text-muted">Minimum 48h à l'avance</small>
                                                 </div>
                                             </div>
 
+                                            <!-- Date de fin -->
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label asp-for="DateFin" class="form-label">
+                                                        <i class="fas fa-calendar-alt me-1"></i>
+                                                        Date de fin <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input asp-for="DateFin" type="date" class="form-control" id="dateFinSelect" min="@DateTime.Today.AddDays(2).ToString("yyyy-MM-dd")" />
+                                                    <span asp-validation-for="DateFin" class="text-danger"></span>
+                                                    <small class="form-text text-muted"> >= date de début</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Champ caché pour stocker les formules sélectionnées -->
+                                        <input type="hidden" id="formulesSelectionneesJson" name="FormulesSelectionneesJson" />
+
+                                        <!-- Étape 4: Sélection des formules améliorées pour la période -->
+                                        <div class="mb-4" id="formulesSelection" style="display:none;">
+                                            <label class="form-label fw-bold">
+                                                <i class="fas fa-list me-1"></i>
+                                                Sélectionnez les formules améliorées pour la période <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <strong>Note :</strong> Seules les formules améliorées sont disponibles pour les visiteurs. 
+                                                Vous pouvez sélectionner une formule pour chaque jour de la période.
+                                            </div>
+                                            
+                                            <div class="card">
+                                                <div class="card-body" id="formulesContent">
+                                                    <div class="text-center">
+                                                        <div class="spinner-border" style="color: #EDAC00;" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
                                             <!-- Commentaires -->
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label asp-for="Commentaires" class="form-label">
                                                         <i class="fas fa-comment me-1"></i>
                                                         Commentaires
                                                     </label>
-                                                    <input asp-for="Commentaires" class="form-control" placeholder="Commentaires optionnels" />
+                                                    <input asp-for="Commentaires" class="form-control" placeholder="" />
                                                     <span asp-validation-for="Commentaires" class="text-danger"></span>
+                                                    <small class="form-text text-muted">Optionnel</small>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Information compacte -->
-                                        <div class="alert alert-light border-warning">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-info-circle me-1"></i>
-                                                        <strong>Groupes non-CIT :</strong> Quantité libre (1-1000 plats)
-                                                    </small>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        <strong>Menus :</strong> Semaine N+1 selon le type sélectionné
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex justify-content-between">
+                                        <!-- Boutons d'action -->
+                                        <div class="d-flex justify-content-between mt-4">
                                             <a asp-action="Index" class="btn btn-secondary">
                                                 <i class="fas fa-arrow-left me-1"></i>
-                                                Retour à la liste
+                                                Retour
                                             </a>
-                                            <button type="submit" class="btn btn-warning">
-                                                <i class="fas fa-users me-1"></i>
+                                            <button type="submit" class="btn btn-warning btn-lg">
+                                                <i class="fas fa-check me-2"></i>
                                                 Créer la commande groupée
                                             </button>
                                         </div>
@@ -206,102 +214,198 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function() {
-            // Charger les quotas quand un groupe est sélectionné
-            $('#groupeSelect').change(function() {
-                loadQuotaInfo();
-            });
+            let formuleSelectionnee = null;
 
-            // Charger les menus quand le type de formule change
-            $('#typeFormuleSelect').change(function() {
-                loadMenusForType();
-            });
-
-            // Charger les menus quand la date change
-            $('#Date').change(function() {
-                loadMenusForType();
-            });
-
-            // Charger les quotas au chargement initial
-            loadQuotaInfo();
-        });
-
-
-        function loadMenusForType() {
-            var typeFormule = $('#typeFormuleSelect').val();
-            var date = $('#Date').val();
-            
-            // Vider le dropdown menu si l'un des champs requis n'est pas rempli
-            if (!typeFormule || !date) {
-                $('#menuSelect').empty().append('<option value="">-- Sélectionner un menu --</option>');
-                return;
-            }
-
-            // Charger les menus via AJAX
-            $.ajax({
-                url: '@Url.Action("GetMenusByType", "Commande")',
-                type: 'GET',
-                data: {
-                    typeFormule: typeFormule,
-                    date: date
-                },
-                success: function(data) {
-                    console.log('Menus reçus:', data);
-                    var select = $('#menuSelect');
-                    select.empty();
-                    select.append('<option value="">-- Sélectionner un menu --</option>');
-                    
-                    if (data && data.length > 0) {
-                        data.forEach(function(item) {
-                            console.log('Ajout menu:', item.value, item.text);
-                            select.append('<option value="' + item.value + '">' + item.text + '</option>');
-                        });
-                    } else {
-                        console.log('Aucun menu trouvé pour le type:', typeFormule);
-                        select.append('<option value="">Aucun menu disponible</option>');
+            // Vérifier le délai minimum de 48h et que date fin >= date début
+            $('#dateDebutSelect, #dateFinSelect').change(function() {
+                var dateDebut = new Date($('#dateDebutSelect').val());
+                var dateFin = new Date($('#dateFinSelect').val());
+                var maintenant = new Date();
+                var delaiMinimum = new Date(maintenant.getTime() + (48 * 60 * 60 * 1000)); // 48h en millisecondes
+                
+                if ($(this).attr('id') === 'dateDebutSelect') {
+                    if (dateDebut < delaiMinimum) {
+                        alert('⚠️ La commande doit être créée au moins 48h à l\'avance. Date minimum : ' + delaiMinimum.toLocaleDateString('fr-FR'));
+                        $(this).val('');
+                        $('#formulesSelection').hide();
+                        return;
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.log('Erreur lors du chargement des menus:', error);
+                    // Mettre à jour le min de dateFin
+                    if ($('#dateFinSelect').val() && dateFin < dateDebut) {
+                        $('#dateFinSelect').val($(this).val());
+                    }
+                    $('#dateFinSelect').attr('min', $(this).val());
+                } else {
+                    if (dateFin < dateDebut) {
+                        alert('⚠️ La date de fin doit être supérieure ou égale à la date de début.');
+                        $(this).val($('#dateDebutSelect').val());
+                        return;
+                    }
                 }
+                
+                chargerFormulesAmeliorees();
             });
-        }
 
-        function loadQuotaInfo() {
-            var groupeId = $('#groupeSelect').val();
-            var date = $('#Date').val();
-            
-            if (!groupeId || !date) {
-                $('#quotaInfo').hide();
-                return;
+            // Charger les formules améliorées quand les champs requis changent
+            $('#directionSelect, #nombreVisiteursInput, #periodeSelect, #dateDebutSelect, #dateFinSelect').change(function() {
+                chargerFormulesAmeliorees();
+            });
+
+            function chargerFormulesAmeliorees() {
+                var dateDebut = $('#dateDebutSelect').val();
+                var dateFin = $('#dateFinSelect').val();
+                var directionId = $('#directionSelect').val();
+                var nombreVisiteurs = $('#nombreVisiteursInput').val();
+                var periode = $('#periodeSelect').val();
+                
+                // Vérifier que tous les champs requis sont remplis
+                if (!dateDebut || !dateFin || !directionId || !nombreVisiteurs || nombreVisiteurs < 1) {
+                    $('#formulesSelection').hide();
+                    return;
+                }
+
+                // Vérifier que dateFin >= dateDebut
+                if (new Date(dateFin) < new Date(dateDebut)) {
+                    $('#formulesSelection').hide();
+                    return;
+                }
+
+                $('#formulesSelection').show();
+                $('#formulesContent').html('<div class="text-center"><div class="spinner-border" style="color: #EDAC00;" role="status"><span class="visually-hidden">Chargement...</span></div></div>');
+
+                $.ajax({
+                    url: '@Url.Action("GetMenusByDateRange", "Commande")',
+                    type: 'GET',
+                    data: {
+                        dateDebut: dateDebut,
+                        dateFin: dateFin
+                    },
+                    success: function(data) {
+                        if (data && data.length > 0) {
+                            // Filtrer uniquement les formules améliorées
+                            var formulesAmeliorees = data.filter(function(f) {
+                                var typeFormule = f.text.split(' - ')[0];
+                                return typeFormule && (
+                                    typeFormule.toUpperCase().includes('AMÉLIORÉ') || 
+                                    typeFormule.toUpperCase().includes('AMELIORE') ||
+                                    typeFormule.toUpperCase().includes('AMELIOREE')
+                                );
+                            });
+                            
+                            if (formulesAmeliorees.length > 0) {
+                                afficherFormules(formulesAmeliorees, periode);
+                            } else {
+                                $('#formulesContent').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Aucune formule améliorée disponible pour cette date. Seules les formules améliorées sont autorisées pour les visiteurs.</div>');
+                            }
+                        } else {
+                            $('#formulesContent').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Aucune formule disponible pour cette date.</div>');
+                        }
+                    },
+                    error: function() {
+                        $('#formulesContent').html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Erreur lors du chargement des formules.</div>');
+                    }
+                });
             }
 
-            // Simulation des informations de quota (à remplacer par un appel AJAX réel)
-            var quotaInfo = {
-                quotaJour: 50,
-                quotaNuit: 30,
-                consommesJour: 20,
-                consommesNuit: 10,
-                restrictionStandard: true
-            };
-
-            var restantsJour = quotaInfo.quotaJour - quotaInfo.consommesJour;
-            var restantsNuit = quotaInfo.quotaNuit - quotaInfo.consommesNuit;
-
-            var html = '<div class="row">';
-            html += '<div class="col-md-6">';
-            html += '<strong>Service Jour:</strong> ' + restantsJour + ' plats disponibles (sur ' + quotaInfo.quotaJour + ')';
-            html += '</div>';
-            html += '<div class="col-md-6">';
-            html += '<strong>Service Nuit:</strong> ' + restantsNuit + ' plats disponibles (sur ' + quotaInfo.quotaNuit + ')';
-            html += '</div>';
-            html += '</div>';
-            
-            if (quotaInfo.restrictionStandard) {
-                html += '<div class="mt-2"><small class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Ce groupe est restreint aux formules standard uniquement.</small></div>';
+            function afficherFormules(formules, periodeFiltre) {
+                var html = '';
+                
+                // Grouper les formules par date
+                var formulesByDate = {};
+                formules.forEach(function(f) {
+                    var parts = f.value.split('|');
+                    var formuleId = parts[0];
+                    var formuleDate = parts[1];
+                    if (!formulesByDate[formuleDate]) {
+                        formulesByDate[formuleDate] = [];
+                    }
+                    formulesByDate[formuleDate].push(f);
+                });
+                
+                // Afficher par date
+                Object.keys(formulesByDate).sort().forEach(function(date) {
+                    var dateFormatee = new Date(date).toLocaleDateString('fr-FR', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    
+                    html += '<div class="mb-4">';
+                    html += '<h6 class="mb-3" style="color: #A32D18;"><i class="fas fa-calendar me-2"></i>' + dateFormatee + '</h6>';
+                    html += '<div class="row">';
+                    
+                    formulesByDate[date].forEach(function(f) {
+                        var parts = f.value.split('|');
+                        var formuleId = parts[0];
+                        var formuleDate = parts[1];
+                        var typeFormule = f.text.split(' - ')[0];
+                        var menuDetails = f.text.split(' - ').slice(1).join(' - ');
+                        
+                        html += '<div class="col-md-6 mb-3">';
+                        html += '<div class="card h-100 menu-card" style="cursor: pointer; border: 2px solid #EDAC00;">';
+                        html += '<div class="card-header" style="background-color: #EDAC00; color: white;">';
+                        html += '<div class="form-check">';
+                        html += '<input class="form-check-input menu-checkbox" type="checkbox" ';
+                        html += 'data-formule-id="' + formuleId + '" ';
+                        html += 'data-date="' + formuleDate + '" ';
+                        html += 'data-type="' + typeFormule + '" ';
+                        html += 'data-details="' + menuDetails + '" ';
+                        html += 'id="formule_' + formuleId + '_' + formuleDate.replace(/-/g, '') + '">';
+                        html += '<label class="form-check-label fw-bold" for="formule_' + formuleId + '_' + formuleDate.replace(/-/g, '') + '">';
+                        html += typeFormule;
+                        html += '</label>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '<div class="card-body">';
+                        html += '<p class="small mb-0">' + menuDetails + '</p>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                    });
+                    
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                $('#formulesContent').html(html);
+                
+                // Ajouter les événements
+                $('.menu-checkbox').on('change', function() {
+                    updateFormulesSelectionnees();
+                });
+                
+                $('.menu-card').on('click', function(e) {
+                    if (!$(e.target).is('input')) {
+                        var checkbox = $(this).find('.menu-checkbox');
+                        checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+                    }
+                });
             }
-
-            $('#quotaDetails').html(html);
-            $('#quotaInfo').show();
-        }
+            
+            function updateFormulesSelectionnees() {
+                var formulesSelectionnees = [];
+                $('.menu-checkbox:checked').each(function() {
+                    var checkbox = $(this);
+                    formulesSelectionnees.push({
+                        formuleId: checkbox.data('formule-id'),
+                        date: checkbox.data('date'),
+                        type: checkbox.data('type'),
+                        details: checkbox.data('details')
+                    });
+                });
+                
+                // Stocker dans un champ caché (JSON)
+                $('#formulesSelectionneesJson').remove();
+                if (formulesSelectionnees.length > 0) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'formulesSelectionneesJson',
+                        name: 'FormulesSelectionneesJson',
+                        value: JSON.stringify(formulesSelectionnees)
+                    }).appendTo('form');
+                }
+            }
+        });
     </script>
 }

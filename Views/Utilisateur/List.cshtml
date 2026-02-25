@@ -4,21 +4,22 @@
 }
 
 <div class="container-fluid">
-    <!-- Header -->
+    <!-- Header responsive -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
                 <div>
                     <h2 class="text-primary mb-1">
                         <i class="fas fa-list me-2"></i>
-                        Liste des Utilisateurs
+                        <span class="d-none d-sm-inline">Liste des Utilisateurs</span>
+                        <span class="d-sm-none">Utilisateurs</span>
                     </h2>
                     <p class="text-muted mb-0">
                         @utilisateurs.Count() utilisateur(s) trouvé(s)
                     </p>
                 </div>
                 <div class="text-end">
-                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                    <a href="@Url.Action("Create")" class="btn btn-primary w-100 w-sm-auto">
                         <i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur
                     </a>
                 </div>
@@ -44,100 +45,203 @@
                     }
                     else
                     {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Matricule</th>
-                                        <th>Email</th>
-                                        <th>Rôle</th>
-                                        <th>Département</th>
-                                        <th>Fonction</th>
-                                        <th>Créé le</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var user in utilisateurs)
-                                    {
+                        <!-- Vue Desktop - Tableau -->
+                        <div class="d-none d-lg-block">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
-                                                        @user.Nom.ToString().Substring(0, 1).ToUpper()
+                                            <th>Nom</th>
+                                            <th>Matricule</th>
+                                            <th>Email</th>
+                                            <th>Rôle</th>
+                                            <th>Direction</th>
+                                            <th>Fonction</th>
+                                            <th>Créé le</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in utilisateurs)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                            @user.Nom.ToString().Substring(0, 1).ToUpper()
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-semibold">@user.Nom @user.Prenoms</div>
+                                                            @if (!string.IsNullOrEmpty(user.PhoneNumber?.ToString()))
+                                                            {
+                                                                <small class="text-muted">@user.PhoneNumber</small>
+                                                            }
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div class="fw-semibold">@user.Nom @user.Prenoms</div>
-                                                        @if (!string.IsNullOrEmpty(user.PhoneNumber?.ToString()))
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">@user.UserName</span>
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(user.Email?.ToString()))
+                                                    {
+                                                        <a href="mailto:@user.Email" class="text-decoration-none">
+                                                            @user.Email
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        var roleClass = user.Role.ToString() switch
                                                         {
-                                                            <small class="text-muted">@user.PhoneNumber</small>
+                                                            "Administrateur" => "bg-danger",
+                                                            "RessourcesHumaines" => "bg-warning",
+                                                            "PrestataireCantine" => "bg-info",
+                                                            "Employe" => "bg-success",
+                                                            _ => "bg-secondary"
+                                                        };
+                                                    }
+                                                    <span class="badge @roleClass">@user.Role</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted">@user.DirectionNom</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted">@user.FonctionNom</span>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        @if (user.CreatedAt != null)
+                                                        {
+                                                            @(((DateTime)user.CreatedAt).ToString("dd/MM/yyyy"))
                                                         }
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="@Url.Action("Details", new { id = user.Id })" 
+                                                           class="btn btn-sm btn-outline-info" title="Voir les détails">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="@Url.Action("Edit", new { id = user.Id })" 
+                                                           class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="confirmDelete('@user.Id', '@user.Nom @user.Prenoms')" title="Supprimer">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Vue Mobile - Cartes -->
+                        <div class="d-lg-none">
+                            <div class="row g-3">
+                                @foreach (var user in utilisateurs)
+                                {
+                                    <div class="col-12">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div class="d-flex align-items-center flex-grow-1">
+                                                        <div class="avatar-lg bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                            @user.Nom.ToString().Substring(0, 1).ToUpper()
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="card-title mb-1">@user.Nom @user.Prenoms</h6>
+                                                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                                                <span class="badge bg-primary">@user.UserName</span>
+                                                                @{
+                                                                    var roleClass = user.Role.ToString() switch
+                                                                    {
+                                                                        "Administrateur" => "bg-danger",
+                                                                        "RessourcesHumaines" => "bg-warning",
+                                                                        "PrestataireCantine" => "bg-info",
+                                                                        "Employe" => "bg-success",
+                                                                        _ => "bg-secondary"
+                                                                    };
+                                                                }
+                                                                <span class="badge @roleClass">@user.Role</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                            <li>
+                                                                <a class="dropdown-item" href="@Url.Action("Details", new { id = user.Id })">
+                                                                    <i class="fas fa-eye me-2"></i>Détails
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="@Url.Action("Edit", new { id = user.Id })">
+                                                                    <i class="fas fa-edit me-2"></i>Modifier
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <button class="dropdown-item text-danger" onclick="confirmDelete('@user.Id', '@user.Nom @user.Prenoms')">
+                                                                    <i class="fas fa-trash me-2"></i>Supprimer
+                                                                </button>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-primary">@user.UserName</span>
-                                            </td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(user.Email?.ToString()))
-                                                {
-                                                    <a href="mailto:@user.Email" class="text-decoration-none">
-                                                        @user.Email
-                                                    </a>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">-</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                @{
-                                                    var roleClass = user.Role.ToString() switch
+                                                
+                                                <div class="row g-2 text-sm">
+                                                    @if (!string.IsNullOrEmpty(user.Email?.ToString()))
                                                     {
-                                                        "Administrateur" => "bg-danger",
-                                                        "RessourcesHumaines" => "bg-warning",
-                                                        "PrestataireCantine" => "bg-info",
-                                                        "Employe" => "bg-success",
-                                                        _ => "bg-secondary"
-                                                    };
-                                                }
-                                                <span class="badge @roleClass">@user.Role</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">@user.DepartementNom</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-muted">@user.FonctionNom</span>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
+                                                        <div class="col-12">
+                                                            <small class="text-muted d-block">Email</small>
+                                                            <a href="mailto:@user.Email" class="text-decoration-none">@user.Email</a>
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(user.PhoneNumber?.ToString()))
+                                                    {
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Téléphone</small>
+                                                            <span>@user.PhoneNumber</span>
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(user.DirectionNom?.ToString()))
+                                                    {
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Direction</small>
+                                                            <span>@user.DirectionNom</span>
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(user.FonctionNom?.ToString()))
+                                                    {
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Fonction</small>
+                                                            <span>@user.FonctionNom</span>
+                                                        </div>
+                                                    }
                                                     @if (user.CreatedAt != null)
                                                     {
-                                                        @(((DateTime)user.CreatedAt).ToString("dd/MM/yyyy"))
+                                                        <div class="col-6">
+                                                            <small class="text-muted d-block">Créé le</small>
+                                                            <span>@(((DateTime)user.CreatedAt).ToString("dd/MM/yyyy"))</span>
+                                                        </div>
                                                     }
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="@Url.Action("Details", new { id = user.Id })" 
-                                                       class="btn btn-sm btn-outline-info" title="Voir les détails">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="@Url.Action("Edit", new { id = user.Id })" 
-                                                       class="btn btn-sm btn-outline-warning" title="Modifier">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                            onclick="confirmDelete('@user.Id', '@user.Nom @user.Prenoms')" title="Supprimer">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     }
                 </div>
@@ -177,6 +281,13 @@
         font-weight: 600;
     }
     
+    .avatar-lg {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
     .table th {
         border-top: none;
         font-weight: 600;
@@ -189,6 +300,22 @@
     
     .btn-group .btn:last-child {
         margin-right: 0;
+    }
+    
+    @@media (max-width: 576px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .avatar-lg {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+        }
     }
 </style>
 

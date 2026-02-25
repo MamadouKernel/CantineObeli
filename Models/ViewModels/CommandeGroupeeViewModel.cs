@@ -1,4 +1,4 @@
-using Obeli_K.Enums;
+﻿using Obeli_K.Enums;
 using Obeli_K.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,29 +6,33 @@ namespace Obeli_K.Models.ViewModels
 {
     public class CommandeGroupeeViewModel
     {
-        [Required(ErrorMessage = "Le groupe non-CIT est obligatoire")]
-        [Display(Name = "Groupe non-CIT")]
-        public Guid GroupeNonCitId { get; set; }
+        [Display(Name = "Nom du groupe de visiteurs")]
+        [StringLength(120)]
+        public string? VisiteurNom { get; set; }
 
-        [Required(ErrorMessage = "La date est obligatoire")]
-        [Display(Name = "Date")]
-        public DateTime Date { get; set; } = DateTime.Today;
+        [Required(ErrorMessage = "Le département est obligatoire")]
+        [Display(Name = "Département")]
+        public Guid DirectionId { get; set; }
+
+        [Required(ErrorMessage = "La date de début est obligatoire")]
+        [Display(Name = "Date de début")]
+        public DateTime DateDebut { get; set; } = DateTime.Today;
+
+        [Required(ErrorMessage = "La date de fin est obligatoire")]
+        [Display(Name = "Date de fin")]
+        public DateTime DateFin { get; set; } = DateTime.Today;
 
         [Display(Name = "Type de Formule")]
         public string? TypeFormule { get; set; }
-
-        [Required(ErrorMessage = "Le menu est obligatoire")]
-        [Display(Name = "Menu")]
-        public Guid IdFormule { get; set; }
 
         [Required(ErrorMessage = "La période de service est obligatoire")]
         [Display(Name = "Période de service")]
         public Periode PeriodeService { get; set; } = Periode.Jour;
 
-        [Required(ErrorMessage = "La quantité est obligatoire")]
-        [Range(1, 1000, ErrorMessage = "La quantité doit être entre 1 et 1000")]
-        [Display(Name = "Quantité")]
-        public int Quantite { get; set; } = 1;
+        [Required(ErrorMessage = "Le nombre de visiteurs est obligatoire")]
+        [Range(1, 1000, ErrorMessage = "Le nombre de visiteurs doit être entre 1 et 1000")]
+        [Display(Name = "Nombre de visiteurs")]
+        public int NombreVisiteurs { get; set; } = 1;
 
         [Display(Name = "Site")]
         public SiteType? Site { get; set; }
@@ -38,10 +42,7 @@ namespace Obeli_K.Models.ViewModels
         public string? Commentaires { get; set; }
 
         // Propriétés pour l'affichage
-        public string? GroupeNom { get; set; }
         public string? FormuleNom { get; set; }
-        public int QuotaDisponible { get; set; }
-        public bool QuotaDepasse { get; set; }
     }
 
     public class GestionQuotasViewModel

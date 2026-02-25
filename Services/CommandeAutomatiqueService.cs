@@ -95,13 +95,15 @@ namespace Obeli_K.Services
                 var commandesConfirmees = 0;
                 foreach (var commande in commandesAConfirmer)
                 {
-                    commande.StatusCommande = (int)Enums.StatutCommande.Consommee;
+                    // NE PAS changer le statut - laisser en Precommander
+                    // La commande sera marquée Consommee quand l'utilisateur scannera
+                    // Si pas scannée, elle restera en Precommander pour facturation
                     commande.ModifiedOn = DateTime.UtcNow;
                     commande.ModifiedBy = "System_AutoConfirmation";
                     commandesConfirmees++;
 
-                    // Créer le point de consommation
-                    await CreerPointConsommationAsync(commande);
+                    // NE PAS créer de point de consommation automatiquement
+                    // Le point sera créé au scan de l'utilisateur
                 }
 
                 await _context.SaveChangesAsync();

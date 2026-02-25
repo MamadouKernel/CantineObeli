@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obeli_K.Data;
@@ -8,7 +8,7 @@ using Obeli_K.Services.Configuration;
 
 namespace Obeli_K.Controllers
 {
-    [Authorize(Roles = "Administrateur,RessourcesHumaines")]
+    [Authorize(Roles = "Administrateur,RH")]
     public class ConfigurationCommandeController : Controller
     {
         private readonly IConfigurationService _configurationService;

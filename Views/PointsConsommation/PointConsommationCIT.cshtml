@@ -1,0 +1,552 @@
+﻿@model Obeli_K.Models.ViewModels.PagedViewModel<Obeli_K.Models.ViewModels.PointConsommationCITViewModel>
+
+@{
+    ViewData["Title"] = "Point de Consommation CIT";
+}
+
+<div class="container-fluid">
+    <!-- En-tête de la page -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">
+                <i class="fas fa-chart-bar text-primary me-2"></i>
+                Point de Consommation CIT
+            </h2>
+            <p class="text-muted mb-0">Nombre de repas consommés par utilisateur pour la période sélectionnée</p>
+        </div>
+        <div class="d-flex gap-2">
+            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+            {
+                <form method="post" asp-action="SynchroniserFacturation" class="d-inline">
+                    <input type="hidden" name="dateDebut" value="@ViewBag.DateDebut" />
+                    <input type="hidden" name="dateFin" value="@ViewBag.DateFin" />
+                    <button type="submit" class="btn btn-primary" 
+                            onclick="return confirm('Synchroniser toutes les données de facturation ?')">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Synchroniser
+                    </button>
+                </form>
+                <form method="post" asp-action="DeclencherFacturation" class="d-inline">
+                    <input type="hidden" name="dateDebut" value="@ViewBag.DateDebut" />
+                    <input type="hidden" name="dateFin" value="@ViewBag.DateFin" />
+                    <button type="submit" class="btn btn-warning" 
+                            onclick="return confirm('Déclencher la facturation pour les commandes non récupérées ?')">
+                        <i class="fas fa-money-bill-wave me-1"></i>
+                        Facturer
+                    </button>
+                </form>
+            }
+            <a asp-action="ExportExcelCIT" 
+               asp-route-dateDebut="@ViewBag.DateDebut" 
+               asp-route-dateFin="@ViewBag.DateFin" 
+               class="btn btn-success">
+                <i class="fas fa-file-excel me-1"></i>
+                Export Excel
+            </a>
+            @* <a href="@Url.Action("Index", "PointsConsommation")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Retour aux Points de Consommation
+            </a> *@
+        </div>
+    </div>
+
+    <!-- Section de filtres -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="points-filters-container">
+                <form method="get" class="row align-items-end g-3">
+                    <!-- Filtres de dates -->
+                    <div class="col-md-3">
+                        <div class="date-input-slim">
+                            <label for="dateDebut" class="form-label">
+                                <i class="fas fa-calendar-day"></i>
+                                Date de début
+                            </label>
+                            <input type="date" name="dateDebut" class="form-control" 
+                                   value="@ViewBag.DateDebut" id="dateDebut">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="date-input-slim">
+                            <label for="dateFin" class="form-label">
+                                <i class="fas fa-calendar-day"></i>
+                                Date de fin
+                            </label>
+                            <input type="date" name="dateFin" class="form-control" 
+                                   value="@ViewBag.DateFin" id="dateFin">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="date-input-slim">
+                            <label for="matricule" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Matricule
+                            </label>
+                            <select id="matricule" name="matricule" class="form-select select2-search" 
+                                    style="border-radius: 8px; border: 1px solid #dee2e6;" 
+                                    data-placeholder="Rechercher par matricule, nom ou prénom...">
+                                <option value="">Tous les utilisateurs</option>
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.Matricule?.ToString()))
+                                {
+                                    <option value="@ViewBag.Matricule" selected>@ViewBag.Matricule</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons de recherche et effacement -->
+                    <div class="col-md-2">
+                        <div class="d-flex gap-1">
+                            <button type="submit" class="btn-slim btn-slim-search">
+                                <i class="fas fa-search"></i>
+                                Rechercher
+                            </button>
+                            <a href="@Url.Action("PointConsommationCIT")" class="btn-slim btn-slim-clear">
+                                <i class="fas fa-times"></i>
+                                Effacer
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Sélecteur de taille de page -->
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center">
+                            <label for="pageSize" class="form-label me-2 mb-0 small">Éléments par page:</label>
+                            <select id="pageSize" class="form-select form-select-sm" style="width: auto;" onchange="changePageSize(this.value)">
+                                <option value="5" selected="@(Model.Pagination.PageSize == 5)">5</option>
+                                <option value="10" selected="@(Model.Pagination.PageSize == 10)">10</option>
+                                <option value="25" selected="@(Model.Pagination.PageSize == 25)">25</option>
+                                <option value="50" selected="@(Model.Pagination.PageSize == 50)">50</option>
+                                <option value="100" selected="@(Model.Pagination.PageSize == 100)">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des montants par utilisateur -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Nombre de repas par utilisateur
+                    </h5>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-light text-dark fs-6">
+                        @Model.Items.Count() utilisateur(s)
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            @if (Model.Items.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="border-0" rowspan="2">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Items.First().Matricule)
+                                </th>
+                                <th class="border-0" rowspan="2" style="cursor: pointer;" title="Trié par ordre alphabétique">
+                                    <i class="fas fa-user me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Items.First().UtilisateurNomComplet)
+                                    <i class="fas fa-sort-alpha-down ms-1 text-primary"></i>
+                                </th>
+                                <th class="border-0 text-center" colspan="3">
+                                    <i class="fas fa-utensils me-1"></i>
+                                    Standard
+                                </th>
+                                <th class="border-0 text-center" colspan="3">
+                                    <i class="fas fa-crown me-1"></i>
+                                    Améliorée
+                                </th>
+                               @*  <th class="border-0 text-end" rowspan="2">
+                                    <i class="fas fa-calculator me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Items.First().Total)
+                                </th> *@
+                                <th class="border-0 text-end" rowspan="2">
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Items.First().MontantTotal)
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().StandardConsommee)
+                                </th>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().StandardNonRecuperee)
+                                </th>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().StandardIndisponible)
+                                </th>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().AmelioreeConsommee)
+                                </th>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().AmelioreeNonRecuperee)
+                                </th>
+                                <th class="border-0 text-end small">
+                                    @Html.DisplayNameFor(model => model.Items.First().AmelioreeIndisponible)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="align-middle">
+                                        <span class="fw-bold text-primary">@item.Matricule</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="fw-medium">@item.UtilisateurNomComplet</span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-success fs-6">
+                                            @item.StandardConsommee.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            @item.StandardNonRecuperee.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-info fs-6">
+                                            @item.StandardIndisponible.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-success fs-6">
+                                            @item.AmelioreeConsommee.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            @item.AmelioreeNonRecuperee.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-info fs-6">
+                                            @item.AmelioreeIndisponible.ToString("N0")
+                                        </span>
+                                    </td>
+                                   @*  <td class="align-middle text-end">
+                                        <span class="badge bg-primary fs-6 fw-bold">
+                                            @item.Total.ToString("N0")
+                                        </span>
+                                    </td> *@
+                                    <td class="align-middle text-end">
+                                        <span class="badge bg-dark fs-6 fw-bold">
+                                            @item.MontantTotal.ToString("N0") FCFA
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="2" class="border-0">
+                                    <i class="fas fa-calculator me-1"></i>
+                                    <strong>TOTAUX</strong>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-success fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.StandardConsommee).ToString("N0")
+                                    </span>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-warning text-dark fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.StandardNonRecuperee).ToString("N0")
+                                    </span>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-info fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.StandardIndisponible).ToString("N0")
+                                    </span>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-success fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.AmelioreeConsommee).ToString("N0")
+                                    </span>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-warning text-dark fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.AmelioreeNonRecuperee).ToString("N0")
+                                    </span>
+                                </th>
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-info fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.AmelioreeIndisponible).ToString("N0")
+                                    </span>
+                                </th>
+                               @*  <th class="border-0 text-end">
+                                    <span class="badge bg-primary fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.Total).ToString("N0")
+                                    </span>
+                                </th> *@
+                                <th class="border-0 text-end">
+                                    <span class="badge bg-dark fs-6 fw-bold">
+                                        @Model.Items.Sum(x => x.MontantTotal).ToString("N0") FCFA
+                                    </span>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun point de consommation CIT trouvé</h5>
+                    <p class="text-muted">Aucun utilisateur n'a de consommation CIT pour la période sélectionnée.</p>
+                </div>
+            }
+        </div>
+        
+        @if (Model.Items.Any())
+        {
+            <div class="card-footer bg-light">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            Affichage de @Model.Pagination.StartItem à @Model.Pagination.EndItem 
+                            sur @Model.Pagination.TotalItems utilisateur(s)
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Pagination -->
+                        @await Html.PartialAsync("_Pagination", Model.Pagination)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Styles CSS pour la page -->
+<style>
+    .points-filters-container {
+        padding: 1.25rem;
+    }
+
+    .date-input-slim .form-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .date-input-slim .form-control {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+
+    .date-input-slim .form-control:focus {
+        border-color: #EDAC00;
+        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
+    }
+
+    .btn-slim {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.2s ease;
+        min-width: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-slim-search {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+    }
+
+    .btn-slim-search:hover {
+        background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-slim-clear {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-slim-clear:hover {
+        background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        color: white;
+    }
+
+    .table th {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        vertical-align: middle;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table thead tr:first-child th {
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table thead tr:last-child th {
+        border-top: 1px solid #dee2e6;
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .table td {
+        font-size: 0.875rem;
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+        border-bottom: none;
+    }
+
+    .card-footer {
+        border-radius: 0 0 12px 12px !important;
+        border-top: 1px solid #dee2e6;
+    }
+</style>
+
+@section Scripts {
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    
+    <!-- Select2 JS - Doit être chargé avant l'initialisation -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        // Script pour changer la taille de page
+        function changePageSize(pageSize) {
+            const url = new URL(window.location);
+            url.searchParams.set('pageSize', pageSize);
+            url.searchParams.set('page', '1'); // Reset to first page
+            window.location.href = url.toString();
+        }
+
+        // Initialiser Select2 pour la recherche de matricule
+        $(document).ready(function() {
+            console.log('Initialisation de Select2 pour le champ matricule');
+            console.log('jQuery version:', $.fn.jquery);
+            console.log('Select2 disponible:', typeof $.fn.select2 !== 'undefined');
+            
+            if (typeof $.fn.select2 === 'undefined') {
+                console.error('Select2 n\'est pas chargé ! Vérifiez que le script est bien inclus.');
+                return;
+            }
+            
+            var selectElement = $('#matricule');
+            console.log('Élément select trouvé:', selectElement.length > 0);
+            
+            if (selectElement.length === 0) {
+                console.error('L\'élément #matricule n\'a pas été trouvé !');
+                return;
+            }
+            
+            var searchUrl = '@Url.Action("SearchUsersByMatricule", "PointsConsommation")';
+            console.log('URL de recherche:', searchUrl);
+            
+            selectElement.select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Rechercher par matricule, nom ou prénom...',
+                allowClear: true,
+                minimumInputLength: 2,
+                language: {
+                    inputTooShort: function() {
+                        return 'Saisissez au moins 2 caractères';
+                    },
+                    noResults: function() {
+                        return 'Aucun résultat trouvé';
+                    },
+                    searching: function() {
+                        return 'Recherche en cours...';
+                    }
+                },
+                ajax: {
+                    url: searchUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function(params) {
+                        console.log('Recherche avec le terme:', params.term);
+                        return {
+                            term: params.term || '' // terme de recherche
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log('Résultats reçus:', data);
+                        if (!data || !Array.isArray(data)) {
+                            console.error('Données invalides reçues:', data);
+                            return { results: [] };
+                        }
+                        var results = data.map(function(item) {
+                            return {
+                                id: item.matricule || item.id || '',
+                                text: item.text || ''
+                            };
+                        });
+                        console.log('Résultats formatés:', results);
+                        return { results: results };
+                    },
+                    cache: true,
+                    error: function(xhr, status, error) {
+                        console.error('Erreur lors de la recherche:', error);
+                        console.error('Status:', status);
+                        console.error('Status code:', xhr.status);
+                        console.error('Réponse:', xhr.responseText);
+                    }
+                }
+            });
+
+            // Pré-sélectionner la valeur si elle existe
+            @if (!string.IsNullOrWhiteSpace(ViewBag.Matricule?.ToString()))
+            {
+                <text>
+                var matriculeValue = '@ViewBag.Matricule';
+                console.log('Pré-sélection du matricule:', matriculeValue);
+                // Créer une option pour la valeur pré-sélectionnée
+                var option = new Option(matriculeValue, matriculeValue, true, true);
+                selectElement.append(option).trigger('change');
+                </text>
+            }
+        });
+    </script>
+}

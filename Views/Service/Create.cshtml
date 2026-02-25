@@ -1,0 +1,87 @@
+﻿@model Obeli_K.Models.Service
+
+@{
+    ViewData["Title"] = "Créer un Service";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Créer un Nouveau Service
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label asp-for="Nom" class="form-label">
+                                Nom du Service <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Nom" class="form-control" placeholder="Ex: Service Informatique" required />
+                            <span asp-validation-for="Nom" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Code" class="form-label">Code</label>
+                            <input asp-for="Code" class="form-control" placeholder="Ex: SI" maxlength="10" />
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                            <small class="form-text text-muted">Code court pour identification (optionnel)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DirectionId" class="form-label">Direction</label>
+                            <select asp-for="DirectionId" class="form-select">
+                                <option value="">-- Sélectionner une direction (optionnel) --</option>
+                                @if (ViewBag.Directions != null)
+                                {
+                                    @foreach (var dir in ViewBag.Directions)
+                                    {
+                                        <option value="@dir.Id">@dir.Nom</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="DirectionId" class="text-danger"></span>
+                            <small class="form-text text-muted">Rattacher ce service à une direction</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Description du service"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Responsable" class="form-label">Responsable</label>
+                            <input asp-for="Responsable" class="form-control" placeholder="Nom du responsable" />
+                            <span asp-validation-for="Responsable" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="@Url.Action("List", "Service")" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Créer le Service
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

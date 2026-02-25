@@ -1,0 +1,475 @@
+﻿@model Obeli_K.Models.ViewModels.CreateCommandeVisiteurViewModel
+@{
+    ViewData["Title"] = "Créer des commandes pour visiteurs";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-1">
+                <i class="fas fa-users me-2"></i>
+                Créer des commandes pour visiteurs
+            </h2>
+            <p class="text-muted">Créez des commandes groupées pour les visiteurs d'un Direction</p>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Informations de la commande
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" id="formVisiteur">
+                        @Html.AntiForgeryToken()
+                        
+                        <!-- Direction -->
+                        <div class="mb-4">
+                            <label asp-for="DirectionId" class="form-label fw-bold">
+                                <i class="fas fa-building me-1"></i>
+                                Direction
+                            </label>
+                            <select asp-for="DirectionId" class="form-select" id="Directionselect" required>
+                                <option value="">-- Sélectionnez un Direction --</option>
+                                @foreach (var dept in ViewBag.Directions as List<Obeli_K.Models.Direction>)
+                                {
+                                    <option value="@dept.Id">@dept.Nom</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DirectionId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Période -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="DateDebut" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Date de début
+                                </label>
+                                <input asp-for="DateDebut" type="date" class="form-control" id="dateDebut" required />
+                                <span asp-validation-for="DateDebut" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DateFin" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Date de fin
+                                </label>
+                                <input asp-for="DateFin" type="date" class="form-control" id="dateFin" required />
+                                <span asp-validation-for="DateFin" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Nombre de visiteurs -->
+                        <div class="mb-4">
+                            <label asp-for="NombreVisiteurs" class="form-label fw-bold">
+                                <i class="fas fa-user-friends me-1"></i>
+                                Nombre de visiteurs
+                            </label>
+                            <input asp-for="NombreVisiteurs" type="number" class="form-control" min="1" max="1000" required />
+                            <span asp-validation-for="NombreVisiteurs" class="text-danger"></span>
+                            <small class="form-text text-muted">Nombre de repas par jour pour cette période</small>
+                        </div>
+
+                        <!-- Sélection des menus disponibles -->
+                        <div class="mb-4" id="menusSelection" style="display:none;">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-list me-1"></i>
+                                Sélectionnez les menus à commander
+                            </label>
+                            
+                            <!-- Panneau de sélection -->
+                            <div class="card mb-3" id="selectionCard" style="display: none; background-color: #EDAC00;">
+                                <div class="card-body text-white">
+                                    <h6 class="mb-2">
+                                        <i class="fas fa-check-square me-2"></i>
+                                        Sélection (<span id="selectionCount">0</span> menu(s))
+                                    </h6>
+                                    <div id="selectionList" class="small"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body" id="menusContent">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Chargement...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="button" class="btn btn-success" id="creerCommandesBtn" style="display:none;">
+                                <i class="fas fa-check me-2"></i>Créer les commandes sélectionnées
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            let menusSelectionnes = [];
+            let formulesDisponibles = [];
+
+            // Charger les menus quand les dates changent
+            $('#dateDebut, #dateFin').on('change', function() {
+                chargerMenus();
+            });
+
+            function chargerMenus() {
+                var dateDebut = $('#dateDebut').val();
+                var dateFin = $('#dateFin').val();
+                var DirectionId = $('#Directionselect').val();
+                var nombreVisiteurs = $('#NombreVisiteurs').val();
+
+                if (!dateDebut || !dateFin || !DirectionId || !nombreVisiteurs) {
+                    $('#menusSelection').hide();
+                    return;
+                }
+
+                $('#menusSelection').show();
+                $('#menusContent').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></div>');
+
+                $.ajax({
+                    url: '@Url.Action("GetFormules", "Visiteur")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    data: JSON.stringify({
+                        dateDebut: dateDebut,
+                        dateFin: dateFin
+                    }),
+                    success: function(data) {
+                        if (!data.success) {
+                            $('#menusContent').html('<div class="alert alert-danger">' + (data.error || 'Erreur lors du chargement des menus') + '</div>');
+                            return;
+                        }
+
+                        if (!data.formules || data.formules.length === 0) {
+                            $('#menusContent').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Aucun menu disponible pour cette période.</div>');
+                            return;
+                        }
+
+                        formulesDisponibles = data.formules;
+                        afficherMenusAvecCheckbox(data.formules);
+                    },
+                    error: function() {
+                        $('#menusContent').html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Erreur lors du chargement des menus.</div>');
+                    }
+                });
+            }
+
+            function afficherMenusAvecCheckbox(formules) {
+                var html = '<div class="row">';
+                
+                // Grouper par date
+                var formulesByDate = {};
+                formules.forEach(function(f) {
+                    if (!formulesByDate[f.date]) {
+                        formulesByDate[f.date] = [];
+                    }
+                    formulesByDate[f.date].push(f);
+                });
+
+                // Afficher par date
+                Object.keys(formulesByDate).sort().forEach(function(date) {
+                    var dateFormatee = new Date(date).toLocaleDateString('fr-FR', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    
+                    html += '<div class="col-12 mb-3">';
+                    html += '<h6 class="text-primary mb-2"><i class="fas fa-calendar me-2"></i>' + dateFormatee + '</h6>';
+                    html += '<div class="row">';
+                    
+                    formulesByDate[date].forEach(function(f) {
+                        var menu = '';
+                        var typeFormule = '';
+                        
+                        if (f.nom.toLowerCase().includes('amélioré')) {
+                            typeFormule = 'Améliorée';
+                            menu = (f.entree ? f.entree + ' - ' : '') + (f.plat || '') + (f.garniture ? ' - ' + f.garniture : '') + (f.dessert ? ' - ' + f.dessert : '');
+                        } else if (f.nom.toLowerCase().includes('standard 1')) {
+                            typeFormule = 'Standard 1';
+                            menu = (f.platStandard1 || '') + (f.garnitureStand1 ? ' - ' + f.garnitureStandard1 : '');
+                        } else if (f.nom.toLowerCase().includes('standard 2')) {
+                            typeFormule = 'Standard 2';
+                            menu = (f.platStandard2 || '') + (f.garnitureStandard2 ? ' - ' + f.garnitureStandard2 : '');
+                        }
+                        
+                        html += '<div class="col-md-4 mb-3">';
+                        html += '<div class="card h-100 menu-card" style="cursor: pointer;">';
+                        html += '<div class="card-header bg-light">';
+                        html += '<div class="form-check">';
+                        html += '<input class="form-check-input menu-checkbox" type="checkbox" ';
+                        html += 'data-formule-id="' + f.idFormule + '" ';
+                        html += 'data-date="' + f.date + '" ';
+                        html += 'data-nom="' + f.nom + '" ';
+                        html += 'data-type="' + typeFormule + '" ';
+                        html += 'id="menu_' + f.idFormule + '">';
+                        html += '<label class="form-check-label fw-bold" for="menu_' + f.idFormule + '">';
+                        html += typeFormule;
+                        html += '</label>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '<div class="card-body">';
+                        html += '<p class="small mb-2">' + menu + '</p>';
+                        html += '<div class="mb-2">';
+                        html += '<label class="form-label small mb-1">Période:</label>';
+                        html += '<select class="form-select form-select-sm periode-select" data-formule-id="' + f.idFormule + '">';
+                        html += '<option value="0">Jour</option>';
+                        html += '<option value="1">Nuit</option>';
+                        html += '</select>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                    });
+                    
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                html += '</div>';
+                $('#menusContent').html(html);
+                
+                // Ajouter les événements
+                $('.menu-checkbox').on('change', updateSelection);
+                $('.menu-card').on('click', function(e) {
+                    if (!$(e.target).is('input, select')) {
+                        var checkbox = $(this).find('.menu-checkbox');
+                        checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+                    }
+                });
+            }
+
+            function updateSelection() {
+                menusSelectionnes = [];
+                $('.menu-checkbox:checked').each(function() {
+                    var checkbox = $(this);
+                    var formuleId = checkbox.data('formule-id');
+                    var date = checkbox.data('date');
+                    var nom = checkbox.data('nom');
+                    var type = checkbox.data('type');
+                    var periode = $('.periode-select[data-formule-id="' + formuleId + '"]').val();
+                    var periodeText = periode === '0' ? 'Jour' : 'Nuit';
+                    
+                    menusSelectionnes.push({
+                        formuleId: formuleId,
+                        date: date,
+                        nom: nom,
+                        type: type,
+                        periode: parseInt(periode),
+                        periodeText: periodeText
+                    });
+                });
+                
+                // Mettre à jour l'affichage
+                if (menusSelectionnes.length > 0) {
+                    $('#selectionCard').show();
+                    $('#creerCommandesBtn').show();
+                    $('#selectionCount').text(menusSelectionnes.length);
+                    
+                    var html = '';
+                    menusSelectionnes.forEach(function(menu) {
+                        var dateFormatee = new Date(menu.date).toLocaleDateString('fr-FR', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short'
+                        });
+                        html += '<div class="mb-1">• ' + menu.type + ' - ' + dateFormatee + ' (' + menu.periodeText + ')</div>';
+                    });
+                    $('#selectionList').html(html);
+                } else {
+                    $('#selectionCard').hide();
+                    $('#creerCommandesBtn').hide();
+                }
+            }
+
+            // Créer les commandes sélectionnées
+            $('#creerCommandesBtn').on('click', function() {
+                if (menusSelectionnes.length === 0) {
+                    alert('Veuillez sélectionner au moins un menu');
+                    return;
+                }
+
+                var DirectionId = $('#Directionselect').val();
+                var nombreVisiteurs = $('#NombreVisiteurs').val();
+
+                if (!DirectionId || !nombreVisiteurs) {
+                    alert('Veuillez remplir tous les champs obligatoires');
+                    return;
+                }
+
+                var btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Création en cours...');
+
+                var commandesReussies = 0;
+                var commandesEchouees = 0;
+
+                function creerCommandeSuivante(index) {
+                    if (index >= menusSelectionnes.length) {
+                        btn.prop('disabled', false).html('<i class="fas fa-check me-2"></i>Créer les commandes sélectionnées');
+                        
+                        if (commandesReussies > 0) {
+                            alert('✅ ' + commandesReussies + ' commande(s) créée(s) avec succès pour ' + nombreVisiteurs + ' visiteur(s)');
+                            location.reload();
+                        } else {
+                            alert('❌ Aucune commande n\'a pu être créée');
+                        }
+                        return;
+                    }
+
+                    var menu = menusSelectionnes[index];
+                    
+                    $.ajax({
+                        url: '@Url.Action("CreateCommande", "Visiteur")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        data: JSON.stringify({
+                            idFormule: menu.formuleId,
+                            dateConsommation: menu.date,
+                            visiteurNom: 'Groupe visiteurs (' + nombreVisiteurs + ' personne' + (nombreVisiteurs > 1 ? 's' : '') + ')',
+                            visiteurTelephone: '',
+                            DirectionId: DirectionId
+                        }),
+                        success: function(response) {
+                            if (response.success) {
+                                commandesReussies++;
+                            } else {
+                                commandesEchouees++;
+                            }
+                        },
+                        error: function() {
+                            commandesEchouees++;
+                        },
+                        complete: function() {
+                            creerCommandeSuivante(index + 1);
+                        }
+                    });
+                }
+
+                creerCommandeSuivante(0);
+            });
+
+            // Définir la date minimum (48h à partir de maintenant)
+            var maintenant = new Date();
+            var delaiMinimum = new Date(maintenant.getTime() + (48 * 60 * 60 * 1000)); // 48 heures
+            var dateMinStr = delaiMinimum.toISOString().split('T')[0];
+            
+            // Définir les attributs min sur les inputs de date
+            $('#dateDebut, #dateFin').attr('min', dateMinStr);
+
+            // Validation des dates
+            $('#dateDebut, #dateFin').on('change', function() {
+                var dateDebut = new Date($('#dateDebut').val());
+                var dateFin = new Date($('#dateFin').val());
+                
+                if (dateFin < dateDebut) {
+                    alert('La date de fin doit être supérieure ou égale à la date de début.');
+                    $('#dateFin').val('');
+                }
+
+                // Validation 48h pour les visiteurs
+                if (dateDebut < delaiMinimum) {
+                    var dateLimite = delaiMinimum.toLocaleDateString('fr-FR') + ' à ' + delaiMinimum.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                    alert('❌ Les commandes pour visiteurs doivent être créées au moins 48h à l\'avance.\n\nDate limite: ' + dateLimite);
+                    $('#dateDebut').val('');
+                }
+            });
+
+            // Recharger les menus quand le Direction ou le nombre de visiteurs change
+            $('#Directionselect, #NombreVisiteurs').on('change', function() {
+                if ($('#dateDebut').val() && $('#dateFin').val()) {
+                    chargerMenus();
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .form-label {
+        color: #495057;
+    }
+
+    .form-control, .form-select {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+</style>
+
+

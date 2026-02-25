@@ -1,0 +1,238 @@
+﻿@model Obeli_K.Models.GroupeNonCit
+
+@{
+    ViewData["Title"] = "Détails des Quotas Permanents d'un Groupe";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Détails des Quotas Permanents d'un Groupe
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Informations Générales
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Nom :</strong> 
+                                        <span class="badge bg-info">@Model.Nom</span>
+                                    </p>
+                                    <p><strong>Code Groupe :</strong> 
+                                        @if (!string.IsNullOrEmpty(Model.CodeGroupe))
+                                        {
+                                            <span class="badge bg-secondary">@Model.CodeGroupe</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Non défini</span>
+                                        }
+                                    </p>
+                                    <p><strong>Description :</strong> 
+                                        @(Model.Description ?? "Aucune description")
+                                    </p>
+                                    <p><strong>Restriction Standard :</strong> 
+                                        @if (Model.RestrictionFormuleStandard)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Activée
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-times"></i> Désactivée
+                                            </span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-clock me-1"></i>
+                                        Métadonnées
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.CreatedOn.HasValue)
+                                    {
+                                        <p><strong>Créé le :</strong> @Model.CreatedOn.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                                        <p><strong>Par :</strong> @Model.CreatedBy</p>
+                                    }
+                                    @if (Model.ModifiedOn.HasValue)
+                                    {
+                                        <p><strong>Modifié le :</strong> @Model.ModifiedOn.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                                        <p><strong>Par :</strong> @Model.ModifiedBy</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-warning mb-3">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-sun me-1"></i>
+                                        Quota Permanent Jour
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.QuotaJournalier.HasValue)
+                                    {
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="text-warning">
+                                                    <i class="fas fa-chart-pie fa-2x"></i>
+                                                    <div class="fw-bold">@Model.QuotaJournalier.Value</div>
+                                                    <small>Quota Total</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-success">
+                                                    <i class="fas fa-utensils fa-2x"></i>
+                                                    <div class="fw-bold">@ViewBag.PlatsConsommesJour</div>
+                                                    <small>Consommés</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-info">
+                                                    <i class="fas fa-chart-bar fa-2x"></i>
+                                                    <div class="fw-bold">@(Model.QuotaJournalier.Value - ViewBag.PlatsConsommesJour)</div>
+                                                    <small>Restants</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="progress mt-3" style="height: 10px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" 
+                                                 style="width: @(Model.QuotaJournalier.Value > 0 ? ViewBag.PlatsConsommesJour * 100 / Model.QuotaJournalier.Value : 0)%">
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">
+                                                @(Model.QuotaJournalier.Value > 0 ? ViewBag.PlatsConsommesJour * 100 / Model.QuotaJournalier.Value : 0)% consommé
+                                            </small>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center text-muted">
+                                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                            <div>Quota non défini</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-info mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-moon me-1"></i>
+                                        Quota Permanent Nuit
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.QuotaNuit.HasValue)
+                                    {
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="text-info">
+                                                    <i class="fas fa-chart-pie fa-2x"></i>
+                                                    <div class="fw-bold">@Model.QuotaNuit.Value</div>
+                                                    <small>Quota Total</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-success">
+                                                    <i class="fas fa-utensils fa-2x"></i>
+                                                    <div class="fw-bold">@ViewBag.PlatsConsommesNuit</div>
+                                                    <small>Consommés</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-info">
+                                                    <i class="fas fa-chart-bar fa-2x"></i>
+                                                    <div class="fw-bold">@(Model.QuotaNuit.Value - ViewBag.PlatsConsommesNuit)</div>
+                                                    <small>Restants</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="progress mt-3" style="height: 10px;">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: @(Model.QuotaNuit.Value > 0 ? ViewBag.PlatsConsommesNuit * 100 / Model.QuotaNuit.Value : 0)%">
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-2">
+                                            <small class="text-muted">
+                                                @(Model.QuotaNuit.Value > 0 ? ViewBag.PlatsConsommesNuit * 100 / Model.QuotaNuit.Value : 0)% consommé
+                                            </small>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center text-muted">
+                                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                            <div>Quota non défini</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Statistiques pour :</strong> @ViewBag.DateAujourdhui.ToString("dd/MM/yyyy")
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("Index", "GroupeNonCit")" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour
+                        </a>
+                        <a href="@Url.Action("Edit", "GroupeNonCit", new { id = Model.Id })" class="btn btn-warning">
+                            <i class="fas fa-edit me-1"></i>
+                            Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .progress {
+        border-radius: 5px;
+    }
+    
+    .progress-bar {
+        border-radius: 5px;
+    }
+</style>

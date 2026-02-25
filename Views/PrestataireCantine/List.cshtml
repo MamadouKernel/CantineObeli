@@ -1,0 +1,152 @@
+﻿@model IEnumerable<object>
+@{
+    ViewData["Title"] = "Liste des Prestataires";
+    var prestataires = Model as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-handshake me-2"></i>
+                        Liste des Prestataires
+                    </h2>
+                    <p class="text-muted mb-0">
+                        @prestataires.Count() prestataire(s) trouvé(s)
+                    </p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Nouveau Prestataire
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des prestataires -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    @if (!prestataires.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucun prestataire trouvé</h5>
+                            <p class="text-muted">Commencez par créer votre premier prestataire.</p>
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer un prestataire
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Contact</th>
+                                        <th>Email</th>
+                                        <th>Téléphone</th>
+                                        <th>Adresse</th>
+                                        <th>Créé le</th>
+                                        <th>Créé par</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var prestataire in prestataires)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@prestataire.Nom</strong>
+                                            </td>
+                                            <td>@prestataire.Contact</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(prestataire.Email))
+                                                {
+                                                    <a href="mailto:@prestataire.Email" class="text-decoration-none">
+                                                        <i class="fas fa-envelope me-1"></i>@prestataire.Email
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(prestataire.Telephone))
+                                                {
+                                                    <a href="tel:@prestataire.Telephone" class="text-decoration-none">
+                                                        <i class="fas fa-phone me-1"></i>@prestataire.Telephone
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@prestataire.Adresse</td>
+                                            <td>@prestataire.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@prestataire.CreatedBy</td>
+                                            <td class="text-end">
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Details", new { id = prestataire.Id })" class="btn btn-sm btn-outline-info" title="Voir détails">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Edit", new { id = prestataire.Id })" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Supprimer" 
+                                                            onclick="confirmDelete('@prestataire.Id', '@prestataire.Nom')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer le prestataire "<strong id="prestataireName"></strong>" ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function confirmDelete(prestataireId, prestataireName) {
+        document.getElementById('prestataireName').textContent = prestataireName;
+        document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + prestataireId;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+}

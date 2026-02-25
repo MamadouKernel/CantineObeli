@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Obeli_K.Models
 {
@@ -8,13 +9,20 @@ namespace Obeli_K.Models
 
         [Required, StringLength(100)] public string Nom { get; set; } = null!;
         [StringLength(500)] public string? Description { get; set; }
+        
         [StringLength(10)] public string? Code { get; set; } // Code court pour identification
+        [StringLength(100)] public string? Responsable { get; set; } // Nom du directeur
+        [StringLength(100)] public string? Email { get; set; } // Email du directeur
 
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public string? CreatedBy { get; set; }
         public string? ModifiedBy { get; set; }
 
+        // Relations
+        public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+
+        // Soft delete
         public int Supprimer { get; set; } = 0; // 0 = not deleted, 1 = deleted
     }
 }

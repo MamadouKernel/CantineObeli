@@ -12,17 +12,29 @@ using Obeli_K.Data;
 
 namespace Obeli_K.Controllers
 {
+    /// <summary>
+    /// Contrôleur responsable de l'authentification et de la gestion des sessions utilisateur.
+    /// Gère les opérations de connexion, déconnexion et changement de mot de passe.
+    /// </summary>
     public class AuthController : Controller
     {
         private readonly ObeliDbContext _db;
 
+        /// <summary>
+        /// Initialise une nouvelle instance du contrôleur d'authentification.
+        /// </summary>
+        /// <param name="db">Contexte de base de données Obeli</param>
         public AuthController(ObeliDbContext db) => _db = db;
 
+        /// <summary>
+        /// Affiche la page de connexion. Redirige vers l'accueil si l'utilisateur est déjà connecté.
+        /// </summary>
+        /// <returns>Vue de connexion ou redirection vers l'accueil</returns>
         [HttpGet]
         public IActionResult Login()
         {
             ClaimsPrincipal claimsPrincipal = HttpContext.User;
-            if (claimsPrincipal.Identity.IsAuthenticated)
+            if (claimsPrincipal.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -60,7 +72,7 @@ namespace Obeli_K.Controllers
                     claims.Add(new(ClaimTypes.Role, "Administrateur"));
                     break;
                 case RoleType.RH:
-                    claims.Add(new(ClaimTypes.Role, "RessourcesHumaines"));
+                    claims.Add(new(ClaimTypes.Role, "RH"));
                     break;
                 case RoleType.Employe:
                     claims.Add(new(ClaimTypes.Role, "Employe"));
@@ -73,14 +85,30 @@ namespace Obeli_K.Controllers
             // Si c'est un administrateur, ajouter automatiquement tous les rôles
             if (u.Role == RoleType.Admin)
             {
-                claims.Add(new(ClaimTypes.Role, "RessourcesHumaines"));
+                claims.Add(new(ClaimTypes.Role, "RH"));
                 claims.Add(new(ClaimTypes.Role, "PrestataireCantine"));
                 claims.Add(new(ClaimTypes.Role, "Employe"));
                 claims.Add(new(ClaimTypes.Role, "Visiteur"));
             }
 
             var id = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+            
+            // Configuration des propriétés d'authentification selon "Se souvenir de moi"
+            var authProperties = new AuthenticationProperties();
+            
+            if (model.SeSouvenirDeMoi)
+            {
+                // Si "Se souvenir de moi" est coché, cookie persistant pendant 30 jours
+                authProperties.IsPersistent = true;
+                authProperties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30);
+            }
+            else
+            {
+                // Sinon, cookie de session (expire à la fermeture du navigateur)
+                authProperties.IsPersistent = false;
+            }
+            
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id), authProperties);
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 return Redirect(model.ReturnUrl);
@@ -232,7 +260,7 @@ namespace Obeli_K.Controllers
 
             var utilisateur = await _db.Utilisateurs
                 .Include(u => u.Fonction)
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (utilisateur == null)
@@ -255,7 +283,7 @@ namespace Obeli_K.Controllers
 
             var utilisateur = await _db.Utilisateurs
                 .Include(u => u.Fonction)
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (utilisateur == null)
@@ -270,7 +298,7 @@ namespace Obeli_K.Controllers
                 .Select(f => new { Value = f.Id.ToString(), Text = f.Nom })
                 .ToListAsync();
 
-            ViewBag.Departements = await _db.Departements
+            ViewBag.Directions = await _db.Directions
                 .Where(d => d.Supprimer == 0)
                 .OrderBy(d => d.Nom)
                 .Select(d => new { Value = d.Id.ToString(), Text = d.Nom })
@@ -339,7 +367,7 @@ namespace Obeli_K.Controllers
             utilisateur.Email = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
             utilisateur.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
             utilisateur.Lieu = string.IsNullOrWhiteSpace(model.Lieu) ? null : model.Lieu.Trim();
-            utilisateur.DepartementId = model.DepartementId;
+            utilisateur.DirectionId = model.DirectionId;
             utilisateur.FonctionId = model.FonctionId;
             utilisateur.Site = model.Site;
             utilisateur.ModifiedAt = DateTime.UtcNow;
@@ -359,7 +387,7 @@ namespace Obeli_K.Controllers
                 .Select(f => new { Value = f.Id.ToString(), Text = f.Nom })
                 .ToListAsync();
 
-            ViewBag.Departements = await _db.Departements
+            ViewBag.Directions = await _db.Directions
                 .Where(d => d.Supprimer == 0)
                 .OrderBy(d => d.Nom)
                 .Select(d => new { Value = d.Id.ToString(), Text = d.Nom })

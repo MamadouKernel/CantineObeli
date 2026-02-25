@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.EditCommandeViewModel
+﻿@model Obeli_K.Models.ViewModels.EditCommandeViewModel
 
 @{
     ViewData["Title"] = "Modifier la Commande";
@@ -51,7 +51,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label asp-for="Quantite" class="form-label"></label>
-                                    <input asp-for="Quantite" type="number" min="1" class="form-control" />
+                                    <input asp-for="Quantite" type="number" min="1" class="form-control" disabled style="background-color: #f8f9fa; color: #6c757d;" />
                                     <span asp-validation-for="Quantite" class="text-danger"></span>
                                 </div>
                             </div>

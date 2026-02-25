@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obeli_K.Data;
@@ -26,7 +26,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Dashboard(DateTime? dateDebut, DateTime? dateFin, 
-            SiteType? site, Guid? departementId, Guid? fonctionId)
+            SiteType? site, Guid? DirectionId, Guid? fonctionId)
         {
             try
             {
@@ -39,14 +39,14 @@ namespace Obeli_K.Controllers
                     DateDebut = dateDebut.Value,
                     DateFin = dateFin.Value,
                     Site = site,
-                    DepartementId = departementId,
+                    DirectionId = DirectionId,
                     FonctionId = fonctionId
                 };
 
                 // Récupérer les données avec filtres
                 var commandesQuery = _context.Commandes
                     .Include(c => c.Utilisateur)
-                        .ThenInclude(u => u!.Departement)
+                        .ThenInclude(u => u!.Direction)
                     .Include(c => c.Utilisateur)
                         .ThenInclude(u => u!.Fonction)
                     .Include(c => c.FormuleJour)
@@ -60,8 +60,8 @@ namespace Obeli_K.Controllers
                 if (site.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.Site == site.Value);
 
-                if (departementId.HasValue)
-                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DepartementId == departementId.Value);
+                if (DirectionId.HasValue)
+                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DirectionId == DirectionId.Value);
 
                 if (fonctionId.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.FonctionId == fonctionId.Value);
@@ -95,7 +95,7 @@ namespace Obeli_K.Controllers
             {
                 var commandesQuery = _context.Commandes
                     .Include(c => c.Utilisateur)
-                        .ThenInclude(u => u!.Departement)
+                        .ThenInclude(u => u!.Direction)
                     .Include(c => c.Utilisateur)
                         .ThenInclude(u => u!.Fonction)
                     .Include(c => c.FormuleJour)
@@ -109,8 +109,8 @@ namespace Obeli_K.Controllers
                 if (model.Site.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.Site == model.Site.Value);
 
-                if (model.DepartementId.HasValue)
-                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DepartementId == model.DepartementId.Value);
+                if (model.DirectionId.HasValue)
+                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DirectionId == model.DirectionId.Value);
 
                 if (model.FonctionId.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.FonctionId == model.FonctionId.Value);
@@ -142,7 +142,7 @@ namespace Obeli_K.Controllers
             {
                 var commandesQuery = _context.Commandes
                     .Include(c => c.Utilisateur)
-                        .ThenInclude(u => u!.Departement)
+                        .ThenInclude(u => u!.Direction)
                     .Include(c => c.Utilisateur)
                         .ThenInclude(u => u!.Fonction)
                     .Include(c => c.FormuleJour)
@@ -156,8 +156,8 @@ namespace Obeli_K.Controllers
                 if (model.Site.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.Site == model.Site.Value);
 
-                if (model.DepartementId.HasValue)
-                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DepartementId == model.DepartementId.Value);
+                if (model.DirectionId.HasValue)
+                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DirectionId == model.DirectionId.Value);
 
                 if (model.FonctionId.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.FonctionId == model.FonctionId.Value);
@@ -184,7 +184,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetParticipationData(DateTime? dateDebut, DateTime? dateFin, 
-            SiteType? site, Guid? departementId)
+            SiteType? site, Guid? DirectionId)
         {
             try
             {
@@ -201,8 +201,8 @@ namespace Obeli_K.Controllers
                 if (site.HasValue)
                     commandesQuery = commandesQuery.Where(c => c.Utilisateur!.Site == site.Value);
 
-                if (departementId.HasValue)
-                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DepartementId == departementId.Value);
+                if (DirectionId.HasValue)
+                    commandesQuery = commandesQuery.Where(c => c.Utilisateur!.DirectionId == DirectionId.Value);
 
                 var commandes = await commandesQuery.ToListAsync();
 
@@ -272,10 +272,10 @@ namespace Obeli_K.Controllers
                 .Where(c => c.StatusCommande == (int)Enums.StatutCommande.Annulee)
                 .Count();
 
-            // Commandes par département
-            indicateurs.CommandesParDepartement = commandes
-                .Where(c => c.Utilisateur?.Departement != null)
-                .GroupBy(c => c.Utilisateur!.Departement!.Nom)
+            // Commandes par direction
+            indicateurs.CommandesParDirection = commandes
+                .Where(c => c.Utilisateur?.Direction != null)
+                .GroupBy(c => c.Utilisateur!.Direction!.Nom)
                 .ToDictionary(g => g.Key, g => g.Count());
 
             // Commandes par fonction
@@ -290,7 +290,7 @@ namespace Obeli_K.Controllers
         private async Task PopulateFilterLists(ReportingDashboardViewModel model)
         {
             model.Sites = Enum.GetValues<SiteType>().ToList();
-            model.Departements = await _context.Departements
+            model.Directions = await _context.Directions
                 .Where(d => d.Supprimer == 0)
                 .OrderBy(d => d.Nom)
                 .ToListAsync();
@@ -314,7 +314,7 @@ namespace Obeli_K.Controllers
                               $"{cmd.CodeCommande}," +
                               $"\"{cmd.Utilisateur?.Nom} {cmd.Utilisateur?.Prenoms}\"," +
                               $"{cmd.Utilisateur?.UserName}," +
-                              $"\"{cmd.Utilisateur?.Departement?.Nom}\"," +
+                              $"\"{cmd.Utilisateur?.Direction?.Nom}\"," +
                               $"\"{cmd.Utilisateur?.Fonction?.Nom}\"," +
                               $"{cmd.Utilisateur?.Site}," +
                               $"\"{cmd.FormuleJour?.NomFormuleNavigation?.Nom}\"," +

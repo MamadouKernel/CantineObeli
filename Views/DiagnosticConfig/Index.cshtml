@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Diagnostic des Configurations";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bug me-2"></i>
+                        Diagnostic des Configurations de Facturation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Erreur :</strong> @ViewBag.Error
+                        </div>
+                    }
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>
+                                <i class="fas fa-database me-2"></i>
+                                Total des configurations trouvées : <span class="badge bg-primary">@ViewBag.TotalCount</span>
+                            </h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="@Url.Action("TestSave")" class="btn btn-info">
+                                <i class="fas fa-vial me-2"></i>
+                                Test de Sauvegarde
+                            </a>
+                            <a href="@Url.Action("Index", "InitConfig")" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>
+                                Initialiser Configurations
+                            </a>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.Configurations != null)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Clé</th>
+                                        <th>Valeur</th>
+                                        <th>Description</th>
+                                        <th>Créé le</th>
+                                        <th>Modifié le</th>
+                                        <th>Créé par</th>
+                                        <th>Modifié par</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (dynamic config in ViewBag.Configurations)
+                                    {
+                                        <tr class="@(config.Cle == "AUCUNE CONFIGURATION TROUVÉE" ? "table-warning" : "")">
+                                            <td>
+                                                <code>@config.Cle</code>
+                                                @if (config.Cle == "FACTURATION_WEEKEND")
+                                                {
+                                                    <i class="fas fa-star text-warning ms-1" title="Configuration problématique"></i>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (config.Valeur == "true")
+                                                {
+                                                    <span class="badge bg-success">@config.Valeur</span>
+                                                }
+                                                else if (config.Valeur == "false")
+                                                {
+                                                    <span class="badge bg-secondary">@config.Valeur</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">@config.Valeur</span>
+                                                }
+                                            </td>
+                                            <td>@config.Description</td>
+                                            <td>@config.CreatedOn</td>
+                                            <td>@config.ModifiedOn</td>
+                                            <td>@config.CreatedBy</td>
+                                            <td>@config.ModifiedBy</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Instructions :</h6>
+                            <ol>
+                                <li>Si aucune configuration n'est trouvée, cliquez sur <strong>"Initialiser Configurations"</strong></li>
+                                <li>Si les configurations existent mais ne se sauvegardent pas, cliquez sur <strong>"Test de Sauvegarde"</strong></li>
+                                <li>Retournez ensuite sur <a href="@Url.Action("Index", "ParametresFacturation")">Paramètres de Facturation</a> pour tester</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

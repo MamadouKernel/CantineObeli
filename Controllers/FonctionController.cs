@@ -1,12 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obeli_K.Data;
 using Obeli_K.Models;
+using Obeli_K.Models.ViewModels;
 
 namespace Obeli_K.Controllers
 {
-    [Authorize(Roles = "Administrateur,RessourcesHumaines")]
+    [Authorize(Roles = "Administrateur,RH")]
     public class FonctionController : Controller
     {
         private readonly ObeliDbContext _context;
@@ -30,13 +31,19 @@ namespace Obeli_K.Controllers
         /// Affiche la liste des fonctions
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(int page = 1, int pageSize = 5)
         {
             try
             {
-                var fonctions = await _context.Fonctions
+                var query = _context.Fonctions
                     .Where(f => f.Supprimer == 0)
-                    .OrderBy(f => f.Nom)
+                    .OrderBy(f => f.Nom);
+
+                var totalCount = await query.CountAsync();
+
+                var fonctions = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(f => new
                     {
                         f.Id,
@@ -51,14 +58,28 @@ namespace Obeli_K.Controllers
                     })
                     .ToListAsync();
 
+                // Créer le modèle de pagination
+                var pagination = new PaginationViewModel(HttpContext, "List", "Fonction")
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount
+                };
+
+                var pagedModel = new PagedViewModel<object>
+                {
+                    Items = fonctions,
+                    Pagination = pagination
+                };
+
                 ViewBag.Fonctions = fonctions;
-                return View();
+                return View(pagedModel);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erreur lors du chargement de la liste des fonctions");
                 TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement des fonctions.";
-                return View(new List<object>());
+                return View(new PagedViewModel<object>());
             }
         }
 
@@ -138,7 +159,7 @@ namespace Obeli_K.Controllers
 
                 // Récupérer les utilisateurs avec cette fonction
                 var utilisateurs = await _context.Utilisateurs
-                    .Include(u => u.Departement)
+                    .Include(u => u.Direction)
                     .Where(u => u.FonctionId == id && u.Supprimer == 0)
                     .OrderBy(u => u.Nom)
                     .ThenBy(u => u.Prenoms)
@@ -153,7 +174,7 @@ namespace Obeli_K.Controllers
                         u.Role,
                         u.Lieu,
                         u.Site,
-                        DepartementNom = u.Departement != null ? u.Departement.Nom : "N/A",
+                        DirectionNom = u.Direction != null ? u.Direction.Nom : "N/A",
                         u.CreatedAt
                     })
                     .ToListAsync();

@@ -1,0 +1,241 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Facturation Automatique";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-money-bill-wave me-2"></i>
+                            Facturation Automatique des Commandes Non Consommées
+                        </h4>
+                        <div>
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#executerModal">
+                                <i class="fas fa-play me-1"></i>
+                                Exécuter la Facturation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["WarningMessage"] != null)
+                    {
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @TempData["WarningMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["InfoMessage"] != null)
+                    {
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @TempData["InfoMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Résumé de la facturation -->
+                    @if (ViewBag.ResultatFacturation != null)
+                    {
+                        var resultat = ViewBag.ResultatFacturation as Obeli_K.Models.ViewModels.FacturationResult;
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-receipt fa-2x mb-2"></i>
+                                        <h5>@resultat.NombreCommandesFacturables</h5>
+                                        <small>Commandes Facturables</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-gift fa-2x mb-2"></i>
+                                        <h5>@resultat.NombreCommandesNonFacturables</h5>
+                                        <small>Commandes Exemptées</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                                        <h5>@resultat.MontantTotalAFacturer.ToString("C")</h5>
+                                        <small>Montant Total</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cog fa-2x mb-2"></i>
+                                        <h5>@(resultat.FacturationActive ? "Activée" : "Désactivée")</h5>
+                                        <small>Statut Facturation</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Liste des commandes non consommées -->
+                    @if (ViewBag.CommandesNonConsommees != null)
+                    {
+                        var commandes = ViewBag.CommandesNonConsommees as List<Obeli_K.Models.ViewModels.CommandeNonConsommeeViewModel>;
+                        if (commandes.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Code Commande</th>
+                                            <th>Utilisateur</th>
+                                            <th>Date Consommation</th>
+                                            <th>Formule</th>
+                                            <th>Montant</th>
+                                            <th>Statut</th>
+                                            <th>Retard (jours)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var commande in commandes)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-secondary">@commande.CodeCommande</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@commande.NomUtilisateur</strong>
+                                                        <br><small class="text-muted">@commande.EmailUtilisateur</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted">@commande.DateConsommation.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@commande.NomFormule</strong>
+                                                        <br><small class="text-muted">@commande.Plat</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="fw-bold">@commande.Montant.ToString("C")</span>
+                                                </td>
+                                                <td>
+                                                    @if (commande.StatusCommande == Obeli_K.Enums.StatutCommande.Precommander)
+                                                    {
+                                                        <span class="badge bg-warning">Précommandée</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-info">@commande.StatusCommande</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger">@commande.NombreJoursRetard jours</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                <h5 class="text-success">Aucune commande non consommée</h5>
+                                <p class="text-muted">Toutes les commandes ont été récupérées ou sont dans les délais.</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour exécuter la facturation -->
+<div class="modal fade" id="executerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-play me-2"></i>
+                    Exécuter la Facturation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Executer" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" name="dateDebut" class="form-control" value="@DateTime.Today.AddDays(-7).ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de fin</label>
+                        <input type="date" name="dateFin" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Cette action va facturer toutes les commandes non consommées dans la période sélectionnée.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-play me-1"></i>
+                        Exécuter la Facturation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .badge {
+        font-size: 0.8em;
+    }
+</style>

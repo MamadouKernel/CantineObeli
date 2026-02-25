@@ -1,4 +1,4 @@
-@model Obeli_K.Models.Utilisateur
+﻿@model Obeli_K.Models.Utilisateur
 @{
     ViewData["Title"] = "Détails de l'Utilisateur";
 }
@@ -144,9 +144,9 @@
                         </div>
                         
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Département</label>
+                            <label class="form-label fw-semibold">Direction</label>
                             <div class="p-2 bg-light rounded">
-                                @(Model.Departement?.Nom ?? "Non assigné")
+                                @(Model.Direction?.Nom ?? "Non assigné")
                             </div>
                         </div>
                         

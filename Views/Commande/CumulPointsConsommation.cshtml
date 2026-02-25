@@ -1,0 +1,424 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Statistiques des Consommations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- En-tête avec filtres de date -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>
+                                Statistiques des consommations
+                            </h4>
+                            <small class="opacity-75">@Model.Periode</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form method="get" class="d-flex gap-2">
+                                <input type="date" name="dateDebut" value="@Model.DateDebut.ToString("yyyy-MM-dd")" class="form-control form-control-sm">
+                                <input type="date" name="dateFin" value="@Model.DateFin.ToString("yyyy-MM-dd")" class="form-control form-control-sm">
+                                <button type="submit" class="btn btn-light btn-sm">
+                                    <i class="fas fa-filter me-1"></i>Filtrer
+                                </button>
+                            </form>
+                            <a href="@Url.Action("ExporterExcelCumul", "Commande", new { dateDebut = Model.DateDebut, dateFin = Model.DateFin })" 
+                               class="btn btn-success btn-sm">
+                                <i class="fas fa-file-excel me-1"></i>Exporter Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques globales -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <h3 class="text-success mb-1">@Model.TotalRepasConsommes</h3>
+                    <p class="text-muted mb-0 small">Total des repas consommés</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                    <h3 class="text-warning mb-1">@Model.TotalRepasNonRecuperes</h3>
+                    <p class="text-muted mb-0 small">Total des repas non récupérés</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                    </div>
+                    <h3 class="text-danger mb-1">@Model.TotalRepasIndisponibles</h3>
+                    <p class="text-muted mb-0 small">Total des repas indisponibles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                    <h3 class="text-primary mb-1">@Model.TotalCout.ToString("N0") FCFA</h3>
+                    <p class="text-muted mb-0">Coût total</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <h3 class="text-info mb-1">@Model.TotalUtilisateurs</h3>
+                    <p class="text-muted mb-0">Utilisateurs actifs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Répartition par Statut -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-donut me-2 text-primary"></i>
+                        Répartition par statut
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CumulParStatut.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var statut in Model.CumulParStatut)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-circle"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">@statut.Statut</h6>
+                                            <small class="text-muted">@statut.Pourcentage% du total</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary fs-6">@statut.NombrePoints</span>
+                                        <br>
+                                        <small class="text-muted">@statut.CoutTotal.ToString("N0") FCFA</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chart-donut fa-3x mb-3 opacity-50"></i>
+                            <p>Aucune donnée disponible</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Répartition par Formule -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-utensils me-2 text-success"></i>
+                        Répartition par formule
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CumulParFormule.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var formule in Model.CumulParFormule)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-utensils"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">@formule.FormuleNom</h6>
+                                            <small class="text-muted">@formule.Pourcentage% du total</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success fs-6">@formule.NombreConsommations</span>
+                                        <br>
+                                        <small class="text-muted">@formule.CoutTotal.ToString("N0") FCFA</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-utensils fa-3x mb-3 opacity-50"></i>
+                            <p>Aucune formule consommée</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Évolution Temporelle -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-info"></i>
+                        Évolution temporelle (7 derniers jours)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CumulParJour.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @{
+                                int startIndex = Math.Max(0, Model.CumulParJour.Count - 7);
+                                var derniersJours = new List<dynamic>();
+                                for (int i = startIndex; i < Model.CumulParJour.Count; i++)
+                                {
+                                    derniersJours.Add(Model.CumulParJour[i]);
+                                }
+                            }
+                            @foreach (var jour in derniersJours)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-calendar-day"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">@jour.Date.ToString("dd/MM/yyyy")</h6>
+                                            <small class="text-muted">@jour.Date.ToString("dddd", new System.Globalization.CultureInfo("fr-FR"))</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-info fs-6">@jour.NombrePoints</span>
+                                        <br>
+                                        <small class="text-muted">@jour.CoutTotal.ToString("N0") FCFA</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chart-line fa-3x mb-3 opacity-50"></i>
+                            <p>Aucune donnée temporelle</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 5 Utilisateurs (anonymisés) -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        Top 5 des utilisateurs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CumulParUtilisateur.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @{
+                                int rank = 1;
+                                int maxUsers = Math.Min(5, Model.CumulParUtilisateur.Count);
+                                var topUsers = new List<dynamic>();
+                                for (int i = 0; i < maxUsers; i++)
+                                {
+                                    topUsers.Add(Model.CumulParUtilisateur[i]);
+                                }
+                                var colors = new[] { "warning", "secondary", "success", "info", "primary" };
+                                var icons = new[] { "crown", "medal", "award", "star", "certificate" };
+                                int colorIndex = 0;
+                                int iconIndex = 0;
+                                foreach (var user in topUsers)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-@colors[colorIndex] me-3">
+                                                <i class="fas fa-@icons[iconIndex]"></i>
+                                                #@rank
+                                            </span>
+                                            <div>
+                                                <h6 class="mb-1">@user.NomComplet</h6>
+                                                <small class="text-muted">
+                                                    Dernière: @user.DerniereConsommation.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-primary">@user.NombrePoints pts</span>
+                                            <br>
+                                            <small class="text-muted">@user.CoutTotal.ToString("N0") FCFA</small>
+                                        </div>
+                                    </div>
+                                    rank++;
+                                    colorIndex = (colorIndex + 1) % colors.Length;
+                                    iconIndex = (iconIndex + 1) % icons.Length;
+                                }
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-users fa-3x mb-3 opacity-50"></i>
+                            <p>Aucun utilisateur actif</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau détaillé des utilisateurs (anonymisé) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table me-2 text-dark"></i>
+                        Détail par utilisateur (Anonymisé)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CumulParUtilisateur.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Utilisateur</th>
+                                        <th class="text-center">Points</th>
+                                        <th class="text-center">Coût Total</th>
+                                        <th class="text-center">Dernière Consommation</th>
+                                        <th class="text-center">Coût Moyen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int userRank = 1;
+                                        foreach (var user in Model.CumulParUtilisateur)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-secondary">#@userRank</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-0">@user.NomComplet</h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-primary fs-6">@user.NombrePoints</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <strong class="text-success">@user.CoutTotal.ToString("N0") FCFA</strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <small class="text-muted">@user.DerniereConsommation.ToString("dd/MM/yyyy HH:mm")</small>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="text-info">
+                                                        @(user.NombrePoints > 0 ? (user.CoutTotal / user.NombrePoints).ToString("N0") : "0") FCFA
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            userRank++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-table fa-3x mb-3 opacity-50"></i>
+                            <h5>Aucune donnée disponible</h5>
+                            <p>Il n'y a pas de points de consommation pour la période sélectionnée.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>

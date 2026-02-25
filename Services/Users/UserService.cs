@@ -19,7 +19,7 @@ namespace Obeli_K.Services.Users
         public async Task<Utilisateur?> GetByUserNameAsync(string userName)
         {
             return await _context.Utilisateurs
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .Include(u => u.Fonction)
                 .FirstOrDefaultAsync(u => u.UserName == userName && (u.Supprimer == 0));
         }
@@ -27,7 +27,7 @@ namespace Obeli_K.Services.Users
         public async Task<Utilisateur?> GetByIdAsync(Guid id)
         {
             return await _context.Utilisateurs
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .Include(u => u.Fonction)
                 .FirstOrDefaultAsync(u => u.Id == id && (u.Supprimer == 0));
         }
@@ -56,7 +56,7 @@ namespace Obeli_K.Services.Users
             existing.Email = utilisateur.Email;
             existing.PhoneNumber = utilisateur.PhoneNumber;
             existing.Lieu = utilisateur.Lieu;
-            existing.DepartementId = utilisateur.DepartementId;
+            existing.DirectionId = utilisateur.DirectionId;
             existing.FonctionId = utilisateur.FonctionId;
             existing.Role = utilisateur.Role;
             existing.Site = utilisateur.Site;
@@ -117,7 +117,7 @@ namespace Obeli_K.Services.Users
         public async Task<List<Utilisateur>> GetAllAsync()
         {
             return await _context.Utilisateurs
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .Include(u => u.Fonction)
                 .Where(u => u.Supprimer == 0)
                 .OrderBy(u => u.Nom)
@@ -128,7 +128,7 @@ namespace Obeli_K.Services.Users
         public async Task<List<Utilisateur>> GetByRoleAsync(Models.Enums.RoleType role)
         {
             return await _context.Utilisateurs
-                .Include(u => u.Departement)
+                .Include(u => u.Direction)
                 .Include(u => u.Fonction)
                 .Where(u => u.Role == role && (u.Supprimer == 0))
                 .OrderBy(u => u.Nom)

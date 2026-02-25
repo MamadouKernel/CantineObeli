@@ -14,9 +14,9 @@ namespace Obeli_K.Models
         [StringLength(100)] public string? Responsable { get; set; } // Nom du responsable
         [StringLength(100)] public string? Email { get; set; } // Email du responsable
 
-        // Relation avec le département parent
-        public Guid? DepartementId { get; set; }
-        public virtual Departement? Departement { get; set; }
+        // Relation avec la direction parente
+        public Guid? DirectionId { get; set; }
+        public virtual Direction? Direction { get; set; }
 
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }

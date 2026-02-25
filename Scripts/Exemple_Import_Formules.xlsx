@@ -1,0 +1,27 @@
+# Ce fichier est un exemple de structure Excel pour l'importation des formules
+# Le fichier réel sera généré par l'application via le bouton "Télécharger le modèle"
+
+# Structure du fichier Excel :
+# Colonne A: Date (YYYY-MM-DD)
+# Colonne B: NomFormule (Formule Améliorée, Formule Standard 1, Formule Standard 2)
+# Colonne C: Entree
+# Colonne D: Plat
+# Colonne E: Garniture
+# Colonne F: Dessert
+# Colonne G: PlatStandard1
+# Colonne H: GarnitureStandard1
+# Colonne I: PlatStandard2
+# Colonne J: GarnitureStandard2
+# Colonne K: Feculent
+# Colonne L: Legumes
+# Colonne M: Marge (laisser vide)
+# Colonne N: Statut (1 = actif, 0 = inactif)
+
+# Exemple de données :
+# Ligne 2: 2024-01-15 | Formule Améliorée | Salade verte | Poulet rôti | Riz pilaf | Fruit | | | | | Riz blanc | Légumes | | 1
+# Ligne 3: 2024-01-15 | Formule Standard 1 | | | | | Sauce graine | Viande bœuf | | | | | | 1
+# Ligne 4: 2024-01-15 | Formule Standard 2 | | | | | | | Attiéké | Poisson grillé | | | | 1
+# Ligne 5: 2024-01-16 | Formule Améliorée | Carottes | Agouti sauce | Riz parfumé | Banane | | | | | Riz | Gombo | | 1
+# Ligne 6: 2024-01-16 | Formule Standard 1 | | | | | Sauce arachide | Poulet | | | | | | 1
+
+# Ce fichier sera remplacé par le vrai fichier Excel généré par l'application

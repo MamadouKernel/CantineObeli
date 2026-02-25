@@ -1,396 +1,370 @@
-@model Obeli_K.Models.ViewModels.CreerCommandeInstantaneeViewModel
+﻿@model Obeli_K.Models.ViewModels.CreerCommandeInstantaneeViewModel
 
 @{
     ViewData["Title"] = "Créer une Commande Instantanée";
 }
 
 <style>
+    /* Design moderne et élégant */
+    :root {
+        --primary-gold: #EDAC00;
+        --primary-gold-light: #f4d03f;
+        --primary-gold-dark: #d4b800;
+        --secondary-blue: #2563eb;
+        --secondary-blue-light: #3b82f6;
+        --success-green: #10b981;
+        --success-green-light: #34d399;
+        --neutral-50: #f8fafc;
+        --neutral-100: #f1f5f9;
+        --neutral-200: #e2e8f0;
+        --neutral-300: #cbd5e1;
+        --neutral-400: #94a3b8;
+        --neutral-500: #64748b;
+        --neutral-600: #475569;
+        --neutral-700: #334155;
+        --neutral-800: #1e293b;
+        --neutral-900: #0f172a;
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     .instant-order-container {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         min-height: 100vh;
         padding: 2rem 0;
-    }
-    
-    .main-card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        overflow: hidden;
-        background: white;
-    }
-    
-    .header-section {
-        background: #EDAC00;
-        color: #2c3e50;
-        padding: 2rem;
-        text-align: center;
         position: relative;
+        overflow: hidden;
     }
     
-    .header-section::before {
+    .instant-order-container::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        opacity: 0.3;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(237, 172, 0, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+        pointer-events: none;
     }
-    
+
+    .main-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 32px;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-light) 50%, #ffd700 100%);
+        color: var(--neutral-900);
+        padding: 4rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%),
+            linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        animation: shimmer 6s ease-in-out infinite;
+    }
+
+    @@keyframes shimmer {
+        0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
     .header-content {
         position: relative;
-        z-index: 1;
+        z-index: 2;
     }
-    
+
+    .header-content h1 {
+        font-weight: 900;
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-700) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
+    }
+
+    .header-content p {
+        font-size: 1.25rem;
+        font-weight: 600;
+        opacity: 0.9;
+        color: var(--neutral-700);
+    }
+
     .form-section {
-        padding: 3rem;
-        background: white;
+        padding: 4rem;
+        background: transparent;
+        position: relative;
     }
-    
+
+    .floating-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 10px 25px -5px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .floating-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-gold), var(--primary-gold-light), var(--primary-gold));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .floating-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 
+            0 20px 40px -12px rgba(0, 0, 0, 0.15),
+            0 8px 16px -8px rgba(0, 0, 0, 0.1);
+        border-color: rgba(237, 172, 0, 0.3);
+    }
+
+    .floating-card:hover::before {
+        opacity: 1;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--neutral-800);
+        margin-bottom: 2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .card-title i {
+        color: var(--primary-gold);
+        font-size: 1.75rem;
+    }
+
     .form-group {
         margin-bottom: 2rem;
     }
     
     .form-label {
-        font-weight: 600;
-        color: #2c3e50;
+        font-weight: 700;
+        color: var(--neutral-700);
         margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
-        font-size: 0.95rem;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+        gap: 0.75rem;
     }
-    
+
     .form-label i {
-        color: #EDAC00;
-        margin-right: 0.5rem;
-        width: 20px;
+        color: var(--primary-gold);
+        font-size: 1.25rem;
+        width: 24px;
         text-align: center;
     }
-    
+
     .form-control, .form-select {
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        padding: 0.875rem 1rem;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
+        border: 2px solid var(--neutral-200);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
     }
-    
+
     .form-control:focus, .form-select:focus {
-        border-color: #EDAC00;
-        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
-        background: white;
+        border-color: var(--primary-gold);
+        box-shadow: 
+            0 0 0 4px rgba(237, 172, 0, 0.1),
+            0 8px 16px -4px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+        outline: none;
+        transform: translateY(-2px);
     }
-    
+
     .form-control:hover, .form-select:hover {
-        border-color: #EDAC00;
-        background: white;
+        border-color: var(--primary-gold);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
     }
-    
-    .btn-primary {
-        background: #EDAC00;
+
+    .btn-confirm {
+        background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-light) 100%);
         border: none;
-        border-radius: 12px;
-        padding: 0.875rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        color: #2c3e50;
+        border-radius: 16px;
+        padding: 1.25rem 3rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: white;
+        box-shadow: 
+            0 8px 16px -4px rgba(16, 185, 129, 0.4),
+            0 4px 8px -2px rgba(16, 185, 129, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-    
-    .btn-primary:hover {
-        background: #d4b800;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(237, 172, 0, 0.4);
-        color: #2c3e50;
+
+    .btn-confirm::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.6s;
     }
-    
+
+    .btn-confirm:hover {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        transform: translateY(-3px);
+        box-shadow: 
+            0 12px 24px -4px rgba(16, 185, 129, 0.5),
+            0 6px 12px -2px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-confirm:hover::before {
+        left: 100%;
+    }
+
     .btn-secondary {
-        background: #6c757d;
+        background: linear-gradient(135deg, var(--neutral-500) 0%, var(--neutral-600) 100%);
         border: none;
-        border-radius: 12px;
-        padding: 0.875rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
+        border-radius: 16px;
+        padding: 1.25rem 3rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: white;
+        box-shadow: 0 8px 16px -4px rgba(107, 114, 128, 0.3);
     }
-    
+
     .btn-secondary:hover {
-        background: #5a6268;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        background: linear-gradient(135deg, var(--neutral-600) 0%, var(--neutral-700) 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px -4px rgba(107, 114, 128, 0.4);
     }
-    
+
     .alert {
         border: none;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
         margin-bottom: 2rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
     }
-    
+
     .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-        border-left: 4px solid #dc3545;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #dc2626;
+        border-left: 4px solid #ef4444;
     }
-    
+
     .alert-success {
-        background: #d1edff;
-        color: #0c5460;
-        border-left: 4px solid #17a2b8;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #16a34a;
+        border-left: 4px solid #22c55e;
     }
-    
-    .section-divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #EDAC00, transparent);
-        margin: 2rem 0;
-        border: none;
+
+    .alert-info {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #2563eb;
+        border-left: 4px solid #3b82f6;
     }
-    
-    .floating-card {
-        background: white;
+
+    .debug-info {
+        background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+        border: 2px solid rgba(139, 92, 246, 0.2);
         border-radius: 16px;
         padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        border: 1px solid #f1f3f4;
-        transition: all 0.3s ease;
-    }
-    
-    .floating-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-    }
-    
-    .step-indicator {
-        display: flex;
-        justify-content: center;
         margin-bottom: 2rem;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
     }
-    
-    .step {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #e9ecef;
-        display: flex;
+
+    .debug-info strong {
+        color: #7c3aed;
+        font-weight: 700;
+    }
+
+    .return-link {
+        color: var(--secondary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        margin: 0 1rem;
-        font-weight: 600;
-        color: #6c757d;
-        transition: all 0.3s ease;
+        gap: 0.5rem;
     }
-    
-    .step.active {
-        background: #EDAC00;
-        color: #2c3e50;
+
+    .return-link:hover {
+        color: var(--secondary-blue-light);
+        transform: translateX(-2px);
     }
-    
-    .step.completed {
-        background: #28a745;
-        color: white;
+
+    .instruction-text {
+        color: var(--neutral-500);
+        font-size: 0.9rem;
+        font-style: italic;
     }
-    
-    .step-line {
-        width: 60px;
-        height: 2px;
-        background: #e9ecef;
-        margin-top: 19px;
+
+    /* Animations subtiles */
+    .form-control, .form-select, .btn-confirm, .btn-secondary {
+        animation: fadeInUp 0.6s ease-out;
     }
-    
-    .step-line.completed {
-        background: #EDAC00;
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    
-    /* Select2 Custom Styles */
-    .select2-container {
-        width: 100% !important;
-    }
-    
-    .select2-container--default .select2-selection--single {
-        height: 50px;
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-    }
-    
-    .select2-container--default .select2-selection--single:hover {
-        border-color: #EDAC00;
-        background: white;
-    }
-    
-    .select2-container--default.select2-container--focus .select2-selection--single {
-        border-color: #EDAC00;
-        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
-        background: white;
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 46px;
-        padding-left: 1rem;
-        color: #2c3e50;
-        font-size: 0.95rem;
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 46px;
-        right: 1rem;
-    }
-    
-    .select2-dropdown {
-        border: 2px solid #EDAC00;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    
-    .select2-results__option {
-        padding: 0.75rem 1rem;
-        font-size: 0.95rem;
-        color: #2c3e50;
-    }
-    
-    .select2-results__option--highlighted {
-        background: #EDAC00;
-        color: #2c3e50;
-    }
-    
-    .select2-search--dropdown .select2-search__field {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.95rem;
-    }
-    
-    .select2-search--dropdown .select2-search__field:focus {
-        border-color: #EDAC00;
-        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__placeholder {
-        color: #6c757d;
-    }
-    
-    /* Styles pour les templates personnalisés */
-    .select2-result-item {
-        padding: 0.5rem 0;
-    }
-    
-    .select2-result-item__title {
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 0.95rem;
-    }
-    
-    .select2-result-item__matricule {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-    
-    .select2-results__option--highlighted .select2-result-item__matricule {
-        color: #2c3e50;
-    }
-    
-    /* Forcer l'affichage de la barre de recherche */
-    .select2-dropdown-with-search .select2-search {
-        display: block !important;
-    }
-    
-    .select2-dropdown-with-search .select2-search--dropdown {
-        display: block !important;
-        padding: 0.5rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .select2-dropdown-with-search .select2-search__field {
-        width: 100% !important;
-        padding: 0.5rem 0.75rem !important;
-        border: 2px solid #e9ecef !important;
-        border-radius: 8px !important;
-        font-size: 0.95rem !important;
-        background: #f8f9fa !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .select2-dropdown-with-search .select2-search__field:focus {
-        border-color: #EDAC00 !important;
-        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25) !important;
-        background: white !important;
-        outline: none !important;
-    }
-    
-    .select2-dropdown-with-search .select2-search__field::placeholder {
-        color: #6c757d !important;
-        font-style: italic !important;
-    }
-    
-    /* Styles pour la barre de recherche personnalisée */
-    #searchUtilisateur {
-        border: 2px solid #EDAC00 !important;
-        border-radius: 12px !important;
-        padding: 0.875rem 1rem !important;
-        font-size: 0.95rem !important;
-        background: #f8f9fa !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-    }
-    
-    #searchUtilisateur:focus {
-        border-color: #EDAC00 !important;
-        box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25) !important;
-        background: white !important;
-        outline: none !important;
-    }
-    
-    #searchUtilisateur::placeholder {
-        color: #6c757d !important;
-        font-style: italic !important;
-    }
-    
-    #searchUtilisateur:hover {
-        border-color: #EDAC00 !important;
-        background: white !important;
-    }
-    
-    /* Style pour l'alerte d'information */
-    .alert-info {
-        background-color: #e3f2fd !important;
-        border: 1px solid #bbdefb !important;
-        color: #1565c0 !important;
-        border-radius: 8px !important;
-        padding: 0.5rem 0.75rem !important;
-        font-size: 0.85rem !important;
-    }
-    
-    .alert-info .fas {
-        color: #1976d2 !important;
-    }
-    
-    /* Styles pour les messages d'erreur détaillés */
-    .field-validation-error {
-        background-color: #f8d7da !important;
-        border: 1px solid #f5c6cb !important;
-        color: #721c24 !important;
-        border-radius: 8px !important;
-        padding: 1rem !important;
-        margin-top: 0.5rem !important;
-        font-size: 0.9rem !important;
-        line-height: 1.4 !important;
-    }
-    
-    .field-validation-error strong {
-        color: #721c24 !important;
-        font-weight: 600 !important;
-    }
-    
-    .field-validation-error em {
-        color: #6c757d !important;
-        font-style: italic !important;
-    }
-    
+
+    /* Responsive design */
     @@media (max-width: 768px) {
         .instant-order-container {
             padding: 1rem 0;
@@ -401,19 +375,35 @@
         }
         
         .header-section {
+            padding: 3rem 1.5rem;
+        }
+        
+        .header-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .floating-card {
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-confirm, .btn-secondary {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .header-content h1 {
+            font-size: 2rem;
+        }
+        
+        .floating-card {
             padding: 1.5rem;
         }
         
-        .select2-container--default .select2-selection--single {
-            height: 45px;
-        }
-        
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 41px;
-        }
-        
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 41px;
+        .form-control, .form-select {
+            padding: 1rem 1.25rem;
         }
     }
 </style>
@@ -421,7 +411,7 @@
 <div class="instant-order-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
+            <div class="col-lg-12 col-xl-12">
                 
                 <div class="main-card">
                     <!-- Header Section -->
@@ -457,197 +447,238 @@
                         </div>
                     }
 
+                        <!-- Debug Info
+                        <div class="debug-info">
+                            <strong>🔍 Debug Information:</strong><br>
+                            <strong>Rôles utilisateur:</strong> @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))<br>
+                            <strong>Est PrestataireCantine:</strong> @User.IsInRole("PrestataireCantine")<br>
+                            <strong>Est Administrateur:</strong> @User.IsInRole("Administrateur")<br>
+                            <strong>Formules disponibles:</strong> @((ViewBag.FormulesAujourdhui as Microsoft.AspNetCore.Mvc.Rendering.SelectList)?.Count() ?? 0)
+                        </div> -->
+
                                     <form asp-action="CreerCommandeInstantanee" method="post">
                                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                             
-                            <!-- Step 1: Client Type & Formula -->
-                            <div class="floating-card">
-                                <h5 class="mb-4 text-center">
-                                    <i class="fas fa-user-friends me-2" style="color: #EDAC00;"></i>
-                                    Informations de base
-                                </h5>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                        <div class="form-group">
-                                                    <label asp-for="TypeClient" class="form-label">
-                                                <i class="fas fa-users"></i>
-                                                        Type de client
-                                                    </label>
-                                                    <select asp-for="TypeClient" class="form-select" id="typeClientSelect" onchange="
-                                                        var typeClient = this.value;
-                                                        var groupeSection = document.getElementById('groupeSection');
-                                                        var groupeCitSection = document.getElementById('groupeCitSection');
-                                                        var quantiteSection = document.getElementById('quantiteSection');
-                                                        var quantiteInput = document.getElementById('Quantite');
-                                                        var siteSection = document.getElementById('siteSection');
-                                                        
-                                                        // Masquer toutes les sections
-                                                        if (groupeSection) groupeSection.style.display = 'none';
-                                                        if (groupeCitSection) groupeCitSection.style.display = 'none';
-                                                        
-                                                        // Afficher selon la sélection
-                                                        if (typeClient === '1') {
-                                                            // Groupe non-CIT
-                                                            if (groupeSection) groupeSection.style.display = 'block';
-                                                            if (quantiteSection) quantiteSection.style.display = 'block';
-                                                            if (siteSection) {
-                                                                siteSection.className = 'col-md-6';
-                                                            }
-                                                        } else if (typeClient === '0') {
-                                                            // Groupe CIT
-                                                            if (groupeCitSection) groupeCitSection.style.display = 'block';
-                                                            if (quantiteSection) quantiteSection.style.display = 'none';
-                                                            if (quantiteInput) quantiteInput.value = '1';
-                                                            if (siteSection) {
-                                                                siteSection.className = 'col-md-8';
-                                                            }
-                                                        } else {
-                                                            // Par défaut
-                                                            if (quantiteSection) quantiteSection.style.display = 'block';
-                                                            if (siteSection) {
-                                                                siteSection.className = 'col-md-6';
-                                                            }
-                                                        }
-                                                    ">
-                                                        <option value="">-- Sélectionner --</option>
-                                                        <option value="1">Groupe non-CIT</option>
-                                                        <option value="0">Groupe CIT</option>
-                                                    </select>
-                                                    <span asp-validation-for="TypeClient" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                        <div class="form-group">
-                                                    <label asp-for="IdFormule" class="form-label">
-                                                <i class="fas fa-utensils"></i>
-                                                        Formule
-                                                    </label>
-                                            <select asp-for="IdFormule" class="form-select select2-search" asp-items="ViewBag.FormulesAujourdhui" data-placeholder="-- Rechercher une formule --">
-                                                <option value="">-- Rechercher une formule --</option>
-                                                    </select>
-                                                    <span asp-validation-for="IdFormule" class="text-danger"></span>
-                                        </div>
-                                                </div>
+                            @if (User.IsInRole("PrestataireCantine") && !User.IsInRole("Administrateur"))
+                            {
+                                <!-- Interface pour commandes individuelles -->
+                                <div class="floating-card">
+                                    <div class="card-title">
+                                        <i class="fas fa-user"></i>
+                                        Commande Individuelle
+                                    </div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-id-card"></i>
+                                                    Matricule
+                                                </label>
+                                                <input type="text" id="userMatricule" class="form-control" placeholder="Entrez le matricule de l'utilisateur" />
                                             </div>
                                         </div>
-
-                            <!-- Step 2: Client Details -->
-                            <div id="groupeSection" class="floating-card" style="display: none;">
-                                <h5 class="mb-4 text-center">
-                                    <i class="fas fa-building me-2" style="color: #EDAC00;"></i>
-                                    Détails du groupe non-CIT
-                                </h5>
-                                <div class="row">
-                                            <div class="col-md-6">
-                                        <div class="form-group">
-                                                    <label asp-for="GroupeNonCitId" class="form-label">
-                                                <i class="fas fa-building"></i>
-                                                        Groupe non-CIT
-                                                    </label>
-                                            <select asp-for="GroupeNonCitId" class="form-select select2-search" asp-items="ViewBag.GroupesNonCit" data-placeholder="-- Rechercher un groupe --">
-                                                <option value="">-- Rechercher un groupe --</option>
-                                                    </select>
-                                                    <span asp-validation-for="GroupeNonCitId" class="text-danger"></span>
-                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                            <div id="groupeCitSection" class="floating-card" style="display: none;">
-                                <h5 class="mb-4 text-center">
-                                    <i class="fas fa-user me-2" style="color: #EDAC00;"></i>
-                                    Détails de l'utilisateur CIT
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label asp-for="UtilisateurId" class="form-label">
-                                                <i class="fas fa-user"></i>
-                                                Utilisateur CIT
-                                            </label>
-                                            <div class="alert alert-info alert-sm mb-2">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                <small><strong>Règle importante :</strong> Un utilisateur CIT ne peut avoir qu'une seule commande instantanée par jour. Le système vérifiera automatiquement s'il existe déjà une commande et son statut (en attente, validée, ou annulée).</small>
-                                            </div>
-                                            
-                                            <select asp-for="UtilisateurId" class="form-select select2-search" data-placeholder="-- Tapez le nom ou matricule pour rechercher --">
-                                                <option value="">-- Sélectionner un utilisateur --</option>
-                                                @if (ViewBag.Utilisateurs != null && ViewBag.UtilisateursData != null)
-                                                {
-                                                    @foreach (var item in ViewBag.Utilisateurs)
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-utensils"></i>
+                                                    Menu du Jour
+                                                </label>
+                                                <select id="selectedMenu" class="form-control">
+                                                    <option value="">Sélectionnez un menu</option>
+                                                    @if (ViewBag.FormulesAujourdhui != null)
                                                     {
-                                                        var userName = ViewBag.UtilisateursData[item.Value];
-                                                        <option value="@item.Value" data-username="@userName" data-fulltext="@item.Text @userName">@item.Text (@userName)</option>
+                                                        @foreach (var item in ViewBag.FormulesAujourdhui)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
                                                     }
-                                                }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-clock"></i>
+                                                    Période
+                                                </label>
+                                                <select id="periodeService" class="form-control">
+                                                    <option value="0">Jour</option>
+                                                    <option value="1">Nuit</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mt-4">
+                                        <button type="button" id="createOrder" class="btn btn-confirm">
+                                            <i class="fas fa-check me-2"></i>
+                                            Confirmer la Commande
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="orderResult" class="mt-4" style="display: none;"></div>
+                                    </div>
+                                    
+                                <!-- Interface pour commandes des Douaniers -->
+                                <div class="floating-card" style="border-left: 4px solid #f59e0b;">
+                                    <div class="card-title">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Commande pour Douaniers
+                                        <span class="badge bg-warning text-dark ms-2">Plats Standard Uniquement</span>
+                                </div>
+                                    
+                                    <div class="row g-4">
+                                            <div class="col-md-6">
+                                        <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-utensils"></i>
+                                                    Formule du Jour
+                                                    </label>
+                                                <select id="douanierFormule" class="form-control">
+                                                    <option value="">Sélectionnez la formule</option>
+                                                    @if (ViewBag.FormulesAujourdhui != null)
+                                                    {
+                                                        @foreach (var item in ViewBag.FormulesAujourdhui)
+                                                        {
+                                                            <option value="@item.Value">@item.Text</option>
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                        <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-hashtag"></i>
+                                                    Nombre de Plats
+                                                    </label>
+                                                <input type="number" id="douanierQuantite" class="form-control" 
+                                                       placeholder="Nombre de plats" min="1" max="100" />
+                                        </div>
+                                                </div>
+                                            </div>
+                                    
+                                    <div class="row g-4 mt-3">
+                                            <div class="col-md-6">
+                                        <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-clock"></i>
+                                                    Période
+                                                    </label>
+                                                <select id="douanierPeriode" class="form-control">
+                                                    <option value="0">Jour</option>
+                                                    <option value="1">Nuit</option>
+                                                    </select>
+                                        </div>
+                                                </div>
+                                        <div class="col-md-6">
+                                        <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-building"></i>
+                                                    Site
+                                            </label>
+                                                <select id="douanierSite" class="form-control">
+                                                    <option value="0">CIT Terminal</option>
+                                                    <option value="1">CIT Billing</option>
                                             </select>
-                                            <span asp-validation-for="UtilisateurId" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>
+                                    
+                                    <div class="alert alert-info mt-4">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Note :</strong> Les commandes pour les Douaniers sont limitées aux plats standard uniquement.
                             </div>
 
-                            <!-- Step 3: Order Details -->
+                                    <div class="text-center mt-4">
+                                        <button type="button" id="createDouanierOrder" class="btn btn-confirm" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                                            <i class="fas fa-shield-alt me-2"></i>
+                                            Créer Commande Douaniers
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="douanierOrderResult" class="mt-4" style="display: none;"></div>
+                                    </div>
+                                    
+                                <!-- Bouton de retour pour PrestataireCantine -->
+                                <div class="text-center mt-4">
+                                    <a href="/Commande" class="return-link">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Retourner à la liste
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <!-- Interface pour Administrateur - Commandes instantanées uniquement pour employés CIT -->
                             <div class="floating-card">
-                                <h5 class="mb-4 text-center">
-                                    <i class="fas fa-cog me-2" style="color: #EDAC00;"></i>
-                                    Détails de la commande
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-2" id="quantiteSection">
-                                        <div class="form-group">
-                                                <label asp-for="Quantite" class="form-label">
-                                                <i class="fas fa-hashtag"></i>
-                                                    Quantité
+                                    <div class="card-title">
+                                        <i class="fas fa-user"></i>
+                                        Commande Instantanée pour Employé
+                                    </div>
+                                    
+                                    <!-- Champ caché pour forcer le type à CitUtilisateur -->
+                                    <input type="hidden" asp-for="TypeClient" value="0" />
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-id-card"></i>
+                                                    Matricule de l'employé
                                                 </label>
-                                                <input asp-for="Quantite" class="form-control" type="number" min="1" max="100" />
-                                                <span asp-validation-for="Quantite" class="text-danger"></span>
-                                            </div>
-                                        </div>
-                                            <div class="col-md-4">
-                                        <div class="form-group">
-                                                    <label asp-for="PeriodeService" class="form-label">
-                                                <i class="fas fa-clock"></i>
-                                                        Période de service
-                                                    </label>
-                                                    <select asp-for="PeriodeService" class="form-select">
-                                                        <option value="0">Jour</option>
-                                                        <option value="1">Nuit</option>
-                                                    </select>
-                                                    <span asp-validation-for="PeriodeService" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6" id="siteSection">
-                                        <div class="form-group">
-                                                    <label asp-for="Site" class="form-label">
-                                                <i class="fas fa-map-marker-alt"></i>
-                                                        Site
-                                                    </label>
-                                                    <select asp-for="Site" class="form-select">
-                                                        <option value="">-- Sélectionner --</option>
-                                                        <option value="0">CIT-Terminal</option>
-                                                        <option value="1">CIT-Billing</option>
-                                                    </select>
-                                                    <span asp-validation-for="Site" class="text-danger"></span>
-                                        </div>
+                                                <input type="text" id="userMatriculeAdmin" class="form-control" placeholder="Entrez le matricule de l'employé" />
+                                                <input type="hidden" asp-for="UtilisateurId" id="hiddenUtilisateurId" />
+                                                <span asp-validation-for="UtilisateurId" class="text-danger"></span>
+                                                <div id="userInfo" class="mt-2" style="display: none;">
+                                                    <div class="alert alert-info mb-0">
+                                                        <i class="fas fa-user-check me-2"></i>
+                                                        <span id="userNameDisplay"></span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label asp-for="IdFormule" class="form-label">
+                                                    <i class="fas fa-utensils"></i>
+                                                    Formule du jour
+                                                </label>
+                                                <select asp-for="IdFormule" class="form-select" asp-items="ViewBag.FormulesAujourdhui">
+                                                    <option value="">-- Sélectionnez une formule --</option>
+                                                </select>
+                                                <span asp-validation-for="IdFormule" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label asp-for="PeriodeService" class="form-label">
+                                                    <i class="fas fa-clock"></i>
+                                                    Période
+                                                </label>
+                                                <select asp-for="PeriodeService" class="form-select">
+                                                    <option value="0">Midi (Jour)</option>
+                                                    <option value="1">Soir (Nuit)</option>
+                                                </select>
+                                                <span asp-validation-for="PeriodeService" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                            <!-- Action Buttons -->
-                            <div class="d-flex justify-content-between mt-4">
-                                            <a asp-action="Index" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>
-                                                Retour à la liste
-                                            </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-bolt me-2"></i>
-                                                Créer la commande instantanée
-                                            </button>
-                                        </div>
+                                <!-- Boutons d'action pour Administrateur -->
+                                <div class="d-flex justify-content-between mt-5">
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Retour à la liste
+                                    </a>
+                                    <button type="submit" class="btn btn-confirm">
+                                        <i class="fas fa-bolt me-2"></i>
+                                        Créer la commande instantanée
+                                    </button>
+                                </div>
+                            </div>
+                            }
                                     </form>
                     </div>
                 </div>
@@ -657,185 +688,362 @@
 </div>
 
 @section Scripts {
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fr.js"></script>
-    
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Variables globales
+        let currentUserId = null;
+        let currentUserName = null;
+        
         // Initialisation quand le DOM est prêt
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM chargé - Initialisation de la page Commande Instantanée');
+            console.log('👤 Rôles utilisateur:', @Html.Raw(Json.Serialize(User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))));
+            console.log('📊 Formules dans ViewBag:', @((ViewBag.FormulesAujourdhui as Microsoft.AspNetCore.Mvc.Rendering.SelectList)?.Count() ?? 0));
             
-            // Fonction pour initialiser Select2
-            function initSelect2() {
-                if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
-                    console.log('✅ jQuery et Select2 sont chargés');
-                    // Variable globale pour stocker le terme de recherche
-                    window.searchTerm = '';
-                    
-                    // Configuration Select2 avec recherche par matricule
-                    $('#UtilisateurId').select2({
-                        language: 'fr',
-                        placeholder: '-- Tapez le nom ou matricule pour rechercher --',
-                        allowClear: true,
-                        width: '100%',
-                        dropdownParent: $('.main-card'),
-                        minimumInputLength: 0,
-                        minimumResultsForSearch: 0,
-                        matcher: function(params, data) {
-                            // Si aucun terme de recherche, afficher tous les résultats
-                            if ($.trim(params.term) === '') {
-                                return data;
-                            }
-                            
-                            var term = params.term.toLowerCase();
-                            
-                            // Rechercher dans le texte affiché (nom)
-                            if (data.text.toLowerCase().indexOf(term) > -1) {
-                                return data;
-                            }
-                            
-                            // Rechercher dans le matricule (data-username)
-                            if (data.element) {
-                                var $element = $(data.element);
-                                var matricule = $element.attr('data-username');
-                                if (matricule && matricule.toLowerCase().indexOf(term) > -1) {
-                                    return data;
-                                }
-                            }
-                            
-                            return null;
-                        },
-                        templateResult: function(data) {
-                            if (!data.id) {
-                                return data.text;
-                            }
-                            
-                            var $element = $(data.element);
-                            var matricule = $element.attr('data-username');
-                            
-                            if (matricule) {
-                                var $result = $(
-                                    '<div class="select2-result-item">' +
-                                        '<div class="select2-result-item__title">' + data.text + '</div>' +
-                                        '<div class="select2-result-item__matricule">Matricule: ' + matricule + '</div>' +
-                                    '</div>'
-                                );
-                                return $result;
-                            }
-                            
-                            return data.text;
-                        },
-                        templateSelection: function(data) {
-                            var $element = $(data.element);
-                            var matricule = $element.attr('data-username');
-                            
-                            if (matricule) {
-                                return data.text + ' (' + matricule + ')';
-                            }
-                            return data.text;
-                        }
-                    });
-                    
-                    console.log('✅ Select2 configuré avec recherche par matricule');
-                    
-                    // Configuration standard pour les autres champs
-                    $('.select2-search').not('#typeClientSelect').not('#UtilisateurId').select2({
-                        language: 'fr',
-                        placeholder: function() {
-                            return $(this).data('placeholder') || '-- Sélectionner --';
-                        },
-                        allowClear: true,
-                        width: '100%',
-                        dropdownParent: $('.main-card'),
-                        minimumInputLength: 0,
-                        minimumResultsForSearch: 0,
-                        searchInputPlaceholder: 'Rechercher...',
-                        templateResult: function(data) {
-                            if (!data.id) {
-                                return data.text;
-                            }
-                            
-                            // Mise en forme spéciale pour les utilisateurs avec matricule
-                            if (data.element && data.element.dataset && data.element.dataset.matricule) {
-                                var $result = $(
-                                    '<div class="select2-result-item">' +
-                                        '<div class="select2-result-item__title">' + data.text + '</div>' +
-                                        '<div class="select2-result-item__matricule">Matricule: ' + data.element.dataset.matricule + '</div>' +
-                                    '</div>'
-                                );
-                                return $result;
-                            }
-                            
-                            return data.text;
-                        },
-                        templateSelection: function(data) {
-                            if (data.element && data.element.dataset && data.element.dataset.matricule) {
-                                return data.text + ' (' + data.element.dataset.matricule + ')';
-                            }
-                            return data.text;
-                        }
-                    });
+            // Initialiser les éléments
+            initializeElements();
+            
+            // Charger les menus
+            loadMenuOptions();
+            
+            // Initialiser la recherche par matricule pour Admin
+            initializeMatriculeSearch();
+        });
+        
+        // Fonction pour initialiser la recherche par matricule (Admin)
+        function initializeMatriculeSearch() {
+            const userMatriculeAdmin = document.getElementById('userMatriculeAdmin');
+            const hiddenUtilisateurId = document.getElementById('hiddenUtilisateurId');
+            const userInfo = document.getElementById('userInfo');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            
+            if (!userMatriculeAdmin || !hiddenUtilisateurId) return;
+            
+            // Recherche avec délai (debounce)
+            let searchTimeout;
+            userMatriculeAdmin.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const matricule = this.value.trim();
+                
+                if (matricule.length < 2) {
+                    if (userInfo) userInfo.style.display = 'none';
+                    hiddenUtilisateurId.value = '';
+                    return;
                 }
                 
-                // Debug pour vérifier les données
-                console.log('Utilisateurs dans ViewBag:', @Html.Raw(Json.Serialize(ViewBag.Utilisateurs)));
-                console.log('UtilisateursData dans ViewBag:', @Html.Raw(Json.Serialize(ViewBag.UtilisateursData)));
-                
-                // Initialiser l'affichage
-                toggleClientSections();
-                
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                        const response = await fetch('/Commande/GetUserByMatricule', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': token
+                            },
+                            body: JSON.stringify({ matricule: matricule })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success && result.userId) {
+                            hiddenUtilisateurId.value = result.userId;
+                            if (userNameDisplay) {
+                                userNameDisplay.textContent = `${result.nom} ${result.prenoms} (${result.matricule})`;
+                            }
+                            if (userInfo) {
+                                userInfo.style.display = 'block';
+                                const alertDiv = userInfo.querySelector('.alert');
+                                if (alertDiv) {
+                                    alertDiv.className = 'alert alert-success mb-0';
+                                }
+                            }
+                        } else {
+                            hiddenUtilisateurId.value = '';
+                            if (userNameDisplay) {
+                                userNameDisplay.textContent = 'Employé non trouvé';
+                            }
+                            if (userInfo) {
+                                userInfo.style.display = 'block';
+                                const alertDiv = userInfo.querySelector('.alert');
+                                if (alertDiv) {
+                                    alertDiv.className = 'alert alert-warning mb-0';
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de la recherche:', error);
+                        hiddenUtilisateurId.value = '';
+                        if (userInfo) userInfo.style.display = 'none';
+                    }
+                }, 500);
+            });
+        }
+        
+        // Fonction pour initialiser les éléments
+        function initializeElements() {
+            const createOrderBtn = document.getElementById('createOrder');
+            if (createOrderBtn) {
+                console.log('✅ Bouton createOrder trouvé, ajout de l\'événement');
+                createOrderBtn.addEventListener('click', handleCreateOrder);
             } else {
-                console.log('❌ Select2 non disponible, nouvelle tentative dans 1 seconde...');
-                setTimeout(initSelect2, 1000);
+                console.log('❌ Bouton createOrder non trouvé');
+            }
+            
+            const createDouanierOrderBtn = document.getElementById('createDouanierOrder');
+            if (createDouanierOrderBtn) {
+                console.log('✅ Bouton createDouanierOrder trouvé, ajout de l\'événement');
+                createDouanierOrderBtn.addEventListener('click', handleCreateDouanierOrder);
+            } else {
+                console.log('❌ Bouton createDouanierOrder non trouvé');
             }
         }
         
-        // Démarrer l'initialisation
-        setTimeout(initSelect2, 1000);
-        });
-
-            // Validation côté client
-        document.addEventListener('DOMContentLoaded', function() {
-            var form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    var typeClient = document.getElementById('typeClientSelect').value;
-                var isValid = true;
-
-                // Réinitialiser les classes d'erreur
-                    var formControls = document.querySelectorAll('.form-control, .form-select');
-                    formControls.forEach(function(control) {
-                        control.classList.remove('is-invalid');
-                    });
-
-                // Validation selon le type de client
-                switch(typeClient) {
-                    case '1': // GroupeNonCit
-                            var groupeNonCitId = document.getElementById('GroupeNonCitId');
-                            if (groupeNonCitId && !groupeNonCitId.value) {
-                                groupeNonCitId.classList.add('is-invalid');
-                            isValid = false;
-                        }
-                        break;
-                    case '0': // Groupe CIT
-                            var utilisateurId = document.getElementById('UtilisateurId');
-                            if (utilisateurId && !utilisateurId.value) {
-                                utilisateurId.classList.add('is-invalid');
-                            isValid = false;
-                        }
-                        break;
+        // Fonction pour charger les menus
+            function loadMenuOptions() {
+                const selectedMenu = document.getElementById('selectedMenu');
+                if (!selectedMenu) {
+                    console.error('❌ Élément selectedMenu non trouvé');
+                    return;
                 }
-
-                if (!isValid) {
-                    e.preventDefault();
-                    alert('Veuillez remplir tous les champs obligatoires.');
-                }
-            });
+                
+            // Vérifier si des options sont déjà présentes (chargées côté serveur)
+            const existingOptions = selectedMenu.querySelectorAll('option[value]:not([value=""])');
+            console.log(`📋 Options existantes trouvées: ${existingOptions.length}`);
+            
+            if (existingOptions.length > 0) {
+                console.log('✅ Menus déjà chargés côté serveur, pas besoin d\'AJAX');
+                return;
             }
-        });
+            
+            console.log('🔄 Chargement des menus via AJAX...');
+                fetch('/Commande/GetMenus')
+                    .then(response => {
+                        console.log('📡 Réponse reçue:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(menus => {
+                        console.log('🍽️ Menus reçus:', menus);
+                        
+                    // Garder l'option par défaut et ajouter les nouvelles options
+                    const defaultOption = selectedMenu.querySelector('option[value=""]');
+                    selectedMenu.innerHTML = '';
+                    if (defaultOption) {
+                        selectedMenu.appendChild(defaultOption);
+                    } else {
+                        selectedMenu.innerHTML = '<option value="">-- Sélectionnez un menu --</option>';
+                    }
+                        
+                        if (menus && Array.isArray(menus) && menus.length > 0) {
+                            menus.forEach((menu, index) => {
+                                const option = document.createElement('option');
+                                option.value = menu.id;
+                                option.textContent = menu.nom;
+                                selectedMenu.appendChild(option);
+                            });
+                        console.log(`✅ ${menus.length} menus chargés via AJAX`);
+                        } else {
+                        const noMenuOption = document.createElement('option');
+                        noMenuOption.value = '';
+                        noMenuOption.textContent = 'Aucun menu disponible';
+                        selectedMenu.appendChild(noMenuOption);
+                        console.log('⚠️ Aucun menu trouvé via AJAX');
+                        }
+                    })
+                    .catch(error => {
+                    console.error('❌ Erreur AJAX:', error);
+                    const errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Erreur lors du chargement';
+                    selectedMenu.appendChild(errorOption);
+                });
+        }
+        
+        // Fonction pour gérer la création de commande
+        async function handleCreateOrder() {
+            console.log('🎯 Bouton Confirmer cliqué');
+            
+            const userMatricule = document.getElementById('userMatricule');
+            const selectedMenu = document.getElementById('selectedMenu');
+            const periodeService = document.getElementById('periodeService');
+            const orderResult = document.getElementById('orderResult');
+            
+            if (!userMatricule || !selectedMenu || !periodeService || !orderResult) {
+                console.error('❌ Éléments du formulaire non trouvés');
+                        return;
+                    }
+                    
+                    const matricule = userMatricule.value.trim();
+                    const menuId = selectedMenu.value;
+                    const periode = periodeService.value;
+            
+            console.log('📝 Données saisies:', {
+                matricule: matricule,
+                menuId: menuId,
+                periode: periode
+            });
+                    
+                    if (!matricule) {
+                console.log('❌ Matricule manquant');
+                        showResult(orderResult, 'Veuillez saisir le matricule.', 'danger');
+                        return;
+                    }
+                    
+                    if (!menuId) {
+                console.log('❌ Menu non sélectionné');
+                        showResult(orderResult, 'Veuillez sélectionner un menu.', 'danger');
+                        return;
+                    }
+                    
+                    try {
+                console.log('🔍 Recherche de l\'utilisateur avec le matricule:', matricule);
+                
+                        // D'abord vérifier que l'utilisateur existe
+                        const userResponse = await fetch('/Commande/GetUserByMatricule', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({
+                                matricule: matricule
+                            })
+                        });
+                        
+                console.log('📡 Réponse GetUserByMatricule:', userResponse.status, userResponse.statusText);
+                        const userResult = await userResponse.json();
+                console.log('👤 Résultat utilisateur:', userResult);
+                        
+                        if (!userResult.success) {
+                            showResult(orderResult, `❌ ${userResult.message}`, 'danger');
+                            return;
+                        }
+                        
+                        // Créer la commande
+                console.log('🛒 Création de la commande avec:', {
+                    userId: userResult.userId,
+                    menuId: menuId,
+                    periode: periode
+                });
+                
+                        const orderResponse = await fetch('/Commande/CreateInstantOrderForUser', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({
+                                userId: userResult.userId,
+                                menuId: menuId,
+                                periode: periode
+                            })
+                        });
+                        
+                console.log('📡 Réponse CreateInstantOrderForUser:', orderResponse.status, orderResponse.statusText);
+                const createOrderResult = await orderResponse.json();
+                console.log('🛒 Résultat commande:', createOrderResult);
+                        
+                if (createOrderResult.success) {
+                            showResult(orderResult, '✅ Commande créée avec succès !', 'success');
+                            setTimeout(() => {
+                        window.location.href = '/Commande/Details/' + createOrderResult.commandeId;
+                            }, 1500);
+                        } else {
+                    showResult(orderResult, `❌ ${createOrderResult.message}`, 'danger');
+                        }
+                    } catch (error) {
+                        showResult(orderResult, '❌ Erreur lors de la création', 'danger');
+                        console.error('Erreur:', error);
+                    }
+            }
+            
+        // Fonction pour gérer la création de commande pour les Douaniers
+        async function handleCreateDouanierOrder() {
+            console.log('🛡️ Bouton Créer Commande Douaniers cliqué');
+            
+            const douanierFormule = document.getElementById('douanierFormule');
+            const douanierQuantite = document.getElementById('douanierQuantite');
+            const douanierPeriode = document.getElementById('douanierPeriode');
+            const douanierSite = document.getElementById('douanierSite');
+            const douanierOrderResult = document.getElementById('douanierOrderResult');
+            
+            if (!douanierFormule || !douanierQuantite || !douanierPeriode || !douanierSite || !douanierOrderResult) {
+                console.error('❌ Éléments du formulaire Douaniers non trouvés');
+                return;
+            }
+            
+            const formuleId = douanierFormule.value;
+            const quantite = parseInt(douanierQuantite.value);
+            const periode = douanierPeriode.value;
+            const site = douanierSite.value;
+            
+            console.log('📝 Données Douaniers saisies:', {
+                formuleId: formuleId,
+                quantite: quantite,
+                periode: periode,
+                site: site
+            });
+            
+            if (!formuleId) {
+                console.log('❌ Formule non sélectionnée');
+                showResult(douanierOrderResult, 'Veuillez sélectionner une formule.', 'danger');
+                return;
+            }
+            
+            if (!quantite || quantite < 1) {
+                console.log('❌ Quantité invalide');
+                showResult(douanierOrderResult, 'Veuillez entrer un nombre de plats valide (minimum 1).', 'danger');
+                return;
+            }
+            
+            try {
+                console.log('🛡️ Création de la commande pour les Douaniers avec:', {
+                    formuleId: formuleId,
+                    quantite: quantite,
+                    periode: periode,
+                    site: site
+                });
+                
+                const response = await fetch('/Commande/CreateDouanierOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        formuleId: formuleId,
+                        quantite: quantite,
+                        periode: periode,
+                        site: site
+                    })
+                });
+                
+                console.log('📡 Réponse CreateDouanierOrder:', response.status, response.statusText);
+                const result = await response.json();
+                console.log('🛡️ Résultat commande Douaniers:', result);
+                
+                if (result.success) {
+                    showResult(douanierOrderResult, `✅ Commande créée avec succès pour ${quantite} plats !`, 'success');
+                    // Réinitialiser le formulaire
+                    douanierFormule.value = '';
+                    douanierQuantite.value = '';
+                    douanierPeriode.value = '0';
+                    douanierSite.value = '0';
+                } else {
+                    showResult(douanierOrderResult, `❌ ${result.message}`, 'danger');
+                }
+            } catch (error) {
+                showResult(douanierOrderResult, '❌ Erreur lors de la création de la commande', 'danger');
+                console.error('Erreur:', error);
+            }
+        }
+        
+        // Fonction pour afficher les résultats
+        function showResult(element, message, type) {
+            element.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            element.style.display = 'block';
+        }
     </script>
 }

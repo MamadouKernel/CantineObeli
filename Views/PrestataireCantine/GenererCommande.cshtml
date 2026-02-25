@@ -1,0 +1,247 @@
+﻿@model Obeli_K.Models.ViewModels.PagedViewModel<Obeli_K.Models.ViewModels.CommandeListViewModel>
+@{
+    ViewData["Title"] = "Générer une commande";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-file-invoice me-2"></i>
+                        Générer une commande
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Afficher et gérer les commandes de la semaine N+1
+                    </p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Exportations")" class="btn btn-success">
+                        <i class="fas fa-download me-2"></i>Exporter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres de période -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Période
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <input type="hidden" name="showQuantities" value="true" />
+                        <div class="col-md-4">
+                            <label for="dateDebut" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>
+                                Date de début
+                            </label>
+                            <input type="date" id="dateDebut" name="dateDebut" class="form-control" 
+                                   value="@ViewBag.DateDebut?.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dateFin" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>
+                                Date de fin
+                            </label>
+                            <input type="date" id="dateFin" name="dateFin" class="form-control" 
+                                   value="@ViewBag.DateFin?.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="d-flex gap-2 w-100">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="fas fa-calendar-check me-2"></i>Sélectionner la période
+                                </button>
+                                <a href="@Url.Action("GenererCommande")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Effacer
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.ShowQuantities == true)
+    {
+        <!-- Affichage des quantités à commander au prestataire -->
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Vue des quantités à commander au prestataire</strong> - Cette vue affiche les quantités totales par formule et par période (Jour/Nuit) pour la période sélectionnée.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Liste des commandes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Commandes de la semaine N+1
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Sélecteur de taille de page -->
+                                <div class="d-flex align-items-center">
+                                    <label for="pageSize" class="form-label me-2 mb-0 small">Éléments par page:</label>
+                                    <select id="pageSize" class="form-select form-select-sm" style="width: auto;" onchange="changePageSize(this.value)">
+                                        <option value="10" selected="@(Model.Pagination?.PageSize == 10)">10</option>
+                                        <option value="25" selected="@(Model.Pagination?.PageSize == 25)">25</option>
+                                        <option value="50" selected="@(Model.Pagination?.PageSize == 50)">50</option>
+                                        <option value="100" selected="@(Model.Pagination?.PageSize == 100)">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!Model.Items.Any())
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Aucune commande trouvée</h5>
+                                <p class="text-muted">Aucune commande trouvée pour la période sélectionnée.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Date</th>
+                                            <th>Utilisateur</th>
+                                            <th>Formule</th>
+                                            <th>Type</th>
+                                            <th>Quantité</th>
+                                            <th>Prix</th>
+                                            <th>Statut</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var commande in Model.Items)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-secondary">@commande.CodeCommande</span>
+                                                </td>
+                                                <td>@commande.Date.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@commande.UtilisateurNom</strong>
+                                                        <br>
+                                                        <small class="text-muted">@commande.UtilisateurMatricule</small>
+                                                    </div>
+                                                </td>
+                                                <td>@commande.FormuleNom</td>
+                                                <td>
+                                                    <span class="badge bg-info">@commande.TypeFormuleNom</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">@commande.Quantite</span>
+                                                </td>
+                                                <td>
+                                                    <strong class="text-success">@commande.Montant.ToString("C0")</strong>
+                                                </td>
+                                                <td>
+                                                    @switch (commande.StatusCommande)
+                                                    {
+                                                        case Obeli_K.Enums.StatutCommande.Precommander:
+                                                            <span class="badge bg-warning">Précommandée</span>
+                                                            break;
+                                                        case Obeli_K.Enums.StatutCommande.Consommee:
+                                                            <span class="badge bg-success">Consommée</span>
+                                                            break;
+                                                        case Obeli_K.Enums.StatutCommande.Annulee:
+                                                            <span class="badge bg-danger">Annulée</span>
+                                                            break;
+                                                        case Obeli_K.Enums.StatutCommande.Indisponible:
+                                                            <span class="badge bg-info">Indisponible</span>
+                                                            break;
+                                                        case Obeli_K.Enums.StatutCommande.NonRecuperer:
+                                                            <span class="badge bg-secondary">Non récupérée</span>
+                                                            break;
+                                                        default:
+                                                            <span class="badge bg-secondary">@commande.StatusCommande</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" title="Voir détails">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-success" title="Confirmer">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Annuler">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination -->
+                            @if (Model.Pagination != null)
+                            {
+                                @await Html.PartialAsync("_Pagination", Model.Pagination)
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function changePageSize(pageSize) {
+            var currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('pageSize', pageSize);
+            currentUrl.searchParams.set('page', '1'); // Revenir à la première page lors du changement de taille
+            window.location.href = currentUrl.toString();
+        }
+
+        // Validation des dates
+        document.getElementById('dateDebut').addEventListener('change', function() {
+            const dateDebut = new Date(this.value);
+            const dateFin = new Date(document.getElementById('dateFin').value);
+            
+            if (dateFin < dateDebut) {
+                document.getElementById('dateFin').value = this.value;
+            }
+        });
+
+        document.getElementById('dateFin').addEventListener('change', function() {
+            const dateDebut = new Date(document.getElementById('dateDebut').value);
+            const dateFin = new Date(this.value);
+            
+            if (dateFin < dateDebut) {
+                alert('La date de fin doit être postérieure à la date de début.');
+                this.value = document.getElementById('dateDebut').value;
+            }
+        });
+    </script>
+}

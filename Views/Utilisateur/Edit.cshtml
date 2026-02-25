@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.EditUtilisateurViewModel
+﻿@model Obeli_K.Models.ViewModels.EditUtilisateurViewModel
 @{
     ViewData["Title"] = "Modifier l'Utilisateur";
 }
@@ -9,8 +9,8 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="text-primary mb-1">
-                        <i class="fas fa-edit me-2"></i>
+                    <h2 class="text-primary mb-1" style="color: #EDAC00 !important;">
+                        <i class="fas fa-user-edit me-2"></i>
                         Modifier l'Utilisateur
                     </h2>
                     <p class="text-muted mb-0">
@@ -31,7 +31,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 text-primary">
+                    <h5 class="mb-0" style="color: #EDAC00 !important;">
                         <i class="fas fa-user me-2"></i>
                         Informations de l'utilisateur
                     </h5>
@@ -41,8 +41,8 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="Id" />
                         
-                        <div class="row g-3">
-                            <!-- Informations personnelles -->
+                        <!-- Informations personnelles -->
+                        <div class="row g-3 mb-4">
                             <div class="col-12">
                                 <h6 class="text-primary mb-3">
                                     <i class="fas fa-id-card me-2"></i>Informations personnelles
@@ -68,12 +68,6 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label asp-for="CodeCommande" class="form-label">Code Commande</label>
-                                <input asp-for="CodeCommande" class="form-control" placeholder="Entrez le code commande (optionnel)" />
-                                <span asp-validation-for="CodeCommande" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6">
                                 <label asp-for="Email" class="form-label">Email</label>
                                 <input asp-for="Email" type="email" class="form-control" placeholder="Entrez l'email" />
                                 <span asp-validation-for="Email" class="text-danger"></span>
@@ -85,30 +79,16 @@
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                             
-                            <!-- Changement de mot de passe -->
-                            <div class="col-12">
-                                <hr class="my-4">
-                                <h6 class="text-primary mb-3">
-                                    <i class="fas fa-lock me-2"></i>Changement de mot de passe <small class="text-muted">(optionnel)</small>
-                                </h6>
-                                <p class="text-muted small mb-3">Laissez ces champs vides si vous ne souhaitez pas changer le mot de passe.</p>
-                            </div>
-                            
                             <div class="col-md-6">
-                                <label asp-for="NouveauMotDePasse" class="form-label">Nouveau mot de passe</label>
-                                <input asp-for="NouveauMotDePasse" type="password" class="form-control" placeholder="Entrez le nouveau mot de passe (optionnel)" />
-                                <span asp-validation-for="NouveauMotDePasse" class="text-danger"></span>
+                                <label asp-for="Lieu" class="form-label">Lieu</label>
+                                <input asp-for="Lieu" class="form-control" placeholder="Entrez le lieu" />
+                                <span asp-validation-for="Lieu" class="text-danger"></span>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <label asp-for="ConfirmerNouveauMotDePasse" class="form-label">Confirmer le nouveau mot de passe</label>
-                                <input asp-for="ConfirmerNouveauMotDePasse" type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe" />
-                                <span asp-validation-for="ConfirmerNouveauMotDePasse" class="text-danger"></span>
-                            </div>
-                            
-                            <!-- Rôle et affectation -->
+                        </div>
+
+                        <!-- Rôle et affectation -->
+                        <div class="row g-3 mb-4">
                             <div class="col-12">
-                                <hr class="my-4">
                                 <h6 class="text-primary mb-3">
                                     <i class="fas fa-user-tag me-2"></i>Rôle et affectation
                                 </h6>
@@ -130,24 +110,39 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label asp-for="DepartementId" class="form-label">Département *</label>
-                                <select asp-for="DepartementId" class="form-select">
-                                    <option value="">Sélectionnez un département</option>
-                                    @if (ViewBag.Departements != null)
+                                <label asp-for="DirectionId" class="form-label">Direction *</label>
+                                <select asp-for="DirectionId" class="form-select" id="directionSelectEdit">
+                                    <option value="">Sélectionnez une direction</option>
+                                    @if (ViewBag.Directions != null)
                                     {
-                                        @foreach (var dept in ViewBag.Departements)
+                                        @foreach (var dir in ViewBag.Directions)
                                         {
-                                            <option value="@dept.Value">@dept.Text</option>
+                                            <option value="@dir.Value">@dir.Text</option>
                                         }
                                     }
                                 </select>
-                                <span asp-validation-for="DepartementId" class="text-danger"></span>
+                                <span asp-validation-for="DirectionId" class="text-danger"></span>
                             </div>
                             
                             <div class="col-md-6">
-                                <label asp-for="FonctionId" class="form-label">Fonction *</label>
+                                <label asp-for="ServiceId" class="form-label">Service <small class="text-muted">(optionnel)</small></label>
+                                <select asp-for="ServiceId" class="form-select" id="serviceSelectEdit">
+                                    <option value="">Sélectionnez un service (optionnel)</option>
+                                    @if (ViewBag.Services != null)
+                                    {
+                                        @foreach (var service in ViewBag.Services)
+                                        {
+                                            <option value="@service.Value">@service.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="ServiceId" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="FonctionId" class="form-label">Fonction</label>
                                 <select asp-for="FonctionId" class="form-select">
-                                    <option value="">Sélectionnez une fonction</option>
+                                    <option value="">Sélectionnez une fonction (optionnel)</option>
                                     @if (ViewBag.Fonctions != null)
                                     {
                                         @foreach (var fonction in ViewBag.Fonctions)
@@ -160,12 +155,6 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label asp-for="Lieu" class="form-label">Lieu</label>
-                                <input asp-for="Lieu" class="form-control" placeholder="Entrez le lieu" />
-                                <span asp-validation-for="Lieu" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6">
                                 <label asp-for="Site" class="form-label">Site</label>
                                 <select asp-for="Site" class="form-select">
                                     <option value="">Sélectionnez un site (optionnel)</option>
@@ -175,15 +164,40 @@
                                 <span asp-validation-for="Site" class="text-danger"></span>
                             </div>
                         </div>
+
+                        <!-- Changement de mot de passe (grisé) -->
+                        <div class="row g-3 mb-4" style="opacity: 0.5; pointer-events: none;">
+                            <div class="col-12">
+                                <h6 class="mb-3" style="color: #6c757d !important;">
+                                    <i class="fas fa-lock me-2"></i>Changer le mot de passe <small class="text-muted">(désactivé)</small>
+                                </h6>
+                                <div class="alert alert-secondary">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Cette section est désactivée.</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="NouveauMotDePasse" class="form-label">Nouveau mot de passe</label>
+                                <input asp-for="NouveauMotDePasse" type="password" class="form-control" placeholder="Entrez le nouveau mot de passe" disabled style="background-color: #f8f9fa; color: #6c757d;" />
+                                <span asp-validation-for="NouveauMotDePasse" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmerNouveauMotDePasse" class="form-label">Confirmer le nouveau mot de passe</label>
+                                <input asp-for="ConfirmerNouveauMotDePasse" type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe" disabled style="background-color: #f8f9fa; color: #6c757d;" />
+                                <span asp-validation-for="ConfirmerNouveauMotDePasse" class="text-danger"></span>
+                            </div>
+                        </div>
                         
                         <!-- Boutons d'action -->
                         <div class="row mt-4">
                             <div class="col-12">
-                                <div class="d-flex justify-content-end gap-2">
+                                <div class="d-flex justify-content-between">
                                     <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-secondary">
                                         <i class="fas fa-times me-2"></i>Annuler
                                     </a>
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-warning" style="background-color: #EDAC00; border-color: #EDAC00;">
                                         <i class="fas fa-save me-2"></i>Enregistrer les modifications
                                     </button>
                                 </div>
@@ -198,4 +212,57 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Charger les services quand une direction est sélectionnée
+        const directionSelect = document.getElementById('directionSelectEdit');
+        const serviceSelect = document.getElementById('serviceSelectEdit');
+        const currentServiceId = '@Model.ServiceId';
+        
+        // Charger les services au chargement de la page si une direction est sélectionnée
+        if (directionSelect.value) {
+            loadServices(directionSelect.value, currentServiceId);
+        }
+        
+        directionSelect.addEventListener('change', function() {
+            loadServices(this.value, null);
+        });
+        
+        function loadServices(directionId, selectedServiceId) {
+            serviceSelect.innerHTML = '<option value="">Chargement...</option>';
+            serviceSelect.disabled = true;
+            
+            if (!directionId) {
+                serviceSelect.innerHTML = '<option value="">Sélectionnez d\'abord une direction</option>';
+                return;
+            }
+            
+            fetch(`/Service/GetServicesByDirection?directionId=${directionId}`)
+                .then(response => response.json())
+                .then(result => {
+                    serviceSelect.innerHTML = '<option value="">Sélectionnez un service (optionnel)</option>';
+                    
+                    if (result.success && result.data && result.data.length > 0) {
+                        result.data.forEach(service => {
+                            const option = document.createElement('option');
+                            option.value = service.id;
+                            option.textContent = service.nom;
+                            if (selectedServiceId && service.id === selectedServiceId) {
+                                option.selected = true;
+                            }
+                            serviceSelect.appendChild(option);
+                        });
+                    } else {
+                        serviceSelect.innerHTML += '<option value="" disabled>Aucun service disponible</option>';
+                    }
+                    
+                    serviceSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des services:', error);
+                    serviceSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    serviceSelect.disabled = false;
+                });
+        }
+    </script>
 }

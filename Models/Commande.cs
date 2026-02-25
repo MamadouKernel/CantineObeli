@@ -42,9 +42,9 @@ namespace Obeli_K.Models
         [StringLength(120)] public string? VisiteurNom { get; set; }
         [StringLength(32)] public string? VisiteurTelephone { get; set; }
         
-        // Direction d'origine du visiteur
-        public Guid? DirectionId { get; set; }
-        public Direction? Direction { get; set; }
+        // Direction d'origine du visiteur - SUPPRIMÉ (table Direction non utilisée)
+        // public Guid? DirectionId { get; set; }
+        // public Direction? Direction { get; set; }
         
         // Code de vérification pour le prestataire
         [StringLength(20)] public string? CodeVerification { get; set; }

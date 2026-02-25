@@ -1,0 +1,362 @@
+﻿@using Obeli_K.Models.ViewModels
+@using Obeli_K.Enums
+@{
+    ViewData["Title"] = "Diagnostic de la Facturation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var allCommandesWithCorrectedStatus = ViewBag.AllCommandesWithCorrectedStatus as List<object>;
+    var commandesPrecommander = ViewBag.CommandesPrecommander as List<Obeli_K.Models.Commande>;
+    var commandesAnnulee = ViewBag.CommandesAnnulee as List<Obeli_K.Models.Commande>;
+    var commandesConsommee = ViewBag.CommandesConsommee as List<Obeli_K.Models.Commande>;
+    var commandesNonConsommees = ViewBag.CommandesNonConsommees as List<Obeli_K.Models.Commande>;
+    var commandesNonConsommeesService = ViewBag.CommandesNonConsommeesService as List<CommandeNonConsommeeViewModel>;
+}
+
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                Diagnostic de la Facturation
+                            </h3>
+                            <small class="opacity-75">Outil de diagnostic pour analyser l'état des commandes et détecter les incohérences</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations et Configuration -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2 text-primary"></i>
+                        Informations Utilisateur
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong><i class="fas fa-envelope me-1 text-primary"></i> Email :</strong>
+                        <span class="text-muted">@(ViewBag.UserEmail ?? "N/A")</span>
+                    </p>
+                    <p class="mb-2">
+                        <strong><i class="fas fa-id-card me-1 text-primary"></i> User ID :</strong>
+                        <code class="bg-light px-2 py-1 rounded">@(ViewBag.UserId ?? "N/A")</code>
+                    </p>
+                    <p class="mb-0">
+                        <strong><i class="fas fa-user-tag me-1 text-primary"></i> Rôle :</strong>
+                        <span class="badge bg-primary">Admin/RH</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog me-2 text-primary"></i>
+                        Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong><i class="fas fa-toggle-on me-1 text-primary"></i> Facturation Active :</strong>
+                        <span class="badge @(ViewBag.FacturationActive == true ? "bg-success" : "bg-danger") ms-2">
+                            @(ViewBag.FacturationActive == true ? "OUI" : "NON")
+                        </span>
+                    </p>
+                    <p class="mb-0">
+                        <strong><i class="fas fa-calendar-alt me-1 text-primary"></i> Période :</strong>
+                        <span class="text-muted">
+                            @ViewBag.DateDebut?.ToString("dd/MM/yyyy") - @ViewBag.DateFin?.ToString("dd/MM/yyyy")
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé des Commandes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        Résumé des Commandes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body text-center">
+                                    <h2 class="mb-2">@(allCommandesWithCorrectedStatus?.Count ?? 0)</h2>
+                                    <p class="mb-0">Total Commandes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body text-center">
+                                    <h2 class="mb-2">@(commandesPrecommander?.Count ?? 0)</h2>
+                                    <p class="mb-0">Précommandées</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white h-100">
+                                <div class="card-body text-center">
+                                    <h2 class="mb-2">@(commandesAnnulee?.Count ?? 0)</h2>
+                                    <p class="mb-0">Annulées</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <h2 class="mb-2">@(commandesConsommee?.Count ?? 0)</h2>
+                                    <p class="mb-0">Consommées</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commandes Non Consommées -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Commandes Non Consommées (Direct)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        <strong>Nombre :</strong>
+                        <span class="badge bg-warning text-dark ms-2">@(commandesNonConsommees?.Count ?? 0)</span>
+                    </p>
+                    @if (commandesNonConsommees?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Date</th>
+                                        <th>Plat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var cmd in commandesNonConsommees)
+                                    {
+                                        <tr>
+                                            <td><code class="bg-light px-2 py-1 rounded">@cmd.CodeCommande</code></td>
+                                            <td>@cmd.DateConsommation?.ToString("dd/MM/yyyy")</td>
+                                            <td>@cmd.FormuleJour?.Plat</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <p class="text-muted mb-0">Aucune commande non consommée trouvée</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Commandes Non Consommées (Service)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        <strong>Nombre :</strong>
+                        <span class="badge bg-info ms-2">@(commandesNonConsommeesService?.Count ?? 0)</span>
+                    </p>
+                    @if (commandesNonConsommeesService?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Date</th>
+                                        <th>Plat</th>
+                                        <th>Montant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var cmd in commandesNonConsommeesService)
+                                    {
+                                        <tr>
+                                            <td><code class="bg-light px-2 py-1 rounded">@cmd.CodeCommande</code></td>
+                                            <td>@cmd.DateConsommation.ToString("dd/MM/yyyy")</td>
+                                            <td>@cmd.Plat</td>
+                                            <td>@cmd.Montant.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <i class="fas fa-info-circle fa-2x text-info mb-2"></i>
+                            <p class="text-muted mb-0">Aucune commande non consommée trouvée par le service</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détail de Toutes les Commandes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2 text-primary"></i>
+                        Détail de Toutes les Commandes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (allCommandesWithCorrectedStatus?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Date Commande</th>
+                                        <th>Date Consommation</th>
+                                        <th>Statut</th>
+                                        <th>Type Client</th>
+                                        <th>Plat</th>
+                                        <th>Montant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (dynamic item in allCommandesWithCorrectedStatus)
+                                    {
+                                        var cmd = item.Commande as Obeli_K.Models.Commande;
+                                        var displayStatus = item.DisplayStatus as string;
+                                        var statusClass = item.StatusClass as string;
+                                        
+                                        <tr>
+                                            <td><code class="bg-light px-2 py-1 rounded">@cmd.CodeCommande</code></td>
+                                            <td>@cmd.Date.ToString("dd/MM/yyyy")</td>
+                                            <td>@cmd.DateConsommation?.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <span class="badge @statusClass">@displayStatus</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge @(cmd.TypeClient == TypeClientCommande.CitUtilisateur ? "bg-primary" : cmd.TypeClient == TypeClientCommande.Visiteur ? "bg-info" : "bg-secondary")">
+                                                    @(cmd.TypeClient == TypeClientCommande.CitUtilisateur ? "CIT" : cmd.TypeClient == TypeClientCommande.Visiteur ? "Visiteur" : "Groupe")
+                                                </span>
+                                            </td>
+                                            <td>@cmd.FormuleJour?.Plat</td>
+                                            <td>@cmd.Montant.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucune commande trouvée pour cette période</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        code {
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.75em;
+        }
+
+        @@media (max-width: 768px) {
+            .card-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .card-header h5 {
+                font-size: 1rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .card-body h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+}

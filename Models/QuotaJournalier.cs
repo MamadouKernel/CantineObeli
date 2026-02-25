@@ -28,9 +28,11 @@ namespace Obeli_K.Models
         public int QuotaNuit { get; set; } = 0;
 
         [Display(Name = "Plats consommés Jour")]
+        [Range(0, int.MaxValue, ErrorMessage = "Le nombre de plats consommés doit être positif ou nul")]
         public int PlatsConsommesJour { get; set; } = 0;
 
         [Display(Name = "Plats consommés Nuit")]
+        [Range(0, int.MaxValue, ErrorMessage = "Le nombre de plats consommés doit être positif ou nul")]
         public int PlatsConsommesNuit { get; set; } = 0;
 
         [Display(Name = "Restriction Formule")]

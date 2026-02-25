@@ -160,7 +160,7 @@ namespace Obeli_K.Services
                 // Récupérer les commandes de la période
                 var commandes = await context.Commandes
                     .Include(c => c.Utilisateur)
-                        .ThenInclude(u => u!.Departement)
+                        .ThenInclude(u => u!.Direction)
                     .Include(c => c.Utilisateur)
                         .ThenInclude(u => u!.Fonction)
                     .Include(c => c.FormuleJour)
@@ -216,7 +216,7 @@ namespace Obeli_K.Services
                               $"{cmd.CodeCommande}," +
                               $"\"{cmd.Utilisateur?.Nom} {cmd.Utilisateur?.Prenoms}\"," +
                               $"{cmd.Utilisateur?.UserName}," +
-                              $"\"{cmd.Utilisateur?.Departement?.Nom}\"," +
+                              $"\"{cmd.Utilisateur?.Direction?.Nom}\"," +
                               $"\"{cmd.Utilisateur?.Fonction?.Nom}\"," +
                               $"{cmd.Utilisateur?.Site}," +
                               $"\"{cmd.FormuleJour?.NomFormuleNavigation?.Nom}\"," +

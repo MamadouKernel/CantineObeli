@@ -1,0 +1,409 @@
+﻿@*
+    Vue pour la validation des commandes Douaniers par code de commande.
+    Accessible uniquement par les Prestataires Cantine.
+*@
+@{
+    ViewData["Title"] = "Validation Commandes Douaniers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Variables CSS */
+    :root {
+        --douanier-primary: #f59e0b;
+        --douanier-primary-light: #fbbf24;
+        --douanier-primary-dark: #d97706;
+        --success-green: #10b981;
+        --danger-red: #ef4444;
+        --neutral-500: #6b7280;
+        --neutral-600: #4b5563;
+        --neutral-700: #374151;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f0f2f5 0%, #e0e5ec 100%);
+        min-height: 100vh;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .validation-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .main-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--douanier-primary) 0%, var(--douanier-primary-light) 100%);
+        border-radius: 16px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+        transform: translateX(-100%);
+        animation: shimmer 3s infinite;
+    }
+
+    .header-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .header-section p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 2;
+    }
+
+    .validation-form {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--neutral-700);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        font-size: 1.1rem;
+    }
+
+    .form-label i {
+        margin-right: 0.8rem;
+        color: var(--douanier-primary);
+        font-size: 1.2rem;
+    }
+
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-control:focus {
+        border-color: var(--douanier-primary);
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        outline: none;
+        background: rgba(255, 255, 255, 1);
+    }
+
+    .btn-validate {
+        background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+        border: none;
+        border-radius: 16px;
+        padding: 1.25rem 3rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+        width: 100%;
+    }
+
+    .btn-validate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-validate:disabled {
+        background: var(--neutral-500);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #16a34a;
+        border-left: 4px solid #22c55e;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #dc2626;
+        border-left: 4px solid #ef4444;
+    }
+
+    .return-link {
+        color: var(--douanier-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .return-link:hover {
+        color: var(--douanier-primary-dark);
+        text-decoration: underline;
+    }
+
+    .return-link i {
+        margin-right: 0.5rem;
+    }
+
+    /* Animations */
+    @@keyframes shimmer {
+        0%, 100% {
+            transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        50% {
+            transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .main-card {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .main-card {
+            padding: 2rem;
+            margin: 1rem;
+        }
+
+        .header-section h1 {
+            font-size: 2rem;
+        }
+
+        .form-control {
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+        }
+
+        .btn-validate {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="validation-container">
+    <div class="main-card">
+        <div class="header-section">
+            <h1>
+                <i class="fas fa-shield-check me-3"></i>
+                Validation Commandes Douaniers
+            </h1>
+            <p>Validez les commandes des Douaniers en saisissant le code de commande</p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="validation-form">
+            <form id="validationForm">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-barcode"></i>
+                        Code de Commande
+                    </label>
+                    <input type="text" id="codeCommande" class="form-control" 
+                           placeholder="Ex: DOU-20240115-ABC12345" 
+                           maxlength="50" required />
+                </div>
+
+                <div class="text-center">
+                    <button type="button" id="validateButton" class="btn btn-validate">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Valider la Commande
+                    </button>
+                </div>
+            </form>
+
+            <div id="validationResult" class="mt-4" style="display: none;"></div>
+        </div>
+
+        <div class="text-center">
+            <a href="/Commande" class="return-link">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retourner à la liste des commandes
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🛡️ DOM chargé - Initialisation de la page Validation Commandes Douaniers');
+            initializeValidationElements();
+        });
+
+        function initializeValidationElements() {
+            const validateButton = document.getElementById('validateButton');
+            const codeCommandeInput = document.getElementById('codeCommande');
+
+            if (validateButton) {
+                validateButton.addEventListener('click', handleValidation);
+            }
+
+            if (codeCommandeInput) {
+                // Auto-format du code de commande
+                codeCommandeInput.addEventListener('input', function(e) {
+                    let value = e.target.value.toUpperCase();
+                    // Supprimer les espaces et caractères non autorisés
+                    value = value.replace(/[^A-Z0-9-]/g, '');
+                    e.target.value = value;
+                });
+
+                // Validation en temps réel
+                codeCommandeInput.addEventListener('blur', function() {
+                    const value = this.value.trim();
+                    if (value && !value.startsWith('DOU-')) {
+                        this.style.borderColor = '#ef4444';
+                        this.style.backgroundColor = '#fef2f2';
+                    } else {
+                        this.style.borderColor = '#e5e7eb';
+                        this.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                    }
+                });
+            }
+        }
+
+        async function handleValidation() {
+            console.log('🛡️ Validation de commande Douaniers');
+
+            const codeCommandeInput = document.getElementById('codeCommande');
+            const validateButton = document.getElementById('validateButton');
+            const validationResult = document.getElementById('validationResult');
+
+            if (!codeCommandeInput || !validateButton || !validationResult) {
+                console.error('❌ Éléments de validation non trouvés');
+                return;
+            }
+
+            const codeCommande = codeCommandeInput.value.trim();
+
+            if (!codeCommande) {
+                showResult(validationResult, '❌ Veuillez saisir un code de commande.', 'danger');
+                return;
+            }
+
+            if (!codeCommande.startsWith('DOU-')) {
+                showResult(validationResult, '❌ Le code de commande doit commencer par "DOU-".', 'danger');
+                return;
+            }
+
+            // Désactiver le bouton pendant la validation
+            validateButton.disabled = true;
+            validateButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Validation en cours...';
+
+            try {
+                console.log('🛡️ Envoi de la requête de validation:', codeCommande);
+
+                const response = await fetch('/Commande/ValiderCommandeDouaniers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        codeCommande: codeCommande
+                    })
+                });
+
+                console.log('📡 Réponse reçue:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                console.log('🛡️ Résultat validation:', result);
+
+                if (result.success) {
+                    showResult(validationResult, result.message, 'success');
+                    // Réinitialiser le formulaire
+                    codeCommandeInput.value = '';
+                } else {
+                    showResult(validationResult, `❌ ${result.message}`, 'danger');
+                }
+            } catch (error) {
+                console.error('❌ Erreur lors de la validation:', error);
+                showResult(validationResult, `❌ Erreur lors de la validation: ${error.message}`, 'danger');
+            } finally {
+                // Réactiver le bouton
+                validateButton.disabled = false;
+                validateButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>Valider la Commande';
+            }
+        }
+
+        function showResult(element, message, type) {
+            element.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            element.style.display = 'block';
+        }
+    </script>
+}

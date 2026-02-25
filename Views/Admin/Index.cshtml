@@ -1,0 +1,201 @@
+﻿@{
+    ViewData["Title"] = "Administration - Nettoyage Base de Données";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Administration - Nettoyage Base de Données
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention !</strong> Les opérations ci-dessous suppriment définitivement les données de la base.
+                        Assurez-vous d'avoir fait une sauvegarde avant de procéder.
+                    </div>
+
+                    <div class="row">
+                        <!-- Statistiques -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        Statistiques Actuelles
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="statistiques">
+                                        <div class="text-center">
+                                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                                            <p class="mt-2 text-muted">Chargement des statistiques...</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="button" class="btn btn-outline-info btn-sm" onclick="chargerStatistiques()">
+                                            <i class="fas fa-refresh me-1"></i>
+                                            Actualiser
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tools me-2"></i>
+                                        Actions de Nettoyage
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-3">
+                                        <!-- Nettoyage complet -->
+                                        <div class="card border-danger">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-danger">
+                                                    <i class="fas fa-broom me-2"></i>
+                                                    Nettoyage Complet
+                                                </h6>
+                                                <p class="card-text small">
+                                                    Supprime toutes les données (commandes, points de consommation, etc.) 
+                                                    en gardant seulement les comptes administrateurs et les données de référence.
+                                                </p>
+                                                <form method="post" asp-action="NettoyerBaseDonnees" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="return confirm('⚠️ ATTENTION ! Cette action va supprimer TOUTES les données de la base (sauf les admins).\n\nÊtes-vous absolument sûr de vouloir continuer ?')">
+                                                        <i class="fas fa-trash-alt me-1"></i>
+                                                        Nettoyer Base de Données
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <!-- Suppression utilisateurs -->
+                                        <div class="card border-warning">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-warning">
+                                                    <i class="fas fa-users-slash me-2"></i>
+                                                    Supprimer Tous les Utilisateurs
+                                                </h6>
+                                                <p class="card-text small">
+                                                    Supprime tous les utilisateurs (y compris les admins). 
+                                                    <strong class="text-danger">DANGEREUX !</strong> Vous devrez recréer un compte admin.
+                                                </p>
+                                                <form method="post" asp-action="SupprimerTousUtilisateurs" class="d-inline">
+                                                    <button type="submit" class="btn btn-warning btn-sm"
+                                                            onclick="return confirm('🚨 DANGER ! Cette action va supprimer TOUS les utilisateurs (même les admins).\n\nVous ne pourrez plus vous connecter au système !\n\nÊtes-vous ABSOLUMENT sûr ?')">
+                                                        <i class="fas fa-user-times me-1"></i>
+                                                        Supprimer Tous les Utilisateurs
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations sur ce qui sera gardé -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-shield-alt me-2"></i>
+                                        Données Conservées lors du Nettoyage
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-success">✅ Conservé :</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="fas fa-user-shield text-success me-2"></i>Comptes administrateurs</li>
+                                                <li><i class="fas fa-sitemap text-info me-2"></i>Directions</li>
+                                                <li><i class="fas fa-briefcase text-info me-2"></i>Fonctions</li>
+                                                <li><i class="fas fa-tags text-info me-2"></i>Types de formules</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-danger">❌ Supprimé :</h6>
+                                            <ul class="list-unstyled">
+                                                <li><i class="fas fa-shopping-cart text-danger me-2"></i>Commandes</li>
+                                                <li><i class="fas fa-utensils text-danger me-2"></i>Points de consommation</li>
+                                                <li><i class="fas fa-calendar text-danger me-2"></i>Formules du jour</li>
+                                                <li><i class="fas fa-users text-danger me-2"></i>Utilisateurs non-admin</li>
+                                                <li><i class="fas fa-store text-danger me-2"></i>Prestataires cantine</li>
+                                                <li><i class="fas fa-cog text-danger me-2"></i>Configurations</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function chargerStatistiques() {
+            $('#statistiques').html(`
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    <p class="mt-2 text-muted">Chargement des statistiques...</p>
+                </div>
+            `);
+
+            $.get('@Url.Action("Statistiques")')
+                .done(function(data) {
+                    let html = '<div class="row">';
+                    
+                    // Première colonne
+                    html += '<div class="col-6">';
+                    html += '<div class="mb-2"><strong>Utilisateurs :</strong> <span class="badge bg-primary">' + data.utilisateurs + '</span></div>';
+                    html += '<div class="mb-2"><strong>Commandes :</strong> <span class="badge bg-secondary">' + data.commandes + '</span></div>';
+                    html += '<div class="mb-2"><strong>Points Consommation :</strong> <span class="badge bg-info">' + data.pointsConsommation + '</span></div>';
+                    html += '<div class="mb-2"><strong>Formules Jour :</strong> <span class="badge bg-success">' + data.formulesJour + '</span></div>';
+                    html += '<div class="mb-2"><strong>Prestataires :</strong> <span class="badge bg-warning">' + data.prestataires + '</span></div>';
+                    html += '</div>';
+                    
+                    // Deuxième colonne
+                    html += '<div class="col-6">';
+                    html += '<div class="mb-2"><strong>Directions :</strong> <span class="badge bg-dark">' + data.Directions + '</span></div>';
+                    html += '<div class="mb-2"><strong>Fonctions :</strong> <span class="badge bg-dark">' + data.fonctions + '</span></div>';
+                    html += '<div class="mb-2"><strong>Types Formule :</strong> <span class="badge bg-dark">' + data.typesFormule + '</span></div>';
+                    html += '<div class="mb-2"><strong>Groupes Non-CIT :</strong> <span class="badge bg-dark">' + data.groupesNonCit + '</span></div>';
+                    html += '<div class="mb-2"><strong>Configurations :</strong> <span class="badge bg-dark">' + data.configurations + '</span></div>';
+                    html += '</div>';
+                    
+                    html += '</div>';
+                    
+                    $('#statistiques').html(html);
+                })
+                .fail(function() {
+                    $('#statistiques').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Erreur lors du chargement des statistiques
+                        </div>
+                    `);
+                });
+        }
+
+        // Charger les statistiques au chargement de la page
+        $(document).ready(function() {
+            chargerStatistiques();
+        });
+    </script>
+}

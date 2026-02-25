@@ -1,0 +1,422 @@
+﻿@model List<Obeli_K.Models.ViewModels.QuantiteCommandePrestataireViewModel>
+@{
+    ViewData["Title"] = "Ajoutez des marges à votre commande";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        @if (ViewBag.IsBlocked == true)
+                        {
+                            <text>Consultez les marges de votre commande</text>
+                        }
+                        else
+                        {
+                            <text>Ajoutez des marges à votre commande</text>
+                        }
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Période du @ViewBag.DateDebut?.ToString("dd/MM/yyyy") au @ViewBag.DateFin?.ToString("dd/MM/yyyy")
+                    </p>
+                    @if (ViewBag.IsExportAlreadyDone == true)
+                    {
+                        <div class="mt-2">
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-file-export me-1"></i>
+                                Export déjà effectué
+                            </span>
+                            @if (ViewBag.LastExport != null)
+                            {
+                                var lastExport = ViewBag.LastExport as Obeli_K.Models.ExportCommandePrestataire;
+                                <small class="text-muted ms-2">
+                                    Par @lastExport.Utilisateur?.UserName le @lastExport.DateExport.ToString("dd/MM/yyyy à HH:mm")
+                                </small>
+                            }
+                        </div>
+                    }
+                </div>
+                <div>
+                    <a href="@Url.Action("GenererCommande", new { showQuantities = true, dateDebut = ViewBag.DateDebut, dateFin = ViewBag.DateFin })" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message de blocage -->
+    @if (ViewBag.IsBlocked == true)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-lock me-2"></i>
+                    <strong>Modification des marges bloquée</strong><br />
+                    Un fichier d'export a déjà été généré pour cette période. Vous ne pouvez plus modifier les marges.
+                    Seuls les administrateurs et les responsables RH peuvent modifier les marges après export.
+                    @if (ViewBag.LastExport != null)
+                    {
+                        var lastExport = ViewBag.LastExport as Obeli_K.Models.ExportCommandePrestataire;
+                        <br /><small class="text-muted">
+                            Dernier export: @lastExport.NomFichier par @lastExport.Utilisateur?.UserName le @lastExport.DateExport.ToString("dd/MM/yyyy à HH:mm")
+                        </small>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Formulaire d'ajout de marges -->
+    <form method="post" action="@Url.Action("AjouterMarges", "PrestataireCantine")">
+        <input type="hidden" name="dateDebut" value="@ViewBag.DateDebut?.ToString("yyyy-MM-dd")" />
+        <input type="hidden" name="dateFin" value="@ViewBag.DateFin?.ToString("yyyy-MM-dd")" />
+        
+    <!-- Messages d'information -->
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    @TempData["InfoMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Contenu principal -->
+    <div class="row">
+        <div class="col-12">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucune formule trouvée</h5>
+                    <p class="text-muted">Aucune formule trouvée pour la période sélectionnée.</p>
+                    <a href="@Url.Action("GenererCommande", new { showQuantities = true, dateDebut = ViewBag.DateDebut, dateFin = ViewBag.DateFin })" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour aux quantités
+                    </a>
+                </div>
+            }
+                else
+                {
+                    @for (int dateIndex = 0; dateIndex < Model.Count; dateIndex++)
+                    {
+                        var jour = Model[dateIndex];
+                        <div class="card mb-4 border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-day me-2"></i>
+                                    @jour.Date.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                @for (int formuleIndex = 0; formuleIndex < jour.Formules.Count; formuleIndex++)
+                                {
+                                    var formule = jour.Formules[formuleIndex];
+                                    <div class="row border-bottom py-3 @(formuleIndex == jour.Formules.Count - 1 ? "border-0" : "")">
+                                        <input type="hidden" name="[@dateIndex].Date" value="@jour.Date.ToString("yyyy-MM-dd")" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].IdFormule" value="@formule.IdFormule" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].TypeFormule" value="@formule.TypeFormule" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Plat" value="@formule.Plat" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Garniture" value="@formule.Garniture" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Entree" value="@formule.Entree" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Dessert" value="@formule.Dessert" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Legumes" value="@formule.Legumes" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].Feculent" value="@formule.Feculent" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].QuantiteJour" value="@formule.QuantiteJour" />
+                                        <input type="hidden" name="[@dateIndex].Formules[@formuleIndex].QuantiteNuit" value="@formule.QuantiteNuit" />
+                                        
+                                        <div class="col-12 mb-2">
+                                            <h6 class="text-secondary mb-0">
+                                                <i class="fas fa-utensils me-2"></i>
+                                                @formule.TypeFormule
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="row">
+                                                @if (!string.IsNullOrEmpty(formule.Plat))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Plat:</strong> @formule.Plat
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Garniture))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Garniture:</strong> @formule.Garniture
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Entree))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Entrée:</strong> @formule.Entree
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Dessert))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Dessert:</strong> @formule.Dessert
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Legumes))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Légumes:</strong> @formule.Legumes
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Feculent))
+                                                {
+                                                    <div class="col-md-6 mb-2">
+                                                        <strong class="text-primary">Féculent:</strong> @formule.Feculent
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="row text-center">
+                                                <div class="col-6">
+                                                    <div class="bg-light p-3 rounded mb-2">
+                                                        <h6 class="text-muted mb-1">Quantité Jour</h6>
+                                                        <h4 class="text-success mb-0">@formule.QuantiteJour</h4>
+                                                    </div>
+                                                    <div class="mb-3">
+                                        <label for="margeJour_@(dateIndex)_@(formuleIndex)" class="form-label small">Marge Jour</label>
+                                        <input type="number" 
+                                               id="margeJour_@(dateIndex)_@(formuleIndex)" 
+                                               name="[@dateIndex].Formules[@formuleIndex].MargeJour" 
+                                               class="form-control form-control-sm text-center @(ViewBag.IsBlocked == true ? "disabled" : "")" 
+                                               min="0" 
+                                               value="@formule.MargeJour" 
+                                               @(ViewBag.IsBlocked == true ? "readonly" : "")
+                                               onchange="calculerTotal('@dateIndex', '@formuleIndex')" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="bg-light p-3 rounded mb-2">
+                                                        <h6 class="text-muted mb-1">Quantité Nuit</h6>
+                                                        <h4 class="text-info mb-0">@formule.QuantiteNuit</h4>
+                                                    </div>
+                                                    <div class="mb-3">
+                                        <label for="margeNuit_@(dateIndex)_@(formuleIndex)" class="form-label small">Marge Nuit</label>
+                                        <input type="number" 
+                                               id="margeNuit_@(dateIndex)_@(formuleIndex)" 
+                                               name="[@dateIndex].Formules[@formuleIndex].MargeNuit" 
+                                               class="form-control form-control-sm text-center @(ViewBag.IsBlocked == true ? "disabled" : "")" 
+                                               min="0" 
+                                               value="@formule.MargeNuit" 
+                                               @(ViewBag.IsBlocked == true ? "readonly" : "")
+                                               onchange="calculerTotal('@dateIndex', '@formuleIndex')" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Affichage de la marge totale -->
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <div class="bg-warning p-2 rounded">
+                                                        <h6 class="text-dark mb-1">Marge Totale</h6>
+                                                        <h5 class="text-dark mb-0" id="margeTotale_@(dateIndex)_@(formuleIndex)">@(formule.MargeJour + formule.MargeNuit)</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        @if (Model.Any())
+        {
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center gap-3">
+                        @if (ViewBag.IsBlocked != true)
+                        {
+                            <button type="submit" class="btn btn-enregistrer">
+                                <i class="fas fa-save me-2"></i>Enregistrer Les Marges
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-secondary" disabled>
+                                <i class="fas fa-lock me-2"></i>Modification Bloquée
+                            </button>
+                        }
+                        <button type="button" class="btn btn-retourner" onclick="retourner()">
+                            <i class="fas fa-arrow-left me-2"></i>Retourner
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .border-bottom {
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .text-success {
+        color: #198754 !important;
+    }
+    
+    .text-info {
+        color: #0dcaf0 !important;
+    }
+    
+    /* Styles des boutons selon l'image */
+    .btn-enregistrer {
+        background-color: transparent;
+        color: #000;
+        border: 2px solid #000;
+        padding: 12px 24px;
+        font-weight: 500;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-enregistrer:hover {
+        background-color: #000;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-retourner {
+        background-color: transparent;
+        color: #007bff;
+        border: 2px solid #007bff;
+        padding: 12px 24px;
+        font-weight: 500;
+        font-size: 16px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-retourner:hover {
+        background-color: #007bff;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+    
+    /* Espacement entre les boutons */
+    .d-flex.gap-3 > * + * {
+        margin-left: 1rem;
+    }
+    
+    /* Styles pour les champs de marge */
+    .form-control-sm {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .form-label.small {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #6c757d;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function calculerTotal(dateIndex, formuleIndex) {
+            // Récupérer les valeurs des marges
+            const margeJourInput = document.getElementById(`margeJour_${dateIndex}_${formuleIndex}`);
+            const margeNuitInput = document.getElementById(`margeNuit_${dateIndex}_${formuleIndex}`);
+            
+            let margeJour = parseInt(margeJourInput.value) || 0;
+            let margeNuit = parseInt(margeNuitInput.value) || 0;
+            
+            // Validation des entrées
+            if (margeJour < 0) {
+                margeJour = 0;
+                margeJourInput.value = 0;
+            }
+            if (margeNuit < 0) {
+                margeNuit = 0;
+                margeNuitInput.value = 0;
+            }
+            
+            // Calculer la marge totale
+            const margeTotale = margeJour + margeNuit;
+            
+            // Mettre à jour l'affichage si un élément de marge totale existe
+            const margeTotaleElement = document.getElementById(`margeTotale_${dateIndex}_${formuleIndex}`);
+            if (margeTotaleElement) {
+                margeTotaleElement.textContent = margeTotale;
+            }
+        }
+        
+        function retourner() {
+            // Retourner à la page précédente
+            window.location.href = '@Url.Action("GenererCommande", "PrestataireCantine")' + 
+                '?showQuantities=true' +
+                '&dateDebut=@ViewBag.DateDebut?.ToString("yyyy-MM-dd")' + 
+                '&dateFin=@ViewBag.DateFin?.ToString("yyyy-MM-dd")';
+        }
+        
+        // Validation du formulaire
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let hasError = false;
+            const margeInputs = document.querySelectorAll('input[name$="MargeJour"], input[name$="MargeNuit"]');
+            
+            margeInputs.forEach(input => {
+                if (input.value < 0) {
+                    input.value = 0;
+                }
+                if (input.value === '' || isNaN(input.value)) {
+                    input.value = 0;
+                }
+            });
+            
+            if (hasError) {
+                e.preventDefault();
+                alert('Veuillez corriger les erreurs avant de soumettre le formulaire.');
+            }
+        });
+    </script>
+}

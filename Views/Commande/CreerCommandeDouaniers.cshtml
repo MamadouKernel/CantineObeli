@@ -1,0 +1,741 @@
+﻿@{
+    ViewData["Title"] = "Commandes Douaniers";
+}
+
+<style>
+    /* Design spécialisé pour les Douaniers */
+    :root {
+        --douanier-primary: #3481c0;
+        --douanier-primary-light: #5a9fd4;
+        --douanier-primary-dark: #2a6ba3;
+        --douanier-secondary: #1e3a5f;
+        --douanier-accent: #f8f9fa;
+        --neutral-50: #f8fafc;
+        --neutral-100: #f1f5f9;
+        --neutral-200: #e2e8f0;
+        --neutral-300: #cbd5e1;
+        --neutral-400: #94a3b8;
+        --neutral-500: #64748b;
+        --neutral-600: #475569;
+        --neutral-700: #334155;
+        --neutral-800: #1e293b;
+        --neutral-900: #0f172a;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .douanier-container {
+        min-height: 100vh;
+        padding: 2rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .douanier-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(31, 41, 55, 0.03) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .main-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 32px;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--douanier-primary) 0%, var(--douanier-primary-light) 100%);
+        color: var(--douanier-secondary);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: 
+            radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%),
+            linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+        animation: shimmer 6s ease-in-out infinite;
+    }
+
+    @@keyframes shimmer {
+        0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .header-content h1 {
+        font-weight: 900;
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, var(--douanier-secondary) 0%, var(--neutral-700) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.02em;
+    }
+
+    .header-content p {
+        font-size: 1.25rem;
+        font-weight: 600;
+        opacity: 0.9;
+        color: var(--neutral-700);
+    }
+
+    .form-section {
+        padding: 4rem;
+        background: transparent;
+        position: relative;
+    }
+
+    .douanier-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 10px 25px -5px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .douanier-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--douanier-primary), var(--douanier-primary-light), var(--douanier-primary));
+        opacity: 1;
+    }
+
+    .douanier-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 
+            0 20px 40px -12px rgba(0, 0, 0, 0.15),
+            0 8px 16px -8px rgba(0, 0, 0, 0.1);
+        border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--douanier-secondary);
+        margin-bottom: 2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .card-title i {
+        color: var(--douanier-primary);
+        font-size: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: var(--douanier-secondary);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+        gap: 0.75rem;
+    }
+
+    .form-label i {
+        color: var(--douanier-primary);
+        font-size: 1.25rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--neutral-200);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--douanier-primary);
+        box-shadow: 
+            0 0 0 4px rgba(245, 158, 11, 0.1),
+            0 8px 16px -4px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+        outline: none;
+        transform: translateY(-2px);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--douanier-primary);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-douanier {
+        background: linear-gradient(135deg, var(--douanier-primary) 0%, var(--douanier-primary-light) 100%);
+        border: none;
+        border-radius: 16px;
+        padding: 1.25rem 3rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: white;
+        box-shadow: 
+            0 4px 12px -2px rgba(52, 129, 192, 0.3),
+            0 2px 4px -1px rgba(52, 129, 192, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-douanier::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.6s;
+    }
+
+    .btn-douanier:hover {
+        background: linear-gradient(135deg, var(--douanier-primary-dark) 0%, var(--douanier-primary) 100%);
+        transform: translateY(-2px);
+        box-shadow: 
+            0 8px 16px -4px rgba(52, 129, 192, 0.4),
+            0 4px 8px -2px rgba(52, 129, 192, 0.3);
+    }
+
+    .btn-douanier:hover::before {
+        left: 100%;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--neutral-500) 0%, var(--neutral-600) 100%);
+        border: none;
+        border-radius: 16px;
+        padding: 1.25rem 3rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: white;
+        box-shadow: 0 8px 16px -4px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, var(--neutral-600) 0%, var(--neutral-700) 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px -4px rgba(107, 114, 128, 0.4);
+    }
+
+    .alert {
+        border: none;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef7f7 0%, #fce8e8 100%);
+        color: #b91c1c;
+        border-left: 4px solid #dc2626;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #15803d;
+        border-left: 4px solid #16a34a;
+    }
+
+    /* Style pour le code de commande */
+    .code-commande-highlight {
+        background: linear-gradient(135deg, #e6f2ff 0%, #cce7ff 100%);
+        border: 2px solid var(--douanier-primary);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--douanier-secondary);
+        box-shadow: 0 4px 8px rgba(52, 129, 192, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #e6f2ff 0%, #cce7ff 100%);
+        color: var(--douanier-secondary);
+        border-left: 4px solid var(--douanier-primary);
+    }
+
+    .return-link {
+        color: var(--douanier-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .return-link:hover {
+        color: var(--douanier-primary-dark);
+        transform: translateX(-2px);
+    }
+
+    .douanier-badge {
+        background: linear-gradient(135deg, var(--douanier-primary) 0%, var(--douanier-primary-light) 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Animations subtiles */
+    .form-control, .form-select, .btn-douanier, .btn-secondary {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .douanier-container {
+            padding: 1rem 0;
+        }
+        
+        .form-section {
+            padding: 2rem 1.5rem;
+        }
+        
+        .header-section {
+            padding: 3rem 1.5rem;
+        }
+        
+        .header-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .douanier-card {
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-douanier, .btn-secondary {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .header-content h1 {
+            font-size: 2rem;
+        }
+        
+        .douanier-card {
+            padding: 1.5rem;
+        }
+        
+        .form-control, .form-select {
+            padding: 1rem 1.25rem;
+        }
+    }
+</style>
+
+<div class="douanier-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 col-xl-12">
+                
+                <div class="main-card">
+                    <!-- Header Section -->
+                    <div class="header-section">
+                        <div class="header-content">
+                            <h1 class="mb-3">
+                                <i class="fas fa-shield-alt me-3"></i>
+                                Commandes Douaniers
+                            </h1>
+                            <p class="mb-0 fs-5">
+                                <i class="fas fa-calendar me-2"></i>
+                                @ViewBag.DateAujourdhui?.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Section -->
+                    <div class="form-section">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <!-- Interface spécialisée pour les Douaniers -->
+                        <form id="douanierOrderForm">
+                            @Html.AntiForgeryToken()
+                            <div class="douanier-card">
+                                <div class="card-title">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Commande pour Douaniers
+                                    <span class="douanier-badge ms-3">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Plats Standard Uniquement
+                                    </span>
+                                </div>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-utensils"></i>
+                                                Formule du Jour
+                                            </label>
+                                            <select id="douanierFormule" class="form-control">
+                                                <option value="">Sélectionnez la formule</option>
+                                                @if (ViewBag.FormulesAujourdhui != null)
+                                                {
+                                                    @foreach (var item in ViewBag.FormulesAujourdhui)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-hashtag"></i>
+                                                Nombre de Plats
+                                            </label>
+                                            <input type="number" id="douanierQuantite" class="form-control" 
+                                                   placeholder="Nombre de plats" min="1" max="100" value="1" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row g-4 mt-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-clock"></i>
+                                                Période
+                                            </label>
+                                            <select id="douanierPeriode" class="form-control">
+                                                <option value="0">Jour</option>
+                                                <option value="1">Nuit</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-building"></i>
+                                                Site
+                                            </label>
+                                            <select id="douanierSite" class="form-control">
+                                                <option value="0">CIT Terminal</option>
+                                                <option value="1">CIT Billing</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            @if (ViewBag.QuotaDouaniers != null && (ViewBag.QuotaDouaniers.QuotaJour > 0 || ViewBag.QuotaDouaniers.QuotaNuit > 0))
+                            {
+                                <div class="alert alert-warning mt-4">
+                                    <i class="fas fa-chart-pie me-2"></i>
+                                    <strong>Quotas Permanents Douaniers :</strong>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <strong>Jour :</strong> @ViewBag.QuotaDouaniers.PlatsConsommesJour / @ViewBag.QuotaDouaniers.QuotaJour plats
+                                            <div class="progress mt-1" style="height: 8px; background-color: #e2e8f0;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: @(ViewBag.QuotaDouaniers.QuotaJour > 0 ? ViewBag.QuotaDouaniers.PlatsConsommesJour * 100 / ViewBag.QuotaDouaniers.QuotaJour : 0)%; background: linear-gradient(90deg, #f4a261 0%, #e76f51 100%);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Nuit :</strong> @ViewBag.QuotaDouaniers.PlatsConsommesNuit / @ViewBag.QuotaDouaniers.QuotaNuit plats
+                                            <div class="progress mt-1" style="height: 8px; background-color: #e2e8f0;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: @(ViewBag.QuotaDouaniers.QuotaNuit > 0 ? ViewBag.QuotaDouaniers.PlatsConsommesNuit * 100 / ViewBag.QuotaDouaniers.QuotaNuit : 0)%; background: linear-gradient(90deg, #264653 0%, #2a9d8f 100%);">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger mt-4">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Attention :</strong> Aucun quota n'a été défini pour les Douaniers. 
+                                    Veuillez contacter les RH/Admin pour configurer les quotas dans les paramètres.
+                                </div>
+                            }
+                            
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note :</strong> Les commandes pour les Douaniers sont limitées aux plats standard uniquement. 
+                                Seules les formules contenant des plats standard peuvent être sélectionnées.
+                            </div>
+                                
+                                <div class="text-center mt-4">
+                                    <button type="button" id="createDouanierOrder" class="btn btn-douanier">
+                                        <i class="fas fa-shield-alt me-2"></i>
+                                        Créer Commande Douaniers
+                                    </button>
+                                </div>
+                                
+                                <div id="douanierOrderResult" class="mt-4" style="display: none;"></div>
+                            </div>
+                        </form>
+                        
+                        <!-- Bouton de retour -->
+                        <div class="text-center mt-4">
+                            <a href="/Commande" class="return-link">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Retourner à la liste des commandes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Variables globales
+        let currentUserId = null;
+        let currentUserName = null;
+        
+        // Initialisation quand le DOM est prêt
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🛡️ DOM chargé - Initialisation de la page Commandes Douaniers');
+            console.log('📊 Formules dans ViewBag:', @((ViewBag.FormulesAujourdhui as Microsoft.AspNetCore.Mvc.Rendering.SelectList)?.Count() ?? 0));
+            
+            // Initialiser les éléments
+            initializeElements();
+        });
+        
+        // Fonction pour initialiser les éléments
+        function initializeElements() {
+            const createDouanierOrderBtn = document.getElementById('createDouanierOrder');
+            if (createDouanierOrderBtn) {
+                console.log('✅ Bouton createDouanierOrder trouvé, ajout de l\'événement');
+                createDouanierOrderBtn.addEventListener('click', handleCreateDouanierOrder);
+            } else {
+                console.log('❌ Bouton createDouanierOrder non trouvé');
+            }
+        }
+        
+        // Fonction pour gérer la création de commande pour les Douaniers
+        async function handleCreateDouanierOrder() {
+            console.log('🛡️ Bouton Créer Commande Douaniers cliqué');
+            
+            const douanierFormule = document.getElementById('douanierFormule');
+            const douanierQuantite = document.getElementById('douanierQuantite');
+            const douanierPeriode = document.getElementById('douanierPeriode');
+            const douanierSite = document.getElementById('douanierSite');
+            const douanierOrderResult = document.getElementById('douanierOrderResult');
+            
+            if (!douanierFormule || !douanierQuantite || !douanierPeriode || !douanierSite || !douanierOrderResult) {
+                console.error('❌ Éléments du formulaire Douaniers non trouvés');
+                showResult(douanierOrderResult, '❌ Erreur: Éléments du formulaire non trouvés', 'danger');
+                return;
+            }
+            
+            const formuleId = douanierFormule.value;
+            const quantite = parseInt(douanierQuantite.value);
+            const periode = douanierPeriode.value;
+            const site = douanierSite.value;
+            
+            console.log('📝 Données Douaniers saisies:', {
+                formuleId: formuleId,
+                quantite: quantite,
+                periode: periode,
+                site: site
+            });
+            
+            // Validation côté client
+            if (!formuleId) {
+                console.log('❌ Formule non sélectionnée');
+                showResult(douanierOrderResult, '❌ Veuillez sélectionner une formule.', 'danger');
+                return;
+            }
+            
+            if (isNaN(quantite) || quantite < 1 || quantite > 100) {
+                console.log('❌ Quantité invalide');
+                showResult(douanierOrderResult, '❌ Veuillez entrer un nombre de plats valide (entre 1 et 100).', 'danger');
+                return;
+            }
+            
+            // Vérifier le token de vérification
+            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (!tokenElement) {
+                console.error('❌ Token de vérification non trouvé');
+                showResult(douanierOrderResult, '❌ Erreur de sécurité: Token manquant', 'danger');
+                return;
+            }
+            
+            const token = tokenElement.value;
+            console.log('🔐 Token de vérification trouvé:', token ? 'Oui' : 'Non');
+            
+            try {
+                console.log('🛡️ Envoi de la requête avec:', {
+                    formuleId: formuleId,
+                    quantite: quantite,
+                    periode: parseInt(periode),
+                    site: parseInt(site)
+                });
+                
+                const response = await fetch('/Commande/CreateDouanierOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({
+                        formuleId: formuleId,
+                        quantite: quantite,
+                        periode: parseInt(periode),
+                        site: parseInt(site)
+                    })
+                });
+                
+                console.log('📡 Réponse reçue:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('🛡️ Résultat commande Douaniers:', result);
+                
+                if (result.success) {
+                    // Afficher le message de succès avec le code de commande
+                    showResult(douanierOrderResult, result.message, 'success');
+                    
+                    // Mettre en évidence le code de commande
+                    setTimeout(() => {
+                        const resultElement = douanierOrderResult.querySelector('.alert-success');
+                        if (resultElement && result.codeCommande) {
+                            // Créer un élément spécial pour le code de commande
+                            const codeElement = document.createElement('div');
+                            codeElement.className = 'code-commande-highlight';
+                            codeElement.innerHTML = `
+                                <i class="fas fa-barcode me-2"></i>
+                                <strong>Code de Commande : ${result.codeCommande}</strong>
+                                <br>
+                                <small style="opacity: 0.8;">Utilisez ce code pour la validation</small>
+                            `;
+                            resultElement.appendChild(codeElement);
+                        }
+                    }, 100);
+                    
+                    // Réinitialiser le formulaire
+                    douanierFormule.value = '';
+                    douanierQuantite.value = '1';
+                    douanierPeriode.value = '0';
+                    douanierSite.value = '0';
+                } else {
+                    showResult(douanierOrderResult, `❌ ${result.message}`, 'danger');
+                }
+            } catch (error) {
+                console.error('❌ Erreur lors de la création:', error);
+                showResult(douanierOrderResult, `❌ Erreur lors de la création de la commande: ${error.message}`, 'danger');
+            }
+        }
+        
+        // Fonction pour afficher les résultats
+        function showResult(element, message, type) {
+            element.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            element.style.display = 'block';
+        }
+    </script>
+}

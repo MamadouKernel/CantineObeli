@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obeli_K.Data;
@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace Obeli_K.Controllers
 {
-    [Authorize(Roles = "Administrateur,RessourcesHumaines,PrestataireCantine")]
+    [Authorize(Roles = "Administrateur,RH,PrestataireCantine")]
     public class ExtractionController : Controller
     {
         private readonly ObeliDbContext _context;

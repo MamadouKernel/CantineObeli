@@ -1,0 +1,522 @@
+﻿@model Obeli_K.Models.ViewModels.VisiteurSelectionViewModel
+@using Obeli_K.Models.Enums
+@{
+    ViewData["Title"] = "Commandes Visiteurs";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-1">
+                <i class="fas fa-user-plus me-2"></i>
+                Commandes pour visiteurs
+            </h2>
+            <p class="text-muted mb-0">
+                Créez des commandes pour des visiteurs individuels ou en groupe. Les visiteurs sont identifiés par leur nom et direction.
+            </p>
+            <div class="alert alert-info mt-2">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>📋 Instructions :</strong> 
+                <ol class="mb-0 mt-2">
+                    <li><strong>1.</strong> Sélectionnez la période de consommation (minimum 48h à l'avance)</li>
+                    <li><strong>2.</strong> Choisissez le direction d'origine du visiteur</li>
+                    <li><strong>3.</strong> Entrez le nom du visiteur (ex: Jean Dupont, Marie Kouassi)</li>
+                    <li><strong>4.</strong> Choisissez la formule souhaitée</li>
+                    <li><strong>5.</strong> Cliquez sur "Commander" pour créer la commande</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section d'aide et navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Comment créer des commandes pour les visiteurs ?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-user text-primary fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="fw-bold">Visiteur individuel</h6>
+                                    <p class="mb-2 text-muted">Créez une commande pour un visiteur spécifique avec son nom et direction.</p>
+                                    <p class="mb-0"><strong>Utilisation :</strong> Saisissez le nom du visiteur, choisissez son direction, sélectionnez la période et la formule.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-users text-success fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="fw-bold">Visiteurs en groupe</h6>
+                                    <p class="mb-2 text-muted">Créez des commandes groupées pour plusieurs visiteurs d'un direction.</p>
+                                    <a href="@Url.Action("Create", "Visiteur")" class="btn btn-success btn-sm me-2">
+                                        <i class="fas fa-plus me-1"></i>Créer des commandes groupées
+                                    </a>
+                                    <a href="@Url.Action("Commands", "Visiteur")" class="btn btn-info btn-sm">
+                                        <i class="fas fa-list me-1"></i>Voir les commandes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Sélection de la période et du visiteur
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="List" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label asp-for="DateDebut" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>Date de début
+                                    <small class="text-muted">(minimum 48h à l'avance)</small>
+                                </label>
+                                <input asp-for="DateDebut" type="date" class="form-control" id="dateDebut" />
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-clock me-1"></i>Les commandes pour visiteurs doivent être créées au moins 48h avant la date de consommation
+                                </small>
+                                <span asp-validation-for="DateDebut" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label asp-for="DateFin" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>Date de fin
+                                </label>
+                                <input asp-for="DateFin" type="date" class="form-control" id="dateFin" />
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>Date de fin de la période de commande (doit être ≥ date de début)
+                                </small>
+                                <span asp-validation-for="DateFin" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label asp-for="DirectionId" class="form-label">
+                                    <i class="fas fa-building me-1"></i>direction
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="DirectionId" class="form-select" id="DirectionId">
+                                    <option value="">-- Sélectionner un direction --</option>
+                                    @if (ViewBag.Directions != null)
+                                    {
+                                        @foreach (var dept in ViewBag.Directions)
+                                        {
+                                            <option value="@dept.Id">@dept.Nom</option>
+                                        }
+                                    }
+                                </select>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-sitemap me-1"></i>direction d'origine du visiteur
+                                </small>
+                                <span asp-validation-for="DirectionId" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label asp-for="VisiteurNom" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nom du visiteur
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="VisiteurNom" class="form-control" placeholder="Ex: Jean Dupont, Marie Kouassi" id="visiteurNom" />
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-id-card me-1"></i>Nom complet du visiteur
+                                </small>
+                                <span asp-validation-for="VisiteurNom" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label asp-for="VisiteurTelephone" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>Téléphone (optionnel)
+                                </label>
+                                <input asp-for="VisiteurTelephone" class="form-control" placeholder="Ex: +225 07 12 34 56 78" id="visiteurTelephone" />
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-mobile-alt me-1"></i>Numéro de téléphone pour contact
+                                </small>
+                                <span asp-validation-for="VisiteurTelephone" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Affichage des formules -->
+    <div class="row" id="formulesContainer">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>
+                        <span id="formulesTitle">Formules disponibles du @(ViewBag.DateDebut?.ToString("dd/MM/yyyy") ?? DateTime.Today.ToString("dd/MM/yyyy")) au @(ViewBag.DateFin?.ToString("dd/MM/yyyy") ?? DateTime.Today.ToString("dd/MM/yyyy"))</span>
+                    </h5>
+                    <small class="d-block mt-1 opacity-75">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Sélectionnez une formule et cliquez sur "Commander" pour créer la commande
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="formulesList">
+                        @if (ViewBag.Formules != null && ViewBag.Formules.Count > 0)
+                        {
+                            @foreach (var formule in ViewBag.Formules)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 border-primary">
+                                        <div class="card-header bg-light">
+                                            <h6 class="card-title mb-0 text-primary">
+                                                <i class="fas fa-utensils me-2"></i>@formule.NomFormuleNavigation?.Nom
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="menu-details">
+                                                <p class="mb-1"><strong>Date:</strong> @formule.Date.ToString("dd/MM/yyyy")</p>
+                                                @if (!string.IsNullOrEmpty(formule.Entree))
+                                                {
+                                                    <p class="mb-1"><strong>Entrée:</strong> @formule.Entree</p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Plat))
+                                                {
+                                                    <p class="mb-1"><strong>Plat:</strong> @formule.Plat</p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Garniture))
+                                                {
+                                                    <p class="mb-1"><strong>Garniture:</strong> @formule.Garniture</p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(formule.Dessert))
+                                                {
+                                                    <p class="mb-1"><strong>Dessert:</strong> @formule.Dessert</p>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="button" class="btn btn-primary w-100" 
+                                                    onclick="creerCommande('@formule.IdFormule', '@formule.Date.ToString("yyyy-MM-dd")', '@ViewBag.SelectedMatricule')"
+                                                    title="Cliquer pour créer une commande pour cette formule"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <i class="fas fa-shopping-cart me-2"></i>Commander cette formule
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Aucune formule disponible pour la période sélectionnée.
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section d'aide sur les formules -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-light">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        💡 Aide - Types de formules disponibles
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-star text-warning fs-4 mb-2"></i>
+                                <h6 class="fw-bold text-warning">Formule Améliorée</h6>
+                                <p class="small text-muted mb-0">
+                                    Menu complet avec entrée, plat principal, garniture et dessert. 
+                                    Idéal pour les occasions spéciales.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-utensils text-primary fs-4 mb-2"></i>
+                                <h6 class="fw-bold text-primary">Formule Standard 1</h6>
+                                <p class="small text-muted mb-0">
+                                    Menu de base avec un plat principal et sa garniture. 
+                                    Équilibre nutritionnel et goût.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-leaf text-success fs-4 mb-2"></i>
+                                <h6 class="fw-bold text-success">Formule Standard 2</h6>
+                                <p class="small text-muted mb-0">
+                                    Alternative au Standard 1 avec un plat différent et sa garniture. 
+                                    Variété et choix.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateDebutInput = document.getElementById('dateDebut');
+            const dateFinInput = document.getElementById('dateFin');
+            const Directionselect = document.getElementById('DirectionId');
+            const visiteurNomInput = document.getElementById('visiteurNom');
+            const visiteurTelephoneInput = document.getElementById('visiteurTelephone');
+            const formulesContainer = document.getElementById('formulesContainer');
+            const formulesList = document.getElementById('formulesList');
+            const formulesTitle = document.getElementById('formulesTitle');
+
+            // Définir la date minimum (48h à partir de maintenant)
+            const maintenant = new Date();
+            const delaiMinimum = new Date(maintenant.getTime() + (48 * 60 * 60 * 1000)); // 48 heures
+            const dateMinStr = delaiMinimum.toISOString().split('T')[0];
+            
+            // Définir les attributs min sur les inputs de date
+            dateDebutInput.min = dateMinStr;
+            dateFinInput.min = dateMinStr;
+
+            // Initialiser les tooltips Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Fonction pour charger et afficher les formules
+            function chargerFormules() {
+                const dateDebut = dateDebutInput.value;
+                const dateFin = dateFinInput.value;
+                
+                if (dateDebut && dateFin) {
+                    // Validation 48h côté client
+                    const dateDebutObj = new Date(dateDebut);
+                    if (dateDebutObj < delaiMinimum) {
+                        formulesContainer.style.display = 'block';
+                        const delaiHeures = Math.round((delaiMinimum - new Date()) / (1000 * 60 * 60));
+                        formulesList.innerHTML = `
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <strong>⏰ Délai insuffisant</strong><br>
+                                    <div class="mt-2">
+                                        <strong>Règle :</strong> Les commandes pour visiteurs doivent être créées au moins <strong>48 heures à l'avance</strong>.<br>
+                                        <strong>Date sélectionnée :</strong> ${dateDebutObj.toLocaleDateString('fr-FR')}<br>
+                                        <strong>Date minimum autorisée :</strong> ${delaiMinimum.toLocaleDateString('fr-FR')} à ${delaiMinimum.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}<br>
+                                        <strong>Temps restant :</strong> ${delaiHeures}h
+                                    </div>
+                                    <div class="mt-2">
+                                        <small><i class="fas fa-lightbulb me-1"></i><strong>Conseil :</strong> Sélectionnez une date au moins 2 jours après aujourd'hui.</small>
+                                    </div>
+                                </div>
+                            </div>`;
+                        return;
+                    }
+                    // Afficher le container
+                    formulesContainer.style.display = 'block';
+                    formulesList.innerHTML = '<div class="col-12"><div class="text-center"><i class="fas fa-spinner fa-spin"></i> Chargement des formules...</div></div>';
+                    
+                    // Mettre à jour le titre
+                    const dateDebutFormatted = new Date(dateDebut).toLocaleDateString('fr-FR');
+                    const dateFinFormatted = new Date(dateFin).toLocaleDateString('fr-FR');
+                    formulesTitle.textContent = `Formules disponibles du ${dateDebutFormatted} au ${dateFinFormatted}`;
+                    
+                    // Charger les formules via AJAX
+                    fetch('@Url.Action("GetFormules", "Visiteur")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify({
+                            dateDebut: dateDebut,
+                            dateFin: dateFin
+                        })
+                    })
+                    .then(response => {
+                        console.log('Réponse reçue:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Données reçues:', data);
+                        if (data.success && data.formules && data.formules.length > 0) {
+                            formulesList.innerHTML = '';
+                            data.formules.forEach(function(formule) {
+                                const formuleCard = createFormuleCard(formule);
+                                formulesList.appendChild(formuleCard);
+                            });
+                        } else {
+                            formulesList.innerHTML = '<div class="col-12"><div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Aucune formule disponible pour la période sélectionnée.</div></div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des formules:', error);
+                        formulesList.innerHTML = '<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Erreur lors du chargement des formules: ' + error.message + '</div></div>';
+                    });
+                } else {
+                    formulesContainer.style.display = 'none';
+                }
+            }
+
+            // Charger les formules au chargement de la page si les dates sont définies
+            if (dateDebutInput.value && dateFinInput.value) {
+                chargerFormules();
+            }
+
+            // Fonction pour créer une carte de formule
+            function createFormuleCard(formule) {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4 mb-4';
+                
+                let menuDetails = '';
+                
+                // Gestion des formules Amélioré (champs classiques)
+                if (formule.entree) menuDetails += `<p class="mb-1"><strong>Entrée:</strong> ${formule.entree}</p>`;
+                if (formule.plat) menuDetails += `<p class="mb-1"><strong>Plat:</strong> ${formule.plat}</p>`;
+                if (formule.garniture) menuDetails += `<p class="mb-1"><strong>Garniture:</strong> ${formule.garniture}</p>`;
+                if (formule.dessert) menuDetails += `<p class="mb-1"><strong>Dessert:</strong> ${formule.dessert}</p>`;
+                
+                // Gestion des formules Standard (2 plats)
+                if (formule.platStandard1) menuDetails += `<p class="mb-1"><strong>Plat Standard 1:</strong> ${formule.platStandard1}</p>`;
+                if (formule.garnitureStandard1) menuDetails += `<p class="mb-1"><strong>Garniture Standard 1:</strong> ${formule.garnitureStandard1}</p>`;
+                if (formule.platStandard2) menuDetails += `<p class="mb-1"><strong>Plat Standard 2:</strong> ${formule.platStandard2}</p>`;
+                if (formule.garnitureStandard2) menuDetails += `<p class="mb-1"><strong>Garniture Standard 2:</strong> ${formule.garnitureStandard2}</p>`;
+                
+                col.innerHTML = `
+                    <div class="card h-100 border-primary">
+                        <div class="card-header bg-light">
+                            <h6 class="card-title mb-0 text-primary">
+                                <i class="fas fa-utensils me-2"></i>${formule.nom}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="menu-details">
+                                <p class="mb-1"><strong>Date:</strong> ${formule.date}</p>
+                                ${menuDetails}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary w-100" 
+                                    onclick="creerCommande('${formule.idFormule}', '${formule.date}')"
+                                    title="Cliquer pour créer une commande pour cette formule"
+                                    data-bs-toggle="tooltip" data-bs-placement="top">
+                                <i class="fas fa-shopping-cart me-2"></i>Commander cette formule
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                return col;
+            }
+
+            // Écouter les changements de dates
+            dateDebutInput.addEventListener('change', chargerFormules);
+            dateFinInput.addEventListener('change', chargerFormules);
+        });
+
+        function creerCommande(idFormule, dateConsommation) {
+            const DirectionId = document.getElementById('DirectionId').value;
+            const visiteurNom = document.getElementById('visiteurNom').value;
+            const visiteurTelephone = document.getElementById('visiteurTelephone').value;
+            
+            if (!DirectionId) {
+                alert("Veuillez sélectionner un direction avant de commander.");
+                return;
+            }
+            
+            if (!visiteurNom) {
+                alert("Veuillez entrer le nom du visiteur avant de commander.");
+                return;
+            }
+
+            // Validation 48h avant de créer la commande
+            const maintenant = new Date();
+            const delaiMinimum = new Date(maintenant.getTime() + (48 * 60 * 60 * 1000)); // 48 heures
+            const dateConsommationObj = new Date(dateConsommation);
+            
+            if (dateConsommationObj < delaiMinimum) {
+                const dateLimite = delaiMinimum.toLocaleDateString('fr-FR') + ' à ' + delaiMinimum.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                const delaiHeures = Math.round((delaiMinimum - maintenant) / (1000 * 60 * 60));
+                alert(`⏰ COMMANDE REFUSÉE - Délai insuffisant\n\n` +
+                      `📋 Règle : Les commandes pour visiteurs doivent être créées au moins 48h à l'avance\n\n` +
+                      `📅 Date de consommation : ${dateConsommationObj.toLocaleDateString('fr-FR')}\n` +
+                      `🕐 Date limite autorisée : ${dateLimite}\n` +
+                      `⏱️ Temps restant requis : ${delaiHeures}h\n\n` +
+                      `💡 Conseil : Sélectionnez une date au moins 2 jours après aujourd'hui.`);
+                return;
+            }
+
+            // Message de confirmation détaillé
+            const dateConsommationFormatted = new Date(dateConsommation).toLocaleDateString('fr-FR');
+            const DirectionNom = document.getElementById('DirectionId').selectedOptions[0].text;
+            const confirmationMessage = `🍽️ CONFIRMATION DE COMMANDE VISITEUR\n\n` +
+                                      `👤 Visiteur : ${visiteurNom}\n` +
+                                      `🏢 direction : ${DirectionNom}\n` +
+                                      `📞 Téléphone : ${visiteurTelephone || 'Non renseigné'}\n` +
+                                      `📅 Date de consommation : ${dateConsommationFormatted}\n` +
+                                      `🆔 ID Formule : ${idFormule}\n\n` +
+                                      `✅ Cette action créera une commande définitive.\n` +
+                                      `⚠️ Voulez-vous continuer ?`;
+            
+            if (confirm(confirmationMessage)) {
+                fetch('@Url.Action("CreateCommande", "Visiteur")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        VisiteurNom: visiteurNom,
+                        VisiteurTelephone: visiteurTelephone,
+                        DirectionId: DirectionId,
+                        IdFormule: idFormule,
+                        DateConsommation: dateConsommation
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload(); // Recharger la page pour mettre à jour les menus
+                    } else {
+                        alert('Erreur: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de la commande.');
+                });
+            }
+        }
+    </script>
+}

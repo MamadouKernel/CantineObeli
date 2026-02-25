@@ -1,0 +1,97 @@
+Module;Sous-Module;Fonctionnalité;Description;Rôles Autorisés;URL;Méthode HTTP;Paramètres
+Authentification;Connexion;Connexion utilisateur;Connexion au système avec matricule et mot de passe;Tous;/Auth/Login;GET/POST;Matricule, MotDePasse, SeSouvenirDeMoi
+Authentification;Connexion;Déconnexion;Déconnexion du système et suppression de la session;Tous connectés;/Auth/Logout;GET;Aucun
+Authentification;Profil;Consulter profil;Afficher les informations du profil utilisateur connecté;Tous connectés;/Auth/Profile;GET;Aucun
+Authentification;Profil;Modifier profil;Modifier les informations personnelles (nom prénom email téléphone);Tous connectés;/Auth/EditProfile;GET/POST;Nom, Prenoms, Email, PhoneNumber, Lieu, DirectionId, FonctionId, Site
+Authentification;Mot de passe;Changer mot de passe;Changer son propre mot de passe;Tous connectés;/Auth/ChangePassword;GET/POST;MotDePasseActuel, NouveauMotDePasse, Confirmation
+Authentification;Mot de passe;Mot de passe oublié;Demander un lien de réinitialisation;Tous;/Auth/Forgot;GET/POST;UserNameOrEmail
+Authentification;Mot de passe;Réinitialiser mot de passe;Réinitialiser avec token reçu par email;Tous;/Auth/Reset;GET/POST;Token, NouveauMotDePasse, Confirmation
+Gestion Utilisateurs;Liste;Liste des utilisateurs;Afficher tous les utilisateurs actifs avec pagination;Admin + RH;/Utilisateur/List;GET;Aucun
+Gestion Utilisateurs;CRUD;Créer utilisateur;Créer un nouvel utilisateur dans le système;Admin + RH;/Utilisateur/Create;GET/POST;Nom, Prenoms, UserName, Email, PhoneNumber, MotDePasse, Role, DirectionId, FonctionId, Site
+Gestion Utilisateurs;CRUD;Détails utilisateur;Afficher les détails complets d'un utilisateur;Admin + RH;/Utilisateur/Details/{id};GET;Id (Guid)
+Gestion Utilisateurs;CRUD;Modifier utilisateur;Modifier les informations d'un utilisateur existant;Admin + RH;/Utilisateur/Edit/{id};GET/POST;Id, Nom, Prenoms, UserName, Email, PhoneNumber, Role, DirectionId, FonctionId, Site, NouveauMotDePasse (optionnel)
+Gestion Utilisateurs;CRUD;Supprimer utilisateur;Supprimer un utilisateur (soft delete);Admin + RH;/Utilisateur/Delete/{id};POST;Id (Guid)
+Gestion Utilisateurs;Gestion;Réinitialiser mots de passe;Réinitialiser les mots de passe de plusieurs utilisateurs;Admin + RH;/Utilisateur/ResetPassword;GET/POST;Matricules (liste), NouveauMotDePasse
+Gestion Directions;Liste;Liste des directions;Afficher toutes les directions avec pagination (5 par page);Admin + RH;/Direction/List;GET;Page, PageSize
+Gestion Directions;CRUD;Créer direction;Créer une nouvelle direction organisationnelle;Admin + RH;/Direction/Create;GET/POST;Nom, Code, Description, Responsable, Email
+Gestion Directions;CRUD;Détails direction;Afficher les détails d'une direction et ses services;Admin + RH;/Direction/Details/{id};GET;Id (Guid)
+Gestion Directions;CRUD;Modifier direction;Modifier les informations d'une direction;Admin + RH;/Direction/Edit/{id};GET/POST;Id, Nom, Code, Description, Responsable, Email
+Gestion Directions;CRUD;Supprimer direction;Supprimer une direction (vérification dépendances);Admin + RH;/Direction/Delete/{id};POST;Id (Guid)
+Gestion Directions;API;API Liste directions;API JSON pour obtenir toutes les directions actives;Admin + RH;/Direction/GetDirections;GET;Aucun
+Gestion Services;Liste;Liste des services;Afficher tous les services avec pagination (5 par page);Admin + RH;/Service/List;GET;Page, PageSize
+Gestion Services;CRUD;Créer service;Créer un nouveau service rattaché à une direction;Admin + RH;/Service/Create;GET/POST;Nom, Code, Description, DirectionId, Responsable, Email
+Gestion Services;CRUD;Détails service;Afficher les détails d'un service;Admin + RH;/Service/Details/{id};GET;Id (Guid)
+Gestion Services;CRUD;Modifier service;Modifier les informations d'un service;Admin + RH;/Service/Edit/{id};GET/POST;Id, Nom, Code, Description, DirectionId, Responsable, Email
+Gestion Services;CRUD;Supprimer service;Supprimer un service (vérification dépendances);Admin + RH;/Service/Delete/{id};POST;Id (Guid)
+Gestion Services;API;API Services par direction;API JSON pour obtenir les services d'une direction;Admin + RH;/Service/GetServicesByDirection;GET;DirectionId (Guid)
+Gestion Fonctions;Liste;Liste des fonctions;Afficher toutes les fonctions avec pagination;Admin + RH;/Fonction/List;GET;Page, PageSize
+Gestion Fonctions;CRUD;Créer fonction;Créer une nouvelle fonction (poste);Admin + RH;/Fonction/Create;GET/POST;Nom, Description
+Gestion Fonctions;CRUD;Détails fonction;Afficher les détails d'une fonction et utilisateurs associés;Admin + RH;/Fonction/Details/{id};GET;Id (Guid)
+Gestion Fonctions;CRUD;Modifier fonction;Modifier une fonction existante;Admin + RH;/Fonction/Edit/{id};GET/POST;Id, Nom, Description
+Gestion Fonctions;CRUD;Supprimer fonction;Supprimer une fonction (vérification dépendances);Admin + RH;/Fonction/Delete/{id};POST;Id (Guid)
+Gestion Menus;Liste;Liste des menus;Afficher tous les menus du jour avec filtres par date;Admin + RH + Prestataire;/FormuleJour/Index;GET;DateDebut, DateFin, TypeFormule
+Gestion Menus;CRUD;Créer menu;Créer un nouveau menu pour une date spécifique;Admin + RH + Prestataire;/FormuleJour/Create;GET/POST;Date, NomFormule, Plat, Garniture, Entree, Dessert, PlatStandard1, GarnitureStandard1, PlatStandard2, GarnitureStandard2
+Gestion Menus;CRUD;Créer menus multiples;Créer des menus pour plusieurs jours consécutifs;Admin + RH + Prestataire;/FormuleJour/CreateMultiDay;GET/POST;DateDebut, DateFin, Menus (liste)
+Gestion Menus;CRUD;Détails menu;Afficher les détails d'un menu;Admin + RH + Prestataire;/FormuleJour/Details/{id};GET;Id (Guid)
+Gestion Menus;CRUD;Modifier menu;Modifier un menu existant;Admin + RH + Prestataire;/FormuleJour/Edit/{id};GET/POST;Id, Date, NomFormule, Plat, Garniture, Entree, Dessert, etc.
+Gestion Menus;CRUD;Supprimer menu;Supprimer un menu (vérification commandes associées);Admin + RH + Prestataire;/FormuleJour/Delete/{id};POST;Id (Guid)
+Gestion Menus;Import;Importer menus Excel;Importer des menus depuis un fichier Excel;Admin + RH + Prestataire;/FormuleJour/Import;GET/POST;Fichier Excel (.xlsx)
+Gestion Menus;Planification;Sélectionner période;Sélectionner une période pour créer des menus;Admin + RH + Prestataire;/FormuleJour/SelectPeriod;GET/POST;DateDebut, DateFin
+Commandes;Liste;Liste des commandes;Afficher toutes les commandes avec filtres multiples;Tous connectés;/Commande/Index;GET;Status, DateDebut, DateFin, TypeClient, Site, Page
+Commandes;Création;Passer commande;Créer une nouvelle commande personnelle (délai 12h);Tous connectés;/Commande/Create;GET/POST;IdFormule, DateConsommation, Quantite, PeriodeService
+Commandes;Consultation;Détails commande;Afficher les détails complets d'une commande;Tous connectés;/Commande/Details/{id};GET;Id (Guid)
+Commandes;Modification;Modifier commande;Modifier une commande existante (si délai respecté);Tous connectés;/Commande/Edit/{id};GET/POST;Id, IdFormule, DateConsommation, Quantite
+Commandes;Gestion;Annuler commande;Annuler une commande (si délai respecté);Tous connectés;/Commande/Cancel/{id};POST;Id (Guid)
+Commandes;Gestion;Supprimer commande;Supprimer définitivement une commande;Admin + RH;/Commande/Delete/{id};POST;Id (Guid)
+Commandes;Vérification;Vérifier commande;Vérifier une commande par son code;Admin + RH + Prestataire;/Commande/VerifierCommande;GET/POST;CodeCommande
+Commandes;Spéciales;Commande instantanée;Créer une commande avec délai < 12h;Admin + RH + Prestataire;/Commande/CreerCommandeInstantanee;GET/POST;IdFormule, DateConsommation, UtilisateurId, Quantite
+Commandes;Spéciales;Commande groupée;Créer une commande pour un groupe d'utilisateurs;Admin + RH;/Commande/CreerCommandeGroupee;GET/POST;DirectionId, DateDebut, DateFin, TypeFormule, NombrePersonnes
+Commandes;Spéciales;Commande douaniers;Créer une commande pour les douaniers (quota spécial);Admin + RH + Prestataire;/Commande/CreerCommandeDouaniers;GET/POST;Date, NombreDouaniers, TypeFormule
+Commandes;Spéciales;Valider commande douaniers;Valider et finaliser les commandes des douaniers;Admin + RH + Prestataire;/Commande/ValiderCommandeDouaniers;GET/POST;Date, Validation
+Commandes;Export;Exporter Excel;Exporter les commandes filtrées en Excel;Admin + RH;/Commande/ExporterExcel;GET;DateDebut, DateFin, Status, TypeClient
+Commandes;API;API Formules disponibles;API pour obtenir les formules d'une période;Tous connectés;/Commande/GetFormulesDisponibles;POST;DateDebut, DateFin
+Commandes Visiteurs;Liste;Liste commandes visiteurs;Afficher les commandes des visiteurs avec filtres;Admin + RH;/Visiteur/Commands;GET;Page, DirectionId, DateDebut, DateFin
+Commandes Visiteurs;Création;Créer commande visiteur;Créer une commande pour un visiteur externe;Admin + RH;/Visiteur/Create;GET/POST;VisiteurNom, VisiteurTelephone, DirectionId, DateDebut, DateFin, NombreVisiteurs, TypeFormule
+Commandes Visiteurs;API;API Créer commande;API pour créer une commande visiteur;Admin + RH;/Visiteur/CreateCommande;POST;VisiteurNom, VisiteurTelephone, DirectionId, IdFormule, DateConsommation
+Commandes Visiteurs;Liste;Liste formules visiteurs;Afficher les formules disponibles pour visiteurs;Admin + RH;/Visiteur/List;GET;DateDebut, DateFin
+Commandes Visiteurs;API;API Formules visiteurs;API pour obtenir les formules disponibles;Admin + RH;/Visiteur/GetFormules;POST;DateDebut, DateFin
+Points de Consommation;Personnel;Mes points de consommation;Voir ses propres points de consommation par période;Tous connectés;/Commande/MesPointsConsommation;GET;DateDebut, DateFin
+Points de Consommation;Global;Point consommation CIT;Voir les points de consommation de tous les utilisateurs CIT;Admin + RH;/PointsConsommation/PointConsommationCIT;GET;DateDebut, DateFin, DirectionId
+Points de Consommation;Gestion;Créer point consommation;Créer un nouveau point de consommation;Admin + RH;/PointsConsommation/Create;GET/POST;UtilisateurId, Date, TypeConsommation, Quantite
+Points de Consommation;Gestion;Modifier point consommation;Modifier un point de consommation existant;Admin + RH;/PointsConsommation/Edit/{id};GET/POST;Id, Date, TypeConsommation, Quantite
+Points de Consommation;Statistiques;Cumul points consommation;Statistiques détaillées des consommations;Admin + RH;/Commande/CumulPointsConsommation;GET;DateDebut, DateFin, DirectionId, Site
+Reporting;Tableau de bord;Tableau de bord reporting;Tableau de bord avec indicateurs et graphiques;Admin + RH + Prestataire;/Reporting/Dashboard;GET;DateDebut, DateFin, Site, DirectionId, FonctionId
+Reporting;Export;Exporter CSV;Exporter le rapport en format CSV;Admin + RH + Prestataire;/Reporting/ExporterCsv;POST;DateDebut, DateFin, Site, DirectionId, FonctionId
+Reporting;Export;Exporter PDF;Exporter le rapport en format PDF;Admin + RH + Prestataire;/Reporting/ExporterPdf;POST;DateDebut, DateFin, Site, DirectionId, FonctionId
+Reporting;API;API Données participation;API pour les données de participation par jour;Admin + RH + Prestataire;/Reporting/GetParticipationData;GET;DateDebut, DateFin, Site, DirectionId
+Extraction;Extraction;Extraction commandes;Extraire les commandes pour facturation avec marges;Admin + RH;/Extraction/Index;GET/POST;DateDebut, DateFin, TypeFormule, Marges
+Extraction;Configuration;Définir marges;Définir les marges de facturation par formule;Admin + RH;/Extraction/DefinirMarges;GET/POST;Marges (par formule)
+Extraction;Modal;Modal extraction;Modal pour extraction rapide;Admin + RH;/Extraction/ExtractionModal;GET;DateDebut, DateFin
+Gestion Marges;Configuration;Gestion des marges;Gérer les marges de facturation globales;Admin + RH;/GestionMarges/Index;GET/POST;MargeAmeliore, MargeStandard1, MargeStandard2
+Prestataires;Commandes;Générer commande prestataire;Générer une commande pour le prestataire de cantine;Admin + RH;/PrestataireCantine/GenererCommande;GET/POST;DateDebut, DateFin, PrestataireId
+Prestataires;Consultation;Quantités commande;Voir les quantités par formule pour le prestataire;Admin + RH;/PrestataireCantine/QuantitesCommandePrestataire;GET;DateDebut, DateFin
+Prestataires;Marges;Gestion marges prestataire;Gérer les marges spécifiques du prestataire;Admin + RH;/PrestataireCantine/GestionMarges;GET/POST;PrestataireId, Marges
+Prestataires;Marges;Ajouter marges;Ajouter des marges pour un prestataire;Admin + RH;/PrestataireCantine/AjouterMarges;GET/POST;PrestataireId, TypeFormule, Marge
+Prestataires;Liste;Liste prestataires;Liste de tous les prestataires de cantine;Admin + RH;/PrestataireCantine/List;GET;Aucun
+Facturation;Gestion;Gestion facturation;Interface de gestion de la facturation;Admin + RH;/Facturation/Index;GET;Mois, Annee
+Facturation;Configuration;Paramètres facturation;Configurer les paramètres de facturation automatique;Admin + RH;/ParametresFacturation/Index;GET/POST;TarifAmeliore, TarifStandard1, TarifStandard2, JourFacturation
+Facturation;Diagnostic;Diagnostic facturation;Diagnostiquer les problèmes de facturation;Admin + RH;/DiagnosticFacturation/Index;GET;Mois, Annee
+Facturation;Automatique;Facturation automatique;Gérer la facturation automatique mensuelle;Admin + RH;/FacturationAutomatique/Index;GET/POST;Mois, Annee, Executer
+Quotas;Gestion;Quotas permanents groupes;Gérer les quotas des groupes non-CIT (douaniers etc);Admin + RH;/GroupeNonCit/Index;GET;Aucun
+Quotas;CRUD;Créer quota groupe;Créer un quota pour un groupe spécifique;Admin + RH;/GroupeNonCit/Create;GET/POST;NomGroupe, TypeGroupe, QuotaJournalier, Description
+Quotas;CRUD;Modifier quota groupe;Modifier un quota de groupe existant;Admin + RH;/GroupeNonCit/Edit/{id};GET/POST;Id, NomGroupe, QuotaJournalier, Description
+Quotas;CRUD;Supprimer quota groupe;Supprimer un quota de groupe;Admin + RH;/GroupeNonCit/Delete/{id};POST;Id (Guid)
+Quotas;Consultation;Détails quota groupe;Voir les détails et l'historique d'un quota;Admin + RH;/GroupeNonCit/Details/{id};GET;Id (Guid)
+Configuration;Commandes;Configuration commandes;Configurer les délais et règles de commande;Admin + RH;/ConfigurationCommande/Index;GET/POST;DelaiCommandeHeures, DelaiAnnulationHeures, DelaiModificationHeures
+Configuration;Diagnostic;Diagnostic configuration;Diagnostiquer la configuration du système;Admin + RH;/DiagnosticConfig/Index;GET;Aucun
+Configuration;Initialisation;Initialisation config;Initialiser la configuration par défaut;Admin;/InitConfig/Index;GET/POST;Aucun
+Administration;Base de données;Administration DB;Interface d'administration de la base de données;Admin;/Admin/Index;GET;Aucun
+Administration;Statistiques;Statistiques système;Obtenir les statistiques du système (API);Admin;/Admin/GetStatistics;GET;Aucun
+Administration;Nettoyage;Nettoyage base;Nettoyer les données obsolètes de la base;Admin;/Cleanup/Index;GET/POST;Type, DateLimite
+Diagnostic;Commandes;Diagnostic commandes;Diagnostiquer les problèmes de commandes;Admin + RH;/DiagnosticCommande/Index;GET;DateDebut, DateFin
+Diagnostic;Utilisateurs;Diagnostic utilisateurs;Diagnostiquer les problèmes utilisateurs;Admin + RH;/DiagnosticUser/Index;GET;Aucun
+Accueil;Navigation;Page d'accueil;Page d'accueil avec résumé et accès rapides;Tous connectés;/Home/Index;GET;Aucun
+Erreurs;Gestion;Page erreur;Page d'erreur générique;Tous;/Error/Index;GET;Aucun
+Erreurs;Gestion;Non autorisé;Page d'accès non autorisé (403);Tous;/Error/Unauthorized;GET;Aucun
+Erreurs;Gestion;Non trouvé;Page ressource non trouvée (404);Tous;/Error/NotFound;GET;Aucun
+Erreurs;Gestion;Erreur serveur;Page erreur serveur (500);Tous;/Error/ServerError;GET;Aucun

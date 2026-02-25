@@ -1,4 +1,4 @@
-@model Obeli_K.Models.ViewModels.CommandeListViewModel
+﻿@model Obeli_K.Models.ViewModels.CommandeListViewModel
 
 @{
     ViewData["Title"] = "Détails de la Commande";
@@ -11,19 +11,26 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
                         <i class="fas fa-info-circle text-warning me-2"></i>
-                        Détails de la Commande
+                        Détails de la commande
                     </h3>
                     <div class="btn-group" role="group">
-                        @if (!User.IsInRole("PrestataireCantine"))
+                        @* Afficher le bouton Modifier uniquement pour RH et Admin sur les commandes non consommées *@
+                        @if ((User.IsInRole("Administrateur") || User.IsInRole("RH")) && Model.StatusCommande != Obeli_K.Enums.StatutCommande.Consommee)
                         {
-                        <a asp-action="Edit" asp-route-id="@Model.IdCommande" class="btn btn-warning">
-                            <i class="fas fa-edit me-1"></i>
-                            Modifier
-                        </a>
+                            <a asp-action="Edit" asp-route-id="@Model.IdCommande" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>
+                                Modifier
+                            </a>
+                        }
+                        @if (Model.StatusCommande == Obeli_K.Enums.StatutCommande.Consommee)
+                        {
+                            <span class="btn btn-secondary disabled" title="Commande consommée - Lecture seule">
+                                <i class="fas fa-lock me-1"></i>Lecture seule
+                            </span>
                         }
                         <a asp-action="Index" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-1"></i>
-                            Retour à la liste
+                            Retour
                         </a>
                     </div>
                 </div>
@@ -34,22 +41,22 @@
                                 <div class="card-header bg-warning text-dark">
                                     <h5 class="card-title mb-0">
                                         <i class="fas fa-shopping-cart me-2"></i>
-                                        Informations Générales
+                                        Informations générales
                                     </h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="row mb-3">
-                                        <div class="col-sm-4"><strong>Code Commande :</strong></div>
+                                        <div class="col-sm-4"><strong>Code de la commande :</strong></div>
                                         <div class="col-sm-8">
                                             <span class="badge bg-secondary fs-6">@Model.CodeCommande</span>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <div class="col-sm-4"><strong>Date de Commande :</strong></div>
+                                        <div class="col-sm-4"><strong>Date de la commande :</strong></div>
                                         <div class="col-sm-8">@Model.Date.ToString("dddd dd MMMM yyyy", new System.Globalization.CultureInfo("fr-FR"))</div>
                                     </div>
                                     <div class="row mb-3">
-                                        <div class="col-sm-4"><strong>Date de Consommation :</strong></div>
+                                        <div class="col-sm-4"><strong>Date de la consommation :</strong></div>
                                         <div class="col-sm-8">
                                             @if (Model.DateConsommation.HasValue)
                                             {
@@ -74,6 +81,12 @@
                                                     break;
                                                 case Obeli_K.Enums.StatutCommande.Annulee:
                                                     <span class="badge bg-danger fs-6">Annulée</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.Indisponible:
+                                                    <span class="badge bg-info fs-6">Indisponible</span>
+                                                    break;
+                                                case Obeli_K.Enums.StatutCommande.NonRecuperer:
+                                                    <span class="badge bg-secondary fs-6">Non récupérée</span>
                                                     break;
                                                 default:
                                                     <span class="badge bg-secondary fs-6">Précommandée</span>
@@ -141,7 +154,7 @@
                                 <div class="card-header bg-warning text-dark">
                                     <h5 class="card-title mb-0">
                                         <i class="fas fa-user me-2"></i>
-                                        Informations Client
+                                        Informations du client
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -206,7 +219,7 @@
                                 <div class="card-header bg-warning text-dark">
                                     <h5 class="card-title mb-0">
                                         <i class="fas fa-utensils me-2"></i>
-                                        Détails de la Formule
+                                        Détails de la formule
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -233,7 +246,7 @@
                                     @if (Model.FormuleDate.HasValue)
                                     {
                                         <div class="row mb-3">
-                                            <div class="col-sm-4"><strong>Date Formule :</strong></div>
+                                            <div class="col-sm-4"><strong>Date de la formule :</strong></div>
                                             <div class="col-sm-8">@Model.FormuleDate.Value.ToString("dd/MM/yyyy")</div>
                                         </div>
                                     }
@@ -246,7 +259,7 @@
                                 <div class="card-header bg-warning text-dark">
                                     <h5 class="card-title mb-0">
                                         <i class="fas fa-info me-2"></i>
-                                        Informations Supplémentaires
+                                        Informations supplémentaires
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -286,7 +299,7 @@
                                             </div>
                                         }
                                     }
-                                    @if (Model.CreatedOn.HasValue)
+                                   @*  @if (Model.CreatedOn.HasValue)
                                     {
                                         <div class="row mb-3">
                                             <div class="col-sm-4"><strong>Créée le :</strong></div>
@@ -299,7 +312,7 @@
                                             <div class="col-sm-4"><strong>Créée par :</strong></div>
                                             <div class="col-sm-8">@Model.CreatedBy</div>
                                         </div>
-                                    }
+                                    } *@
                                 </div>
                             </div>
                         </div>

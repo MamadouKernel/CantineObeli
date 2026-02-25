@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Obeli_K.Models
@@ -24,7 +25,21 @@ namespace Obeli_K.Models
         public string? Legumes { get; set; }
 
         public int? Marge { get; set; }
-        public int? Statut { get; set; }
+        
+        // Quotas pour la gestion des commandes instantanées
+        [Display(Name = "Quota Jour Restant")]
+        public int? QuotaJourRestant { get; set; } = 0; // Quota initial pour le midi
+        
+        [Display(Name = "Quota Nuit Restant")]
+        public int? QuotaNuitRestant { get; set; } = 0; // Quota initial pour le soir
+        
+        [Display(Name = "Marge Jour Restante")]
+        public int? MargeJourRestante { get; set; } = 0; // Marge disponible après épuisement du quota jour
+        
+        [Display(Name = "Marge Nuit Restante")]
+        public int? MargeNuitRestante { get; set; } = 0; // Marge disponible après épuisement du quota nuit
+        
+        public int? Statut { get; set; } = 1; // Par défaut activé
 
         public DateTime Date { get; set; }
 

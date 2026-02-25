@@ -22,8 +22,7 @@ namespace Obeli_K.Data
         // DbSets
         public DbSet<Utilisateur> Utilisateurs { get; set; }
         public DbSet<Direction> Directions { get; set; }
-        public DbSet<Departement> Departements { get; set; }
-        // public DbSet<Service> Services { get; set; }
+        public DbSet<Service> Services { get; set; }
         public DbSet<Fonction> Fonctions { get; set; }
         public DbSet<Commande> Commandes { get; set; }
         public DbSet<FormuleJour> FormulesJour { get; set; }
@@ -32,6 +31,8 @@ namespace Obeli_K.Data
         public DbSet<PointConsommation> PointsConsommation { get; set; }
         public DbSet<ConfigurationCommande> ConfigurationsCommande { get; set; }
         public DbSet<QuotaJournalier> QuotasJournaliers { get; set; }
+        public DbSet<PrestataireCantine> PrestataireCantines { get; set; }
+        public DbSet<ExportCommandePrestataire> ExportCommandesPrestataire { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +45,8 @@ namespace Obeli_K.Data
                 entity.Property(e => e.Nom).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.Code).HasMaxLength(10);
+                entity.Property(e => e.Responsable).HasMaxLength(100);
+                entity.Property(e => e.Email).HasMaxLength(100);
                 entity.Property(e => e.CreatedBy).HasMaxLength(100);
                 entity.Property(e => e.ModifiedBy).HasMaxLength(100);
                 entity.Property(e => e.Supprimer).HasDefaultValue(0);
@@ -68,18 +71,15 @@ namespace Obeli_K.Data
                 entity.Property(e => e.Supprimer).HasDefaultValue(0);
 
                 // Relations
-                entity.HasOne(e => e.Departement)
-                    .WithMany(d => d.Utilisateurs)
-                    .HasForeignKey(e => e.DepartementId)
+                entity.HasOne(e => e.Direction)
+                    .WithMany()
+                    .HasForeignKey(e => e.DirectionId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                // Temporairement commenté pour éviter les erreurs de colonnes manquantes
-                /*
                 entity.HasOne(e => e.Service)
                     .WithMany(s => s.Utilisateurs)
                     .HasForeignKey(e => e.ServiceId)
                     .OnDelete(DeleteBehavior.Restrict);
-                */
 
                 entity.HasOne(e => e.Fonction)
                     .WithMany(f => f.Utilisateurs)
@@ -117,11 +117,6 @@ namespace Obeli_K.Data
                     .WithMany(g => g.Commandes)
                     .HasForeignKey(e => e.GroupeNonCitId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(e => e.Direction)
-                    .WithMany()
-                    .HasForeignKey(e => e.DirectionId)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Configuration FormuleJour
@@ -149,17 +144,6 @@ namespace Obeli_K.Data
                     .WithMany(t => t.FormulesJour)
                     .HasForeignKey(e => e.TypeFormuleId)
                     .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            // Configuration Département
-            modelBuilder.Entity<Departement>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Nom).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Description).HasMaxLength(500);
-                entity.Property(e => e.CreatedBy).HasMaxLength(100);
-                entity.Property(e => e.ModifiedBy).HasMaxLength(100);
-                entity.Property(e => e.Supprimer).HasDefaultValue(0);
             });
 
             // Configuration Fonction
@@ -241,47 +225,7 @@ namespace Obeli_K.Data
                 .Property(e => e.Site)
                 .HasConversion<int>();
 
-            // Configuration Direction (temporairement commenté)
-            /*
-            modelBuilder.Entity<Direction>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Nom).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Description).HasMaxLength(500);
-                entity.Property(e => e.Code).HasMaxLength(10);
-                entity.Property(e => e.Responsable).HasMaxLength(100);
-                entity.Property(e => e.Email).HasMaxLength(100);
-                entity.Property(e => e.CreatedBy).HasMaxLength(100);
-                entity.Property(e => e.ModifiedBy).HasMaxLength(100);
-                entity.Property(e => e.Supprimer).HasDefaultValue(0);
-            });
-            */
-
-            // Configuration Departement
-            modelBuilder.Entity<Departement>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Nom).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Description).HasMaxLength(500);
-                // Temporairement commenté pour éviter les erreurs de colonnes manquantes
-                // entity.Property(e => e.Code).HasMaxLength(10);
-                // entity.Property(e => e.Responsable).HasMaxLength(100);
-                // entity.Property(e => e.Email).HasMaxLength(100);
-                entity.Property(e => e.CreatedBy).HasMaxLength(100);
-                entity.Property(e => e.ModifiedBy).HasMaxLength(100);
-                entity.Property(e => e.Supprimer).HasDefaultValue(0);
-
-                // Relations (temporairement commenté)
-                /*
-                entity.HasOne(e => e.Direction)
-                    .WithMany(d => d.Departements)
-                    .HasForeignKey(e => e.DirectionId)
-                    .OnDelete(DeleteBehavior.Restrict);
-                */
-            });
-
-            // Configuration Service (temporairement commenté)
-            /*
+            // Configuration Service
             modelBuilder.Entity<Service>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -294,13 +238,12 @@ namespace Obeli_K.Data
                 entity.Property(e => e.ModifiedBy).HasMaxLength(100);
                 entity.Property(e => e.Supprimer).HasDefaultValue(0);
 
-                // Relations
-                entity.HasOne(e => e.Departement)
+                // Relation avec Direction
+                entity.HasOne(e => e.Direction)
                     .WithMany(d => d.Services)
-                    .HasForeignKey(e => e.DepartementId)
+                    .HasForeignKey(e => e.DirectionId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-            */
 
             // Configuration ConfigurationCommande
             modelBuilder.Entity<ConfigurationCommande>(entity =>
@@ -334,6 +277,51 @@ namespace Obeli_K.Data
                 
                 // Index unique sur GroupeNonCitId + Date
                 entity.HasIndex(e => new { e.GroupeNonCitId, e.Date }).IsUnique();
+            });
+
+            // Configuration PrestataireCantine
+            modelBuilder.Entity<PrestataireCantine>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nom).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Contact).HasMaxLength(100);
+                entity.Property(e => e.Email).HasMaxLength(100);
+                entity.Property(e => e.Telephone).HasMaxLength(20);
+                entity.Property(e => e.Adresse).HasMaxLength(500);
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+                entity.Property(e => e.Supprimer).HasDefaultValue(0);
+                
+                // Index sur le nom pour les recherches
+                entity.HasIndex(e => e.Nom);
+            });
+
+            // Configuration ExportCommandePrestataire
+            modelBuilder.Entity<ExportCommandePrestataire>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DateDebut).IsRequired();
+                entity.Property(e => e.DateFin).IsRequired();
+                entity.Property(e => e.NomFichier).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.TailleFichier).IsRequired();
+                entity.Property(e => e.UtilisateurId).IsRequired();
+                entity.Property(e => e.DateExport).IsRequired();
+                entity.Property(e => e.ExportEffectue).HasDefaultValue(true);
+                entity.Property(e => e.Commentaires).HasMaxLength(500);
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+                entity.Property(e => e.Supprimer).HasDefaultValue(0);
+                
+                // Relations
+                entity.HasOne(e => e.Utilisateur)
+                    .WithMany()
+                    .HasForeignKey(e => e.UtilisateurId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                // Index sur les dates pour les recherches
+                entity.HasIndex(e => new { e.DateDebut, e.DateFin });
+                entity.HasIndex(e => e.DateExport);
+                entity.HasIndex(e => e.UtilisateurId);
             });
         }
     }

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Obeli_K.Models.Enums;
 
 namespace Obeli_K.Models.ViewModels
@@ -37,8 +37,10 @@ namespace Obeli_K.Models.ViewModels
         [Required(ErrorMessage = "Le rôle est obligatoire.")]
         public RoleType Role { get; set; }
 
-        [Required(ErrorMessage = "Le département est obligatoire.")]
-        public Guid DepartementId { get; set; }
+        [Required(ErrorMessage = "La direction est obligatoire.")]
+        public Guid? DirectionId { get; set; }
+
+        public Guid? ServiceId { get; set; }
 
         public Guid? FonctionId { get; set; }
 

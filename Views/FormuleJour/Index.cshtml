@@ -1,4 +1,4 @@
-@model IEnumerable<Obeli_K.Models.ViewModels.FormuleJourViewModel>
+﻿@model Obeli_K.Models.ViewModels.PagedViewModel<Obeli_K.Models.ViewModels.FormuleJourViewModel>
 
 @{
     ViewData["Title"] = "Gestion des Formules";
@@ -8,32 +8,58 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-utensils text-warning me-2"></i>
-                        Gestion des Formules
-                        @if (ViewBag.SemaineSuivante == true)
-                        {
-                            <span class="badge bg-success ms-2">Semaine N+1</span>
-                        }
-                    </h3>
-                    <div class="btn-group" role="group">
-                        <a asp-action="Create" class="btn btn-warning">
-                            <i class="fas fa-plus me-1"></i>
-                            Nouvelle Formule
-                        </a>
-                        <a asp-action="CreateBulk" class="btn btn-primary">
-                            <i class="fas fa-calendar-plus me-1"></i>
-                            Création en Lot
-                        </a>
-                        <a asp-action="Import" class="btn btn-info">
-                            <i class="fas fa-file-import me-1"></i>
-                            Importer
-                        </a>
-                        <a asp-action="Index" asp-route-semaineSuivante="true" class="btn btn-success">
-                            <i class="fas fa-calendar-week me-1"></i>
-                            Semaine N+1
-                        </a>
+                <!-- Header responsive -->
+                <div class="card-header">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-utensils text-warning me-2"></i>
+                            <span class="d-none d-sm-inline">Gestion des Formules</span>
+                            <span class="d-sm-none">Formules</span>
+                            @if (ViewBag.SemaineSuivante == true)
+                            {
+                                <span class="badge bg-success ms-2">Semaine N+1</span>
+                            }
+                        </h3>
+                        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100 w-lg-auto">
+                            <div class="btn-group w-100 w-sm-auto" role="group">
+                                <a asp-action="Create" class="btn btn-warning">
+                                    <i class="fas fa-plus me-1"></i>
+                                    <span class="d-none d-sm-inline">Nouvelle </span>Formule
+                                </a>
+                                <a asp-action="Import" class="btn btn-info">
+                                    <i class="fas fa-file-import me-1"></i>
+                                    <span class="d-none d-sm-inline">Importer</span>
+                                    <span class="d-sm-none">Import</span>
+                                </a>
+                            </div>
+                            
+                            <!-- Actions secondaires - masquées sur mobile -->
+                            <div class="btn-group d-none d-md-flex" role="group">
+                                <a asp-action="Index" asp-route-semaineSuivante="true" class="btn btn-success">
+                                    <i class="fas fa-calendar-week me-1"></i>
+                                    Semaine N+1
+                                </a>
+                                <a asp-action="ExportExcel" 
+                                   asp-route-dateDebut="@ViewBag.DateDebut" 
+                                   asp-route-dateFin="@ViewBag.DateFin" 
+                                   asp-route-semaineSuivante="@ViewBag.SemaineSuivante" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-file-excel me-1"></i>
+                                    Export Excel
+                                </a>
+                            </div>
+                            
+                            <!-- Sélecteur de taille de page - masqué sur mobile -->
+                            <div class="d-none d-lg-flex align-items-center">
+                                <label for="pageSize" class="form-label me-2 mb-0 small text-nowrap">Par page:</label>
+                                <select id="pageSize" class="form-select form-select-sm" style="width: auto;" onchange="changePageSize(this.value)">
+                                    <option value="5" selected="@(Model.Pagination.PageSize == 5)">5</option>
+                                    <option value="10" selected="@(Model.Pagination.PageSize == 10)">10</option>
+                                    <option value="25" selected="@(Model.Pagination.PageSize == 25)">25</option>
+                                <option value="50" selected="@(Model.Pagination.PageSize == 50)">50</option>
+                                <option value="100" selected="@(Model.Pagination.PageSize == 100)">100</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -57,30 +83,44 @@
                     <!-- Filtres -->
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <form method="get" class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="dateDebut" class="form-label">Date de début</label>
-                                    <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="@ViewBag.DateDebut">
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="dateFin" class="form-label">Date de fin</label>
-                                    <input type="date" class="form-control" id="dateFin" name="dateFin" value="@ViewBag.DateFin">
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary me-2">
-                                        <i class="fas fa-search me-1"></i>
-                                        Filtrer
-                                    </button>
-                                    <a asp-action="Index" class="btn btn-secondary">
-                                        <i class="fas fa-times me-1"></i>
-                                        Effacer
-                                    </a>
-                                </div>
-                            </form>
+                            <div class="date-filters-container">
+                                <form method="get" class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <div class="date-input-container">
+                                            <label for="dateDebut" class="form-label">
+                                                <i class="fas fa-calendar-day"></i>
+                                                Date de début
+                                            </label>
+                                            <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="@ViewBag.DateDebut">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="date-input-container">
+                                            <label for="dateFin" class="form-label">
+                                                <i class="fas fa-calendar-day"></i>
+                                                Date de fin
+                                            </label>
+                                            <input type="date" class="form-control" id="dateFin" name="dateFin" value="@ViewBag.DateFin">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="date-action-buttons">
+                                            <button type="submit" class="btn-search">
+                                                <i class="fas fa-search"></i>
+                                                Rechercher
+                                            </button>
+                                            <a asp-action="Index" class="btn-clear">
+                                                <i class="fas fa-times"></i>
+                                                Effacer
+                                            </a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
 
-                    @if (Model != null && Model.Any())
+                    @if (Model != null && Model.Items != null && Model.Items.Any())
                     {
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -97,7 +137,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var formule in Model)
+                                    @foreach (var formule in Model.Items)
                                     {
                                         <tr>
                                             <td>
@@ -208,6 +248,9 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Pagination -->
+                        @await Html.PartialAsync("_Pagination", Model.Pagination)
                     }
                     else
                     {
@@ -228,10 +271,19 @@
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="~/css/date-inputs.css" />
     <script>
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);
+        
+        // Fonction pour changer la taille de page
+        function changePageSize(pageSize) {
+            const url = new URL(window.location);
+            url.searchParams.set('pageSize', pageSize);
+            url.searchParams.set('page', '1'); // Retourner à la première page
+            window.location.href = url.toString();
+        }
     </script>
 }
