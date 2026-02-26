@@ -16,9 +16,38 @@ var config = builder.Configuration;
 // Configuration EPPlus pour éviter l'erreur de licence
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-// 1) EF Core (SQL Server) — lit "DefaultConnection"
+// Configuration de la base de données selon le provider choisi
+var databaseProvider = config.GetValue<string>("DatabaseProvider") ?? "SqlServer";
+Console.WriteLine($"🔧 Provider de base de données: {databaseProvider}");
+
 builder.Services.AddDbContext<ObeliDbContext>(opts =>
-    opts.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+{
+    switch (databaseProvider.ToLower())
+    {
+        case "postgresql":
+        case "postgres":
+            var postgresConnection = config.GetConnectionString("PostgreSqlConnection");
+            if (string.IsNullOrEmpty(postgresConnection))
+            {
+                throw new InvalidOperationException("La chaîne de connexion PostgreSqlConnection est manquante dans appsettings.json");
+            }
+            opts.UseNpgsql(postgresConnection);
+            Console.WriteLine("✅ Configuration PostgreSQL activée");
+            break;
+            
+        case "sqlserver":
+        case "mssql":
+        default:
+            var sqlServerConnection = config.GetConnectionString("SqlServerConnection");
+            if (string.IsNullOrEmpty(sqlServerConnection))
+            {
+                throw new InvalidOperationException("La chaîne de connexion SqlServerConnection est manquante dans appsettings.json");
+            }
+            opts.UseSqlServer(sqlServerConnection);
+            Console.WriteLine("✅ Configuration SQL Server activée");
+            break;
+    }
+});
 
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IUserService, UserService>();
