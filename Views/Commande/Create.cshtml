@@ -96,6 +96,43 @@
         <div class="row">
         <!-- Colonne principale - Menus par jour -->
         <div class="col-lg-8">
+            @if (!Model.JoursSemaine.Any(j => j.Formules.Any(f => 
+                !string.IsNullOrEmpty(f.Entree) || 
+                !string.IsNullOrEmpty(f.Plat) || 
+                !string.IsNullOrEmpty(f.PlatStandard1) || 
+                !string.IsNullOrEmpty(f.PlatStandard2) ||
+                !string.IsNullOrEmpty(f.Feculent) ||
+                !string.IsNullOrEmpty(f.Legumes)
+            )))
+            {
+                <!-- Message quand aucun menu n'est disponible -->
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-utensils fa-4x text-muted"></i>
+                            </div>
+                            <h3 class="text-muted mb-3">Pas de menu disponible pour le moment</h3>
+                            <p class="text-muted mb-4">
+                                Aucun menu n'est actuellement disponible pour la période sélectionnée.<br>
+                                Les menus seront bientôt mis à jour par l'équipe de restauration.
+                            </p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="@Url.Action("Create")" class="btn btn-primary">
+                                    <i class="fas fa-calendar-week me-2"></i>
+                                    Voir la semaine courante
+                                </a>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                    <i class="fas fa-list me-2"></i>
+                                    Mes commandes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
             @foreach (var jour in Model.JoursSemaine)
             {
                 var dateConsommation = jour.Date;
@@ -263,6 +300,7 @@
                         </div>
                     </div>
                 </div>
+            }
             }
         </div>
 
