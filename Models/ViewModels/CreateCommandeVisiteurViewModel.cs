@@ -29,7 +29,7 @@ namespace Obeli_K.Models.ViewModels
 
         [Required(ErrorMessage = "Le type de formule est obligatoire")]
         [Display(Name = "Type de formule")]
-        public string TypeFormule { get; set; } = "Standard 1";
+        public string TypeFormule { get; set; } = "Amélioré"; // Les visiteurs ont uniquement la formule améliorée
 
         [Required(ErrorMessage = "La période de service est obligatoire")]
         [Display(Name = "Période de service")]

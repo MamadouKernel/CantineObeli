@@ -343,8 +343,8 @@
                     <ul class="navbar-nav me-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Liens directs pour Admin et RH uniquement -->
-                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
+                            <!-- Liens directs pour Admin, RH et Prestataire -->
+                            @if (User.IsInRole("Administrateur") || User.IsInRole("RH") || User.IsInRole("PrestataireCantine"))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -519,27 +519,6 @@
                                 </ul>
                             </li>
                             
-                            <!-- Menus Dropdown pour PrestataireCantine -->
-                            @if (User.IsInRole("PrestataireCantine") && !User.IsInRole("Administrateur") && !User.IsInRole("RH"))
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-utensils me-1"></i>Menus
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="@Url.Action("Index", "FormuleJour")">
-                                            <i class="fas fa-list me-2"></i>Liste des Menus
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Create", "FormuleJour")">
-                                            <i class="fas fa-plus me-2"></i>Créer un Menu
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Import", "FormuleJour")">
-                                            <i class="fas fa-file-import me-2"></i>Importer des Menus
-                                        </a></li>
-                                    </ul>
-                                </li>
-                            }
-                            
                             <!-- Visiteur -->
                             @if (User.IsInRole("Administrateur") || User.IsInRole("RH"))
                             {
@@ -570,11 +549,99 @@
                                             <i class="fas fa-file-invoice me-2"></i>Générer une commande
                                         </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("QuantitesCommandePrestataire", "PrestataireCantine")">
+                                            <i class="fas fa-chart-bar me-2"></i>Quantités par formule
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("GestionMarges", "PrestataireCantine")">
+                                            <i class="fas fa-percentage me-2"></i>Gestion des marges
+                                        </a>
+                                    </li>
                                     <!--<li>
                                         <a class="dropdown-item" href="@Url.Action("Exportations", "PrestataireCantine")">
                                             <i class="fas fa-download me-2"></i>Exportation
                                         </a>
                                     </li>-->
+                                </ul>
+                            </li>
+                            
+                            <!-- Menu Facturation (Admin/RH) -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-money-bill-wave me-1"></i>Facturation
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "FacturationAutomatique")">
+                                            <i class="fas fa-robot me-2"></i>Facturation Automatique
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "ParametresFacturation")">
+                                            <i class="fas fa-cogs me-2"></i>Paramètres Facturation
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "Facturation")">
+                                            <i class="fas fa-file-invoice-dollar me-2"></i>Gestion Facturation
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "DiagnosticFacturation")">
+                                            <i class="fas fa-stethoscope me-2"></i>Diagnostic Facturation
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        
+                        @if (User.IsInRole("Administrateur"))
+                        {
+                            <!-- Menu Administration (Admin uniquement) -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-tools me-1"></i>Administration
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><h6 class="dropdown-header">
+                                        <i class="fas fa-bug me-1"></i>Diagnostics
+                                    </h6></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "DiagnosticConfig")">
+                                            <i class="fas fa-cog me-2"></i>Diagnostic Configuration
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "DiagnosticCommande")">
+                                            <i class="fas fa-shopping-cart me-2"></i>Diagnostic Commandes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "DiagnosticUser")">
+                                            <i class="fas fa-user-check me-2"></i>Diagnostic Utilisateurs
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">
+                                        <i class="fas fa-database me-1"></i>Système
+                                    </h6></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "InitConfig")">
+                                            <i class="fas fa-play-circle me-2"></i>Initialisation Config
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "Admin")">
+                                            <i class="fas fa-database me-2 text-danger"></i>Administration DB
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Index", "Cleanup")">
+                                            <i class="fas fa-broom me-2"></i>Nettoyage Base
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         }
@@ -596,10 +663,6 @@
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("ResetPassword", "Utilisateur")">
                                             <i class="fas fa-key me-2"></i>Réinitialiser mot de passe
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Admin")">
-                                            <i class="fas fa-database me-2 text-danger"></i>Administration DB
                                         </a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="@Url.Action("List", "Direction")">
@@ -626,22 +689,9 @@
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "ConfigurationCommande")">
                                             <i class="fas fa-clock me-2"></i>Configuration des commandes
                                         </a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "ParametresFacturation")">
-                            <i class="fas fa-cogs me-2"></i>Paramètres de la facturation
-                        </a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "Facturation")">
-                            <i class="fas fa-money-bill-wave me-2"></i>Gestion de la facturation
-                        </a></li>
-                        <li><a class="dropdown-item" href="@Url.Action("Index", "DiagnosticFacturation")">
-                            <i class="fas fa-stethoscope me-2"></i>Diagnostic de la facturation
-                        </a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Index", "GroupeNonCit")">
                                             <i class="fas fa-users me-2"></i>Quotas Permanents des Groupes
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="@Url.Action("Index", "FacturationAutomatique")">
-                                            <i class="fas fa-money-bill-wave me-2"></i>Facturation automatique
                                         </a></li>
                                     </ul>
                                 </li>

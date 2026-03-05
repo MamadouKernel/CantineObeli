@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - O'Beli</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    
+    <style>
+        :root {
+            --primary-color: #EDAC00;
+            --secondary-color: #A32D18;
+            --accent-color: #59311F;
+            --light-accent: #A26D55;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #ffc107 100%);
+            padding: 2rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+        
+        .auth-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-header .subtitle {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        
+        .auth-body {
+            padding: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(237, 172, 0, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #ffc107 100%);
+            border: none;
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #d4a600 0%, #e0a800 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(237, 172, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #c82333 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #8b1e1e 0%, #a71e2a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(163, 45, 24, 0.3);
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-danger {
+            background-color: #fee;
+            color: #c33;
+        }
+        
+        .alert-success {
+            background-color: #efe;
+            color: #3c3;
+        }
+        
+        .alert-info {
+            background-color: #eff;
+            color: #3cc;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background-color: var(--light-gray);
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .auth-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-footer a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+        
+        .text-danger {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .input-group-text {
+            background-color: var(--light-gray);
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .input-group .form-control:focus {
+            border-left: none;
+        }
+        
+        /* Responsive */
+        @@media (max-width: 576px) {
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .auth-body {
+                padding: 1.5rem;
+            }
+            
+            .auth-footer {
+                padding: 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>
+                    <i class="fas fa-utensils me-2"></i>O'Beli
+                </h1>
+                <div class="subtitle">Gestion Cantine CIT</div>
+            </div>
+            
+            <div class="auth-body">
+                @RenderBody()
+            </div>
+            
+            @if (IsSectionDefined("Footer"))
+            {
+                <div class="auth-footer">
+                    @RenderSection("Footer", required: false)
+                </div>
+            }
+        </div>
+        
+        <div class="text-center mt-3">
+            <small class="text-white">
+                &copy; 2025 - O'Beli - Côte d'Ivoire Terminal
+            </small>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,231 @@
+Module,Fonctionnalité,Description,Rôles autorisés,Actions,Commentaires,Guide d'utilisation
+Authentification,Connexion,Connexion au système avec matricule et mot de passe,Tous,OK,,
+Authentification,Déconnexion,Déconnexion du système,Tous,OK,,
+Authentification,Profil utilisateur,Consulter son profil personnel,Tous connectés,OK,,
+Authentification,Modifier profil,Modifier ses informations personnelles,Tous connectés,OK,Au niveau de la fonction c'est la direction qui apparait,
+Authentification,Changer mot de passe,Changer son mot de passe,Tous connectés,OK,,
+Authentification,Mot de passe oublié,Réinitialiser le mot de passe,Tous,OK,✅ CORRIGÉ - Système implémenté,"1. Sur la page de connexion (/Auth/Login)
+2. Cliquer sur le lien ""Mot de passe oublié ?""
+3. Entrer votre matricule
+4. Un email sera envoyé avec un lien de réinitialisation (nécessite configuration SMTP)
+5. Cliquer sur le lien dans l'email
+6. Entrer le nouveau mot de passe
+7. Confirmer et se reconnecter"
+Authentification,Réinitialisation mot de passe,Réinitialiser avec token,Tous,OK,✅ CORRIGÉ - Système implémenté,"Voir ""Mot de passe oublié"" ci-dessus. Le token est généré automatiquement et envoyé par email."
+Gestion Utilisateurs,Liste des utilisateurs,Afficher tous les utilisateurs actifs,"Admin, RH",OK,,
+Gestion Utilisateurs,Créer utilisateur,Créer un nouvel utilisateur,"Admin, RH",OK,,
+Gestion Utilisateurs,Détails utilisateur,Voir les détails d'un utilisateur,"Admin, RH",OK,,
+Gestion Utilisateurs,Modifier utilisateur,Modifier les informations d'un utilisateur,"Admin, RH",OK,,
+Gestion Utilisateurs,Supprimer utilisateur,Supprimer un utilisateur (soft delete),"Admin, RH",OK,,
+Gestion Utilisateurs,Réinitialiser mot de passe,Réinitialiser le mot de passe d'utilisateurs,"Admin, RH",OK,✅ CORRIGÉ - Bouton ajouté,"1. Menu ""Administration"" > ""Gestion Utilisateurs""
+2. Dans la liste des utilisateurs
+3. Cliquer sur le bouton ""Réinitialiser"" (icône clé) à droite de chaque utilisateur
+4. Entrer les matricules (un par ligne ou séparés par virgules)
+5. Définir le nouveau mot de passe
+6. Confirmer - Tous les utilisateurs sélectionnés auront le même mot de passe"
+Gestion Directions,Liste des directions,Afficher toutes les directions,"Admin, RH",OK,,
+Gestion Directions,Créer direction,Créer une nouvelle direction,"Admin, RH",OK,,
+Gestion Directions,Détails direction,Voir les détails d'une direction,"Admin, RH",OK,,
+Gestion Directions,Modifier direction,Modifier une direction,"Admin, RH",OK,,
+Gestion Directions,Supprimer direction,Supprimer une direction,"Admin, RH",OK,,
+Gestion Directions,Liste directions (automatique),Obtenir la liste des directions dans les formulaires,"Admin, RH",OK,✅ Déjà implémenté,"Cette fonctionnalité est automatique. Quand vous créez ou modifiez un utilisateur, la liste des directions s'affiche automatiquement dans le menu déroulant."
+Gestion Services,Liste des services,Afficher tous les services,"Admin, RH",OK,,
+Gestion Services,Créer service,Créer un nouveau service,"Admin, RH",OK,,
+Gestion Services,Détails service,Voir les détails d'un service,"Admin, RH",OK,,
+Gestion Services,Modifier service,Modifier un service,"Admin, RH",OK,,
+Gestion Services,Supprimer service,Supprimer un service,"Admin, RH",OK,,
+Gestion Services,Services par direction (automatique),Obtenir les services d'une direction dans les formulaires,"Admin, RH",OK,✅ Déjà implémenté,"Cette fonctionnalité est automatique. Quand vous sélectionnez une direction dans un formulaire, les services de cette direction s'affichent automatiquement dans le menu déroulant."
+Gestion Fonctions,Liste des fonctions,Afficher toutes les fonctions,"Admin, RH",OK,,
+Gestion Fonctions,Créer fonction,Créer une nouvelle fonction,"Admin, RH",OK,,
+Gestion Fonctions,Détails fonction,Voir les détails d'une fonction,"Admin, RH",OK,,
+Gestion Fonctions,Modifier fonction,Modifier une fonction,"Admin, RH",OK,,
+Gestion Fonctions,Supprimer fonction,Supprimer une fonction,"Admin, RH",OK,,
+Gestion Menus,Liste des menus,Afficher tous les menus du jour,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Créer menu,Créer un nouveau menu du jour,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Créer menus multiples,Créer des menus pour plusieurs jours,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Détails menu,Voir les détails d'un menu,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Modifier menu,Modifier un menu existant,"Admin, RH, Prestataire",OK,✅ CORRIGÉ - Autorisation ajoutée,"1. Menu ""Gestion"" > ""Menus du Jour""
+2. Cliquer sur ""Modifier"" (icône crayon) à droite du menu
+3. Modifier les informations
+4. Enregistrer les modifications"
+Gestion Menus,Supprimer menu,Supprimer un menu,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Importer menus,Importer des menus depuis Excel,"Admin, RH, Prestataire",OK,,
+Gestion Menus,Sélectionner période,Sélectionner une période pour créer des menus,"Admin, RH, Prestataire",OK,,
+Commandes,Liste des commandes,Afficher toutes les commandes avec filtres,Tous connectés,OK,✅ CORRIGÉ - Accès vérifié,"1. Menu ""Commandes"" > ""Mes Commandes""
+2. Ou cliquer sur ""Commandes"" dans le menu principal
+3. La liste s'affiche avec filtres (période, statut, site)"
+Commandes,Passer commande,Créer une nouvelle commande personnelle,Tous connectés,OK,,
+Commandes,Détails commande,Voir les détails d'une commande,Tous connectés,OK,,
+Commandes,Modifier commande,Modifier une commande existante,Tous connectés,OK,✅ Déjà implémenté - Règle métier 24h,"Vous pouvez modifier une commande jusqu'à 24h avant la date de consommation. Après ce délai, la modification n'est plus possible (règle métier)."
+Commandes,Annuler commande,Annuler une commande,Tous connectés,OK,,
+Commandes,Supprimer commande,Supprimer une commande,"Admin, RH",OK,✅ Documentation créée - Voir guide,"📖 Guide créé: Documentation/GUIDE_ANNULER_VS_SUPPRIMER.md
+
+DIFFÉRENCE:
+• ANNULER: Soft delete, garde l'historique, motif requis, visible dans les rapports
+• SUPPRIMER: Hard delete, suppression définitive, Admin/RH uniquement, pas d'historique
+
+Utilisez ANNULER pour les commandes normales, SUPPRIMER uniquement pour les erreurs de saisie."
+Commandes,Vérifier commande,Vérifier une commande par code,"Admin, RH, Prestataire",OK,✅ CORRIGÉ - Accès RH ajouté,"1. Menu ""Commandes"" > ""Vérifier Commande""
+2. Entrer le code de commande ou scanner le QR code
+3. Les détails de la commande s'affichent
+4. Valider ou annuler selon le besoin"
+Commandes,Commande instantanée,Créer une commande instantanée (< 12h),"Admin, RH, Prestataire",OK,✅ CORRIGÉ - Autorisation vérifiée,"1. Menu ""Commandes"" > ""Commande Instantanée""
+2. Sélectionner l'utilisateur (matricule)
+3. Choisir la formule disponible
+4. Confirmer la commande
+Note: Réservé aux commandes urgentes (< 12h avant le service)"
+Commandes,Commande groupée,Créer une commande pour un groupe,"Admin, RH",OK,,
+Commandes,Commande douaniers,Créer une commande pour les douaniers,"Admin, RH, Prestataire",OK,,
+Commandes,Valider commande douaniers,Valider les commandes des douaniers,"Admin, RH, Prestataire",OK,✅ Documentation créée - Voir guide,"📖 Guide créé: Documentation/GUIDE_COMMANDES_DOUANIERS.md
+
+WORKFLOW:
+1. Les douaniers passent commande via le système
+2. Admin/RH/Prestataire accède à ""Vérifier Commande""
+3. Entre le code de la commande douanier
+4. Clique sur ""Valider"" pour confirmer
+5. La commande passe au statut ""Validée"""
+Commandes,Exporter Excel,Exporter les commandes en Excel,"Admin, RH",OK,,
+Commandes,Formules disponibles (automatique),Voir les formules disponibles selon la période,Tous connectés,OK,✅ Déjà implémenté,"Cette fonctionnalité est automatique. Quand vous créez une commande et sélectionnez une date, les formules disponibles pour cette période s'affichent automatiquement."
+Commandes Visiteurs,Liste commandes visiteurs,Afficher les commandes des visiteurs,"Admin, RH",OK,,
+Commandes Visiteurs,Créer commande visiteur,Créer une commande pour un visiteur,"Admin, RH",OK,✅ CORRIGÉ - Autorisation ajoutée,"1. Menu ""Visiteurs"" > ""Créer Commande Visiteur""
+2. Entrer les informations du visiteur
+3. Sélectionner la formule (liste affichée automatiquement)
+4. Confirmer la commande"
+Commandes Visiteurs,Créer commande visiteur (système),Système de création de commande visiteur,"Admin, RH",OK,✅ Déjà implémenté,"Cette fonctionnalité fonctionne automatiquement en arrière-plan quand vous créez une commande visiteur via le formulaire. Rien de spécial à faire, le système gère tout."
+Commandes Visiteurs,Liste formules visiteurs,Afficher les formules pour visiteurs,"Admin, RH",OK,✅ CORRIGÉ - Visibilité améliorée,"Les formules s'affichent automatiquement lors de la création d'une commande visiteur:
+1. Menu ""Visiteurs"" > ""Créer Commande Visiteur""
+2. Sélectionner la date
+3. Les formules disponibles s'affichent dans un panneau avec bordure bleue
+4. Cocher les formules souhaitées"
+Commandes Visiteurs,Formules visiteurs (automatique),Voir les formules disponibles pour visiteurs,"Admin, RH",OK,✅ Déjà implémenté,"Cette fonctionnalité est automatique. Quand vous créez une commande visiteur, les formules disponibles s'affichent automatiquement dans le formulaire."
+Points de Consommation,Mes points de consommation,Voir ses propres points de consommation,Tous connectés,OK,,
+Points de Consommation,Point consommation CIT,Voir les points de consommation CIT,"Admin, RH",OK,,
+Points de Consommation,Créer point consommation,Créer un nouveau point de consommation,"Admin, RH",OK,✅ Documentation créée - Voir guide,"📖 Guide créé: Documentation/GUIDE_POINT_CONSOMMATION.md
+
+COMMENT CRÉER:
+1. Menu ""Points de Consommation"" > ""Créer Point""
+2. Remplir le formulaire:
+   - Nom du point
+   - Type (CIT/Non-CIT)
+   - Site
+   - Description
+3. Enregistrer
+4. Le point est maintenant disponible pour les commandes"
+Points de Consommation,Modifier point consommation,Modifier un point de consommation,"Admin, RH",OK,,
+Points de Consommation,Cumul points consommation,Statistiques des consommations,"Admin, RH",OK,Possible d'avoir les statistiques,
+Reporting,Tableau de bord,Tableau de bord avec indicateurs,"Admin, RH, Prestataire",OK,,
+Reporting,Exporter CSV,Exporter le rapport en CSV,"Admin, RH, Prestataire",OK,,
+Reporting,Exporter PDF,Exporter le rapport en PDF,"Admin, RH, Prestataire",OK,,
+Extraction,Extraction commandes,Extraire les commandes pour facturation,"Admin, RH",OK,,
+Extraction,Définir marges,Définir les marges pour extraction,"Admin, RH",OK,,
+Extraction,Modal extraction,Modal pour extraction rapide,"Admin, RH",OK,✅ Documentation créée - Voir guide,"📖 Guide créé: Documentation/GUIDE_MODAL_EXTRACTION.md
+
+COMMENT ACCÉDER:
+1. Menu ""Facturation"" > ""Extraction Commandes""
+2. Sélectionner la période d'extraction
+3. Cliquer sur ""Extraire""
+4. Une modal s'ouvre avec:
+   - Résumé des commandes
+   - Montants par formule
+   - Options d'export (Excel, PDF)
+5. Confirmer l'extraction"
+Gestion Marges,Gestion des marges,Gérer les marges de facturation,"Admin, RH",OK,✅ Déjà implémenté,"1. Menu ""Prestataires"" > ""Gestion des Marges""
+2. Sélectionner le prestataire
+3. Définir les marges par formule
+4. Enregistrer"
+Prestataires,Générer commande prestataire,Générer une commande pour le prestataire,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Prestataires"" > ""Générer Commande Prestataire""
+2. Sélectionner la période
+3. Sélectionner le prestataire
+4. Le système génère automatiquement la commande avec les quantités
+5. Télécharger ou envoyer au prestataire"
+Prestataires,Quantités commande prestataire,Voir les quantités par formule,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Prestataires"" > ""Quantités Commande Prestataire""
+2. Sélectionner la période
+3. Les quantités par formule s'affichent
+4. Export Excel disponible"
+Prestataires,Gestion marges prestataire,Gérer les marges du prestataire,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Prestataires"" > ""Gestion des Marges""
+2. Sélectionner le prestataire
+3. Définir les marges par type de formule
+4. Enregistrer les modifications"
+Prestataires,Ajouter marges,Ajouter des marges,"Admin, RH",OK,,
+Prestataires,Liste prestataires,Liste des prestataires,"Admin, RH",OK,,"1. Menu ""Gestion"" > ""Prestataires""
+2. La liste complète s'affiche"
+Facturation,Gestion facturation,Gérer la facturation,"Admin, RH",OK,✅ Déjà implémenté,"1. Menu ""Facturation"" > ""Gestion Facturation""
+2. Accès à toutes les fonctions de facturation"
+Facturation,Paramètres facturation,Configurer les paramètres de facturation,"Admin, RH",OK,✅ Déjà implémenté,"1. Menu ""Facturation"" > ""Paramètres Facturation""
+2. Configurer les paramètres (tarifs, marges, etc.)"
+Facturation,Diagnostic facturation,Diagnostiquer les problèmes de facturation,"Admin, RH",OK,✅ Déjà implémenté,"1. Menu ""Facturation"" > ""Diagnostic Facturation""
+2. Voir les anomalies et problèmes de facturation"
+Facturation,Facturation automatique,Gérer la facturation automatique,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu + Dashboard,"1. Menu ""Facturation"" > ""Facturation Automatique""
+2. Configurer l'heure d'exécution
+3. Activer/Désactiver la facturation automatique
+4. Voir le dashboard avec statistiques et graphiques
+5. Historique des exécutions disponible"
+Quotas,Quotas permanents groupes,Gérer les quotas des groupes non-CIT,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Quotas Groupes Non-CIT""
+2. Voir la liste des quotas permanents
+3. Créer, modifier ou supprimer des quotas"
+Quotas,Créer quota groupe,Créer un quota pour un groupe,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Quotas Groupes Non-CIT""
+2. Cliquer sur ""Créer Quota""
+3. Remplir le formulaire (groupe, quota mensuel, période)
+4. Enregistrer"
+Quotas,Modifier quota groupe,Modifier un quota de groupe,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Quotas Groupes Non-CIT""
+2. Cliquer sur ""Modifier"" à droite du quota
+3. Modifier les valeurs
+4. Enregistrer"
+Quotas,Supprimer quota groupe,Supprimer un quota de groupe,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Quotas Groupes Non-CIT""
+2. Cliquer sur ""Supprimer"" à droite du quota
+3. Confirmer la suppression"
+Quotas,Détails quota groupe,Voir les détails d'un quota,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Quotas Groupes Non-CIT""
+2. Cliquer sur ""Détails"" à droite du quota
+3. Voir l'historique et les consommations"
+Configuration,Configuration commandes,Configurer les délais de commande,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Paramètres"" > ""Configuration Commandes""
+2. Configurer:
+   - Délai minimum de commande (heures)
+   - Délai de modification (heures)
+   - Délai d'annulation (heures)
+   - Heure limite de commande
+3. Enregistrer"
+Configuration,Diagnostic configuration,Diagnostiquer la configuration,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Diagnostic Configuration""
+2. Voir l'état de la configuration:
+   - Paramètres manquants
+   - Valeurs incorrectes
+   - Recommandations
+3. Corriger si nécessaire"
+Configuration,Initialisation config,Initialiser la configuration,Admin,OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Initialisation Configuration""
+2. Initialiser les paramètres par défaut
+3. Confirmer l'initialisation
+⚠️ ATTENTION: Réservé aux administrateurs, réinitialise la configuration"
+Administration,Administration DB,Gérer la base de données,Admin,OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Administration Base de Données""
+2. Accès aux outils:
+   - Backup base de données
+   - Restauration
+   - Optimisation
+   - Statistiques
+⚠️ ATTENTION: Réservé aux administrateurs"
+Administration,Statistiques système,Voir les statistiques du système,Admin,OK,✅ Déjà implémenté - Via Dashboard,"Les statistiques système sont disponibles:
+1. Tableau de bord principal (page d'accueil)
+2. Menu ""Reporting"" > ""Tableau de Bord""
+3. Statistiques détaillées par module"
+Administration,Nettoyage base,Nettoyer la base de données,Admin,OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Nettoyage Base de Données""
+2. Sélectionner les éléments à nettoyer:
+   - Commandes anciennes
+   - Logs anciens
+   - Données temporaires
+3. Confirmer le nettoyage
+⚠️ ATTENTION: Réservé aux administrateurs"
+Diagnostic,Diagnostic commandes,Diagnostiquer les commandes,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Diagnostic Commandes""
+2. Voir les anomalies:
+   - Commandes sans formule
+   - Commandes en double
+   - Commandes expirées
+3. Corriger les problèmes détectés"
+Diagnostic,Diagnostic utilisateurs,Diagnostiquer les utilisateurs,"Admin, RH",OK,✅ CORRIGÉ - Ajouté au menu,"1. Menu ""Administration"" > ""Diagnostic Utilisateurs""
+2. Voir les anomalies:
+   - Utilisateurs sans direction
+   - Utilisateurs inactifs
+   - Doublons
+3. Corriger les problèmes détectés"
+Accueil,Page d'accueil,Page d'accueil de l'application,Tous connectés,OK,,
+Erreurs,Page erreur,Page d'erreur générique,Tous,OK,pas encore rencontré ce problème,
+Erreurs,Non autorisé,Page accès non autorisé,Tous,OK,pas encore rencontré ce problème,
+Erreurs,Non trouvé,Page ressource non trouvée,Tous,OK,pas encore rencontré ce problème,
+Erreurs,Erreur serveur,Page erreur serveur,Tous,OK,pas encore rencontré ce problème,

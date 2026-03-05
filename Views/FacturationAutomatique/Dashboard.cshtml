@@ -1,0 +1,379 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Dashboard Facturation Automatique";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-primary mb-1">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Dashboard Facturation Automatique
+                    </h2>
+                    <p class="text-muted mb-0">Vue d'ensemble et statistiques</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-list me-1"></i>
+                        Vue Liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques Rapides -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Aujourd'hui</h6>
+                            <h3 class="mb-0" id="stat-aujourdhui">0</h3>
+                            <small>commandes facturées</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Ce Mois</h6>
+                            <h3 class="mb-0" id="stat-mois">0</h3>
+                            <small>commandes facturées</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Montant Mois</h6>
+                            <h3 class="mb-0" id="stat-montant">0 FCFA</h3>
+                            <small>total facturé</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card stat-card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Taux Exemption</h6>
+                            <h3 class="mb-0" id="stat-taux">0%</h3>
+                            <small>commandes exemptées</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Évolution des Facturations (30 derniers jours)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartEvolution" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Répartition Ce Mois
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartRepartition"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique Montants -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        Montants Facturés par Jour (30 derniers jours)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartMontants" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dernières Facturations -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Dernières Facturations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="tableHistorique">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Commandes Facturées</th>
+                                    <th>Commandes Exemptées</th>
+                                    <th>Montant Total</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Chargé via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-icon {
+        opacity: 0.3;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        // Données simulées (à remplacer par des données réelles via AJAX)
+        const donneesEvolution = {
+            labels: [],
+            facturees: [],
+            exemptees: []
+        };
+        
+        const donneesMontants = {
+            labels: [],
+            montants: []
+        };
+        
+        // Générer 30 derniers jours
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const label = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            
+            donneesEvolution.labels.push(label);
+            donneesEvolution.facturees.push(Math.floor(Math.random() * 20));
+            donneesEvolution.exemptees.push(Math.floor(Math.random() * 5));
+            
+            donneesMontants.labels.push(label);
+            donneesMontants.montants.push(Math.floor(Math.random() * 50000));
+        }
+        
+        // Graphique Évolution
+        const ctxEvolution = document.getElementById('chartEvolution').getContext('2d');
+        new Chart(ctxEvolution, {
+            type: 'line',
+            data: {
+                labels: donneesEvolution.labels,
+                datasets: [
+                    {
+                        label: 'Facturées',
+                        data: donneesEvolution.facturees,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Exemptées',
+                        data: donneesEvolution.exemptees,
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Graphique Répartition
+        const ctxRepartition = document.getElementById('chartRepartition').getContext('2d');
+        new Chart(ctxRepartition, {
+            type: 'doughnut',
+            data: {
+                labels: ['Facturées', 'Exemptées'],
+                datasets: [{
+                    data: [85, 15],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Graphique Montants
+        const ctxMontants = document.getElementById('chartMontants').getContext('2d');
+        new Chart(ctxMontants, {
+            type: 'bar',
+            data: {
+                labels: donneesMontants.labels,
+                datasets: [{
+                    label: 'Montant (FCFA)',
+                    data: donneesMontants.montants,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('fr-FR') + ' FCFA';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Mettre à jour les statistiques
+        document.getElementById('stat-aujourdhui').textContent = '15';
+        document.getElementById('stat-mois').textContent = '342';
+        document.getElementById('stat-montant').textContent = '956,400 FCFA';
+        document.getElementById('stat-taux').textContent = '12%';
+        
+        // Charger l'historique (simulé)
+        const tbody = document.querySelector('#tableHistorique tbody');
+        for (let i = 0; i < 10; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${date.toLocaleDateString('fr-FR')}</td>
+                <td><span class="badge bg-primary">${Math.floor(Math.random() * 20)}</span></td>
+                <td><span class="badge bg-warning">${Math.floor(Math.random() * 5)}</span></td>
+                <td><strong>${(Math.floor(Math.random() * 50000)).toLocaleString('fr-FR')} FCFA</strong></td>
+                <td><span class="badge bg-success">✓ Réussie</span></td>
+            `;
+        }
+    </script>
+}

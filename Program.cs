@@ -54,6 +54,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<Obeli_K.Services.Configuration.IConfigurationService, Obeli_K.Services.Configuration.ConfigurationService>();
 builder.Services.AddScoped<Obeli_K.Services.ICommandeAutomatiqueService, Obeli_K.Services.CommandeAutomatiqueService>();
 builder.Services.AddScoped<Obeli_K.Services.IFacturationService, Obeli_K.Services.FacturationService>();
+builder.Services.AddScoped<Obeli_K.Services.INotificationService, Obeli_K.Services.NotificationService>();
 builder.Services.AddScoped<ExcelExportService>();
 builder.Services.AddScoped<GroupeNonCitInitializationService>();
 

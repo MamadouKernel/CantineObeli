@@ -667,7 +667,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword(AdminResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {

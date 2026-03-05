@@ -163,7 +163,7 @@ namespace Obeli_K.Controllers
                     DateDebut = DateTime.Today,
                     DateFin = DateTime.Today.AddDays(7),
                     NombreVisiteurs = 1,
-                    TypeFormule = "Standard 1",
+                    TypeFormule = "Amélioré", // Les visiteurs ont uniquement la formule améliorée
                     PeriodeService = Periode.Jour
                 };
 
@@ -188,6 +188,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur,RH")]
         public async Task<IActionResult> CreateCommande([FromBody] CreateCommandeVisiteurRequest request)
         {
             try
@@ -354,6 +355,9 @@ namespace Obeli_K.Controllers
                         .ToListAsync();
                     return View(model);
                 }
+
+                // Forcer la formule améliorée pour les visiteurs
+                model.TypeFormule = "Amélioré";
 
                 // Validation : Les commandes pour visiteurs doivent être créées au moins 48h à l'avance
                 var maintenant = DateTime.Now;

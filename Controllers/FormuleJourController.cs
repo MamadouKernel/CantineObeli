@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -575,58 +575,61 @@ namespace Obeli_K.Controllers
         /// Affiche le formulaire de modification de formule
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid id)
-        {
-            try
-            {
-                var formule = await _context.FormulesJour
-                    .Include(f => f.NomFormuleNavigation)
-                    .FirstOrDefaultAsync(f => f.IdFormule == id && f.Supprimer == 0);
-
-                if (formule == null)
+                [Authorize(Roles = "Administrateur,RH,PrestataireCantine")]
+                public async Task<IActionResult> Edit(Guid id)
                 {
-                    TempData["ErrorMessage"] = "Formule non trouvée.";
-                    return RedirectToAction(nameof(Index));
+                    try
+                    {
+                        var formule = await _context.FormulesJour
+                            .Include(f => f.NomFormuleNavigation)
+                            .FirstOrDefaultAsync(f => f.IdFormule == id && f.Supprimer == 0);
+
+                        if (formule == null)
+                        {
+                            TempData["ErrorMessage"] = "Formule non trouvée.";
+                            return RedirectToAction(nameof(Index));
+                        }
+
+                        var viewModel = new FormuleJourViewModel
+                        {
+                            IdFormule = formule.IdFormule,
+                            Date = formule.Date,
+                            NomFormule = formule.NomFormule,
+                            TypeFormuleId = formule.TypeFormuleId,
+                            Entree = formule.Entree,
+                            Plat = formule.Plat,
+                            Garniture = formule.Garniture,
+                            Dessert = formule.Dessert,
+                            PlatStandard1 = formule.PlatStandard1,
+                            GarnitureStandard1 = formule.GarnitureStandard1,
+                            PlatStandard2 = formule.PlatStandard2,
+                            GarnitureStandard2 = formule.GarnitureStandard2,
+                            Feculent = formule.Feculent,
+                            Legumes = formule.Legumes,
+                            Marge = formule.Marge,
+                            Statut = formule.Statut,
+                            Verrouille = formule.Verrouille,
+                            Historique = formule.Historique
+                        };
+
+                        await PopulateViewBags();
+                        return View(viewModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Erreur lors du chargement de la formule {Id}", id);
+                        TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement de la formule.";
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
 
-                var viewModel = new FormuleJourViewModel
-                {
-                    IdFormule = formule.IdFormule,
-                    Date = formule.Date,
-                    NomFormule = formule.NomFormule,
-                    TypeFormuleId = formule.TypeFormuleId,
-                    Entree = formule.Entree,
-                    Plat = formule.Plat,
-                    Garniture = formule.Garniture,
-                    Dessert = formule.Dessert,
-                    PlatStandard1 = formule.PlatStandard1,
-                    GarnitureStandard1 = formule.GarnitureStandard1,
-                    PlatStandard2 = formule.PlatStandard2,
-                    GarnitureStandard2 = formule.GarnitureStandard2,
-                    Feculent = formule.Feculent,
-                    Legumes = formule.Legumes,
-                    Marge = formule.Marge,
-                    Statut = formule.Statut,
-                    Verrouille = formule.Verrouille,
-                    Historique = formule.Historique
-                };
-
-                await PopulateViewBags();
-                return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erreur lors du chargement de la formule {Id}", id);
-                TempData["ErrorMessage"] = "Une erreur est survenue lors du chargement de la formule.";
-                return RedirectToAction(nameof(Index));
-            }
-        }
 
         /// <summary>
         /// Traite la modification d'une formule
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur,RH,PrestataireCantine")]
         public async Task<IActionResult> Edit(Guid id, FormuleJourViewModel model)
         {
             try

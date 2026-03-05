@@ -55,6 +55,41 @@ namespace Obeli_K.Controllers
             }
         }
 
+        /// <summary>
+        /// Page HTML pour afficher les informations de diagnostic de manière lisible
+        /// </summary>
+        public async Task<IActionResult> Info()
+        {
+            try
+            {
+                ViewBag.IsAuthenticated = User.Identity?.IsAuthenticated ?? false;
+                ViewBag.Name = User.Identity?.Name;
+                ViewBag.AuthenticationType = User.Identity?.AuthenticationType;
+                ViewBag.Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+                
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+                {
+                    var user = await _context.Utilisateurs
+                        .AsNoTracking()
+                        .Include(u => u.Direction)
+                        .Include(u => u.Service)
+                        .Include(u => u.Fonction)
+                        .FirstOrDefaultAsync(u => u.Id == userId && u.Supprimer == 0);
+
+                    ViewBag.User = user;
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Erreur lors du diagnostic utilisateur");
+                ViewBag.Error = ex.Message;
+                return View();
+            }
+        }
+
         private string? GetUserIdFromClaims()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

@@ -1008,7 +1008,7 @@ namespace Obeli_K.Controllers
                 if (!CanModifyCommande(commande))
                 {
                     _logger.LogWarning("Tentative d'accès à la modification d'une commande non modifiable: {Id}, Date: {Date}", id, commande.DateConsommation);
-                    TempData["ErrorMessage"] = "Cette commande ne peut plus être modifiée. Les commandes consommées ne peuvent jamais être modifiées. Seules les commandes non consommées de la semaine N+1 (avant dimanche 12H00) ou dont la date de consommation permet une annulation avant la veille à 12h peuvent être modifiées.";
+                    TempData["ErrorMessage"] = "Cette commande ne peut plus être modifiée. Les commandes consommées ne peuvent jamais être modifiées. Les commandes dont la date de consommation est passée ne peuvent être modifiées que par un Administrateur, et uniquement si elles ne sont pas consommées.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -1035,7 +1035,43 @@ namespace Obeli_K.Controllers
                     ReceptionConfirmeeParNom = commande.ReceptionConfirmeeParNom
                 };
 
+                // Charger les listes communes (types de clients, sites, etc.)
                 await PopulateViewBags();
+
+                // Surcharger la liste des formules pour l'édition :
+                // on affiche les formules du jour de consommation de la commande,
+                // et on pré-sélectionne celle actuellement liée à la commande.
+                if (model.DateConsommation != default)
+                {
+                    var dateConsommation = model.DateConsommation.Date;
+
+                    var formulesPourJour = await _context.FormulesJour
+                        .AsNoTracking()
+                        .Include(f => f.NomFormuleNavigation)
+                        .Where(f => f.Supprimer == 0 && f.Date.Date == dateConsommation)
+                        .OrderBy(f => f.Date)
+                        .ThenBy(f => f.NomFormuleNavigation!.Nom)
+                        .ToListAsync();
+
+                    var formulesSelectList = formulesPourJour
+                        .Select(f =>
+                        {
+                            var platPrincipal = GetPlatPrincipal(f);
+                            var displayText = string.IsNullOrWhiteSpace(platPrincipal)
+                                ? $"{f.Date:dd/MM/yyyy} ({f.Date:dddd}) - {f.NomFormule}"
+                                : $"{f.Date:dd/MM/yyyy} ({f.Date:dddd}) - {f.NomFormule} ({platPrincipal})";
+
+                            return new
+                            {
+                                IdFormule = f.IdFormule,
+                                DisplayText = displayText
+                            };
+                        })
+                        .ToList();
+
+                    ViewBag.Formules = new SelectList(formulesSelectList, "IdFormule", "DisplayText", model.IdFormule);
+                }
+
                 return View(model);
             }
             catch (Exception ex)
@@ -1087,7 +1123,7 @@ namespace Obeli_K.Controllers
                 if (!CanModifyCommande(existingCommande))
                 {
                     _logger.LogWarning("Tentative de modification d'une commande non modifiable: {Id}, Date: {Date}", id, existingCommande.DateConsommation);
-                    TempData["ErrorMessage"] = "Cette commande ne peut plus être modifiée. Les commandes consommées ne peuvent jamais être modifiées. Seules les commandes non consommées de la semaine N+1 (avant dimanche 12H00) ou dont la date de consommation permet une annulation avant la veille à 12h peuvent être modifiées.";
+                    TempData["ErrorMessage"] = "Cette commande ne peut plus être modifiée. Les commandes consommées ne peuvent jamais être modifiées. Les commandes dont la date de consommation est passée ne peuvent être modifiées que par un Administrateur, et uniquement si elles ne sont pas consommées.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -1207,7 +1243,7 @@ namespace Obeli_K.Controllers
                 {
                     _logger.LogWarning("Tentative de suppression d'une commande non modifiable: {Id}, Status: {Status}, Date: {Date}", 
                         id, commande.StatusCommande, commande.DateConsommation);
-                    TempData["ErrorMessage"] = "Cette commande ne peut plus être supprimée. Les commandes consommées ne peuvent jamais être supprimées. Seules les commandes non consommées de la semaine N+1 (avant dimanche 12H00) ou dont la date de consommation permet une annulation avant la veille à 12h peuvent être supprimées.";
+                    TempData["ErrorMessage"] = "Cette commande ne peut plus être supprimée. Les commandes consommées ne peuvent jamais être supprimées. Les commandes dont la date de consommation est passée ne peuvent être supprimées que par un Administrateur, et uniquement si elles ne sont pas consommées.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -1502,10 +1538,12 @@ namespace Obeli_K.Controllers
         /// <summary>
         /// Calcule le prix d'une formule selon son type
         /// </summary>
-        private decimal GetPrixFormule(string nomFormule)
+        private decimal GetPrixFormule(string? nomFormule)
         {
-            if (string.IsNullOrEmpty(nomFormule))
+            if (string.IsNullOrWhiteSpace(nomFormule))
+            {
                 return 550m; // Prix par défaut pour Standard
+            }
 
             var nomFormuleLower = nomFormule.ToLower().Trim();
             
@@ -1692,7 +1730,7 @@ namespace Obeli_K.Controllers
         /// Affiche le formulaire pour vérifier une commande par matricule
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,PrestataireCantine,RH")]
         public IActionResult VerifierCommande()
         {
             return View();
@@ -1703,7 +1741,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,PrestataireCantine,RH")]
         public async Task<IActionResult> VerifierCommande(string matricule)
         {
             if (string.IsNullOrWhiteSpace(matricule))
@@ -1779,7 +1817,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,PrestataireCantine,RH")]
         public async Task<IActionResult> ValiderCommande(Guid id)
         {
             try
@@ -1836,7 +1874,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,PrestataireCantine,RH")]
         public async Task<IActionResult> AnnulerCommande(Guid id, string motif)
         {
             try
@@ -2087,7 +2125,7 @@ namespace Obeli_K.Controllers
         /// Affiche le formulaire de création de commande instantanée pour visiteurs et groupes non-CIT
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,RH,PrestataireCantine")]
         public async Task<IActionResult> CreerCommandeInstantanee()
         {
             try
@@ -2190,7 +2228,7 @@ namespace Obeli_K.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,RH,PrestataireCantine")]
         public async Task<IActionResult> CreerCommandeInstantanee(CreerCommandeInstantaneeViewModel model)
         {
             try
@@ -2430,10 +2468,10 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Récupère un utilisateur par matricule (pour les prestataires et administrateurs)
+        /// Récupère un utilisateur par matricule (pour les prestataires, administrateurs et RH)
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Administrateur,PrestataireCantine")]
+        [Authorize(Roles = "Administrateur,PrestataireCantine,RH")]
         public async Task<IActionResult> GetUserByMatricule([FromBody] GetUserByMatriculeRequest request)
         {
             try
@@ -3580,28 +3618,17 @@ namespace Obeli_K.Controllers
         }
 
         /// <summary>
-        /// Vérifie si une commande peut être modifiée selon les règles métier
-        /// EXCEPTION: Les administrateurs peuvent toujours modifier (sauf commandes consommées)
+        /// Vérifie si une commande peut être modifiée ou supprimée selon les règles métier.
+        /// - Avant la date de consommation : modifiable pour les rôles autorisés (Edit/Delete) si non consommée.
+        /// - Après la date de consommation : seule un Administrateur peut modifier/supprimer, et uniquement si la commande n'est pas consommée.
+        /// - Une commande consommée n'est jamais modifiable/supprimable, même par un Administrateur.
         /// </summary>
         private bool CanModifyCommande(Commande commande)
         {
             if (commande.DateConsommation == null)
                 return false;
 
-            // Exception pour les Administrateurs: ils peuvent toujours modifier (sauf commandes consommées)
-            if (User.IsInRole("Administrateur"))
-            {
-                // Les admins ne peuvent pas modifier les commandes consommées
-                if (commande.StatusCommande == (int)StatutCommande.Consommee)
-                {
-                    _logger.LogInformation("❌ Commande non modifiable - Déjà consommée même pour Administrateur (Statut: {Status})", (StatutCommande)commande.StatusCommande);
-                    return false;
-                }
-                _logger.LogInformation("✅ Commande modifiable - Administrateur (pas de restrictions de délai)");
-                return true;
-            }
-
-            // Règle 0: Les commandes consommées ne peuvent JAMAIS être modifiées
+            // Règle 0 : une commande consommée n'est jamais modifiable/supprimable
             if (commande.StatusCommande == (int)StatutCommande.Consommee)
             {
                 _logger.LogInformation("❌ Commande non modifiable - Déjà consommée (Statut: {Status})", (StatutCommande)commande.StatusCommande);
@@ -3609,57 +3636,24 @@ namespace Obeli_K.Controllers
             }
 
             var dateConsommation = commande.DateConsommation.Value.Date;
-            var aujourdhui = DateTime.Today;
-            var maintenant = DateTime.Now;
+            var aujourdHui = DateTime.Today;
 
-            // Règle 1: Commandes de la semaine N+1 (semaine suivante) - modifiables jusqu'au dimanche 12H00
-            var (lundiN1, vendrediN1) = GetSemaineSuivanteOuvree();
-            var dimancheN1 = vendrediN1.AddDays(2); // Dimanche de la semaine N+1
-            var dimancheN1_12h = dimancheN1.AddHours(12); // Dimanche 12H00
-            
-            if (dateConsommation >= lundiN1 && dateConsommation <= dimancheN1)
+            // Exception Administrateur : peut modifier/supprimer même après la date (tant que non consommée)
+            if (User.IsInRole("Administrateur"))
             {
-                // Vérifier si nous sommes encore avant le dimanche 12H00
-                if (maintenant <= dimancheN1_12h)
-                {
-                    _logger.LogInformation("✅ Commande modifiable - Semaine N+1 (avant dimanche 12H): {Date}", dateConsommation);
-                    return true;
-                }
-                else
-                {
-                    _logger.LogInformation("❌ Commande non modifiable - Semaine N+1 après dimanche 12H: {Date} (limite: {Limite})", dateConsommation, dimancheN1_12h);
-                    return false;
-                }
+                _logger.LogInformation("✅ Commande modifiable - Administrateur (date de consommation: {Date})", dateConsommation);
+                return true;
             }
 
-            // Règle 2: Commandes modifiables jusqu'à la veille à 12h (conformément au cahier des charges)
-            // "L'employé pourra annuler ou modifier son plat jusqu'à 24 heures avant le jour de consommation, 
-            // soit au plus tard la veille à 12h"
-            var veilleA12h = dateConsommation.Date.AddDays(-1).AddHours(12); // Veille à 12h00
-            
-            // Vérifier que la date de consommation n'est pas encore passée
-            if (dateConsommation >= aujourdhui)
+            // Règle générale : tant que la date de consommation n'est pas encore arrivée, la commande est modifiable/supprimable
+            if (dateConsommation >= aujourdHui)
             {
-                // Vérifier que nous sommes encore avant la veille à 12h
-                if (maintenant <= veilleA12h)
-                {
-                    _logger.LogInformation("✅ Commande modifiable - Avant la veille à 12h: {Date} (limite: {Limite})", dateConsommation, veilleA12h);
-                    return true;
-                }
-                else
-                {
-                    _logger.LogInformation("❌ Commande non modifiable - Après la veille à 12h: {Date} (limite: {Limite})", dateConsommation, veilleA12h);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogInformation("❌ Commande non modifiable - Date de consommation déjà passée: {Date}", dateConsommation);
-                return false;
+                _logger.LogInformation("✅ Commande modifiable - Date de consommation non encore arrivée: {Date}", dateConsommation);
+                return true;
             }
 
-            _logger.LogInformation("❌ Commande non modifiable - Date: {Date}, Semaine N+1: {LundiN1}-{VendrediN1}", 
-                dateConsommation, lundiN1, vendrediN1);
+            // Après la date de consommation, aucun autre rôle ne peut modifier/supprimer
+            _logger.LogInformation("❌ Commande non modifiable - Date de consommation déjà passée: {Date}", dateConsommation);
             return false;
         }
 
@@ -4033,9 +4027,14 @@ namespace Obeli_K.Controllers
         /// <summary>
         /// Retourne le prix standard d'une formule
         /// </summary>
-        private decimal GetPrixFormuleStandard(string nomFormule)
+        private decimal GetPrixFormuleStandard(string? nomFormule)
         {
-            return nomFormule?.ToLower() switch
+            if (string.IsNullOrWhiteSpace(nomFormule))
+            {
+                return 550m;
+            }
+
+            return nomFormule.ToLower() switch
             {
                 "amélioré" or "ameliore" or "améliorée" or "ameliorée" => 2800m,
                 "standard" or "standard 1" or "standard 2" => 550m,

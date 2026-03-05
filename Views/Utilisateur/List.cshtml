@@ -131,6 +131,10 @@
                                                            class="btn btn-sm btn-outline-warning" title="Modifier">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
+                                                        <a href="@Url.Action("ResetPassword", "Utilisateur", new { id = user.Id })" 
+                                                           class="btn btn-sm btn-outline-primary" title="Réinitialiser le mot de passe">
+                                                            <i class="fas fa-key"></i>
+                                                        </a>
                                                         <button type="button" class="btn btn-sm btn-outline-danger" 
                                                                 onclick="confirmDelete('@user.Id', '@user.Nom @user.Prenoms')" title="Supprimer">
                                                             <i class="fas fa-trash"></i>
@@ -188,6 +192,11 @@
                                                             <li>
                                                                 <a class="dropdown-item" href="@Url.Action("Edit", new { id = user.Id })">
                                                                     <i class="fas fa-edit me-2"></i>Modifier
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="@Url.Action("ResetPassword", "Utilisateur", new { id = user.Id })">
+                                                                    <i class="fas fa-key me-2"></i>Réinitialiser mot de passe
                                                                 </a>
                                                             </li>
                                                             <li><hr class="dropdown-divider"></li>

@@ -31,7 +31,15 @@ namespace Obeli_K.Services
             {
                 try
                 {
-                    await VerifierEtExecuterFacturation();
+                    // Vérifier l'heure d'exécution configurée
+                    var heureExecution = await ObtenirHeureExecutionAsync();
+                    var maintenant = DateTime.Now;
+                    
+                    // Exécuter uniquement à l'heure configurée (par défaut 2h du matin)
+                    if (maintenant.Hour == heureExecution)
+                    {
+                        await ExecuterAvecRetryAsync();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -40,6 +48,67 @@ namespace Obeli_K.Services
 
                 // Vérifier toutes les heures
                 await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+            }
+        }
+
+        private async Task<int> ObtenirHeureExecutionAsync()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var configurationService = scope.ServiceProvider.GetRequiredService<IConfigurationService>();
+            
+            var heureConfig = await configurationService.GetConfigurationAsync("FACTURATION_HEURE_EXECUTION");
+            
+            if (int.TryParse(heureConfig, out int heure) && heure >= 0 && heure < 24)
+            {
+                return heure;
+            }
+            
+            return 2; // Par défaut 2h du matin
+        }
+
+        private async Task ExecuterAvecRetryAsync(int maxRetries = 3)
+        {
+            int tentative = 0;
+            Exception? derniereException = null;
+
+            while (tentative < maxRetries)
+            {
+                try
+                {
+                    tentative++;
+                    _logger.LogInformation("🔄 Tentative {Tentative}/{Max} de facturation automatique", tentative, maxRetries);
+                    
+                    await VerifierEtExecuterFacturation();
+                    
+                    _logger.LogInformation("✅ Facturation automatique réussie à la tentative {Tentative}", tentative);
+                    return; // Succès, sortir de la boucle
+                }
+                catch (Exception ex)
+                {
+                    derniereException = ex;
+                    _logger.LogWarning(ex, "⚠️ Échec de la tentative {Tentative}/{Max}", tentative, maxRetries);
+                    
+                    if (tentative < maxRetries)
+                    {
+                        var delai = TimeSpan.FromMinutes(5 * tentative); // Délai exponentiel
+                        _logger.LogInformation("⏳ Nouvelle tentative dans {Delai} minutes", delai.TotalMinutes);
+                        await Task.Delay(delai);
+                    }
+                }
+            }
+
+            // Toutes les tentatives ont échoué
+            _logger.LogError(derniereException, "❌ Échec de la facturation automatique après {Max} tentatives", maxRetries);
+            
+            // Envoyer notification d'erreur
+            using var scope = _serviceProvider.CreateScope();
+            var notificationService = scope.ServiceProvider.GetService<INotificationService>();
+            
+            if (notificationService != null && derniereException != null)
+            {
+                await notificationService.EnvoyerNotificationErreurAsync(
+                    $"Échec de la facturation automatique après {maxRetries} tentatives",
+                    derniereException);
             }
         }
 
@@ -122,7 +191,7 @@ namespace Obeli_K.Services
                         resultatFacturation.MontantTotalAFacturer);
 
                     // Envoyer une notification
-                    NotifierFacturationEffectuee(resultatFacturation);
+                    await NotifierFacturationEffectuee(resultatFacturation, aujourdhui);
                 }
                 else
                 {
@@ -191,7 +260,7 @@ namespace Obeli_K.Services
             }
         }
 
-        private void NotifierFacturationEffectuee(FacturationResult resultat)
+        private async Task NotifierFacturationEffectuee(FacturationResult resultat, DateTime dateFacturation)
         {
             try
             {
@@ -200,8 +269,14 @@ namespace Obeli_K.Services
                 _logger.LogInformation("   🆓 Commandes exemptées: {Exemptees}", resultat.NombreCommandesNonFacturables);
                 _logger.LogInformation("   💵 Montant total: {Montant:C}", resultat.MontantTotalAFacturer);
                 
-                // Ici on pourrait envoyer un email ou une notification SignalR
-                // Pour l'instant, on se contente de logger
+                // Envoyer notification par email
+                using var scope = _serviceProvider.CreateScope();
+                var notificationService = scope.ServiceProvider.GetService<INotificationService>();
+                
+                if (notificationService != null)
+                {
+                    await notificationService.EnvoyerNotificationFacturationAsync(resultat, dateFacturation);
+                }
             }
             catch (Exception ex)
             {

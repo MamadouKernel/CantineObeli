@@ -134,5 +134,34 @@ namespace Obeli_K.Controllers
                 return View();
             }
         }
+
+        // GET: FacturationAutomatique/Dashboard
+        public async Task<IActionResult> Dashboard()
+        {
+            try
+            {
+                _logger.LogInformation("📊 Chargement du dashboard de facturation");
+
+                // Récupérer les statistiques des 30 derniers jours
+                var dateDebut = DateTime.Today.AddDays(-30);
+                var commandesNonConsommees = await _facturationService.GetCommandesNonConsommeesAsync(dateDebut, null);
+
+                // Calculer la facturation
+                var resultatFacturation = await _facturationService.CalculerFacturationAsync(commandesNonConsommees);
+
+                ViewBag.CommandesNonConsommees = commandesNonConsommees;
+                ViewBag.ResultatFacturation = resultatFacturation;
+                ViewBag.DateDebut = dateDebut;
+                ViewBag.DateFin = DateTime.Today;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Erreur lors du chargement du dashboard");
+                TempData["ErrorMessage"] = "Erreur lors du chargement du dashboard.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
     }
 }

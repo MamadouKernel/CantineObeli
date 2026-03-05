@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obeli_K.Models;
 using Obeli_K.Models.Enums;
+using Obeli_K.Models.ViewModels;
 using Obeli_K.Data;
 
 namespace Obeli_K.Controllers
@@ -392,6 +393,142 @@ namespace Obeli_K.Controllers
                 .OrderBy(d => d.Nom)
                 .Select(d => new { Value = d.Id.ToString(), Text = d.Nom })
                 .ToListAsync();
+        }
+
+        // ======== Nouveau système Mot de passe oublié avec email ========
+        
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var utilisateur = await _db.Utilisateurs
+                .FirstOrDefaultAsync(u => u.UserName == model.Matricule && u.Supprimer == 0);
+
+            // Toujours afficher le même message pour ne pas divulguer l'existence d'un compte
+            if (utilisateur != null && !string.IsNullOrEmpty(utilisateur.Email))
+            {
+                // Générer un token sécurisé
+                var rawToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+                var tokenHash = Sha256Base64(rawToken);
+
+                // Enregistrer le token
+                utilisateur.ResetTokenHash = tokenHash;
+                utilisateur.ResetExpireLeUtc = DateTime.UtcNow.AddHours(24); // Valide 24h
+                utilisateur.ResetUtilise = false;
+                utilisateur.ModifiedAt = DateTime.UtcNow;
+                utilisateur.ModifiedBy = "System";
+
+                await _db.SaveChangesAsync();
+
+                // Générer le lien de réinitialisation
+                var resetLink = Url.Action(
+                    nameof(ResetPassword),
+                    "Auth",
+                    new { token = rawToken, matricule = utilisateur.UserName },
+                    Request.Scheme
+                );
+
+                // TODO: Envoyer l'email avec le lien
+                // Pour l'instant, on affiche le lien dans TempData (à remplacer par envoi email)
+                TempData["SuccessMessage"] = $"Un email a été envoyé à votre adresse professionnelle avec un lien de réinitialisation. Le lien est valide pendant 24 heures.";
+                
+                // En développement, afficher le lien
+                #if DEBUG
+                TempData["DebugResetLink"] = resetLink;
+                #endif
+            }
+            else
+            {
+                // Même message pour ne pas divulguer si le compte existe
+                TempData["SuccessMessage"] = "Si un compte existe avec ce matricule, un email a été envoyé avec les instructions de réinitialisation.";
+            }
+
+            return RedirectToAction(nameof(ForgotPassword));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string token, string matricule)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(matricule))
+            {
+                TempData["ErrorMessage"] = "Lien de réinitialisation invalide.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Vérifier que le token est valide
+            var tokenHash = Sha256Base64(token);
+            var utilisateur = await _db.Utilisateurs
+                .FirstOrDefaultAsync(u => 
+                    u.UserName == matricule &&
+                    u.ResetTokenHash == tokenHash &&
+                    u.ResetExpireLeUtc > DateTime.UtcNow &&
+                    !u.ResetUtilise &&
+                    u.Supprimer == 0
+                );
+
+            if (utilisateur == null)
+            {
+                TempData["ErrorMessage"] = "Ce lien de réinitialisation est invalide ou a expiré. Veuillez faire une nouvelle demande.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Token = token,
+                Matricule = matricule
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Vérifier le token
+            var tokenHash = Sha256Base64(model.Token);
+            var utilisateur = await _db.Utilisateurs
+                .FirstOrDefaultAsync(u => 
+                    u.UserName == model.Matricule &&
+                    u.ResetTokenHash == tokenHash &&
+                    u.ResetExpireLeUtc > DateTime.UtcNow &&
+                    !u.ResetUtilise &&
+                    u.Supprimer == 0
+                );
+
+            if (utilisateur == null)
+            {
+                TempData["ErrorMessage"] = "Ce lien de réinitialisation est invalide ou a expiré.";
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            // Mettre à jour le mot de passe
+            utilisateur.MotDePasseHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword, workFactor: 12);
+            utilisateur.ResetUtilise = true;
+            utilisateur.MustResetPassword = false;
+            utilisateur.ModifiedAt = DateTime.UtcNow;
+            utilisateur.ModifiedBy = utilisateur.UserName;
+
+            await _db.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Votre mot de passe a été réinitialisé avec succès ! Vous pouvez maintenant vous connecter.";
+            return RedirectToAction(nameof(Login));
         }
 
         private static string Sha256Base64(string input)

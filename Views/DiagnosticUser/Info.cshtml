@@ -1,0 +1,346 @@
+@using Obeli_K.Models.Enums
+@using System.Linq
+@{
+    ViewData["Title"] = "Diagnostic Utilisateur";
+    var user = ViewBag.User as Obeli_K.Models.Utilisateur;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-user-cog me-2"></i>
+                Diagnostic Utilisateur
+            </h1>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Erreur :</strong> @ViewBag.Error
+                </div>
+            }
+
+            <!-- Informations de session -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-key me-2"></i>
+                        Informations de Session
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 30%">Authentifié</th>
+                            <td>
+                                @if (ViewBag.IsAuthenticated)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>Oui
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times me-1"></i>Non
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Nom</th>
+                            <td>@ViewBag.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Type d'authentification</th>
+                            <td>@ViewBag.AuthenticationType</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Claims -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Claims (Revendications)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Valeur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in ViewBag.Claims)
+                            {
+                                <tr>
+                                    <td>
+                                        <code>@claim.Type</code>
+                                    </td>
+                                    <td>
+                                        @if (claim.Type.Contains("Role"))
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-user-tag me-1"></i>@claim.Value
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @claim.Value
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Utilisateur en base de données -->
+            @if (user != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-database me-2"></i>
+                            Utilisateur en Base de Données
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 30%">ID</th>
+                                <td><code>@user.Id</code></td>
+                            </tr>
+                            <tr>
+                                <th>Matricule (UserName)</th>
+                                <td><strong>@user.UserName</strong></td>
+                            </tr>
+                            <tr>
+                                <th>Nom complet</th>
+                                <td>@user.Nom @user.Prenoms</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>@user.Email</td>
+                            </tr>
+                            <tr>
+                                <th>Téléphone</th>
+                                <td>@user.PhoneNumber</td>
+                            </tr>
+                            <tr>
+                                <th>Rôle (Enum)</th>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        @user.Role (@((int)user.Role))
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">
+                                        @switch (user.Role)
+                                        {
+                                            case RoleType.Admin:
+                                                <span>0 = Administrateur</span>
+                                                break;
+                                            case RoleType.RH:
+                                                <span>1 = RH (Ressources Humaines)</span>
+                                                break;
+                                            case RoleType.Employe:
+                                                <span>2 = Employé</span>
+                                                break;
+                                            case RoleType.PrestataireCantine:
+                                                <span>3 = Prestataire Cantine</span>
+                                                break;
+                                        }
+                                    </small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Site</th>
+                                <td>
+                                    @if (user.Site.HasValue)
+                                    {
+                                        <span class="badge bg-info">@user.Site</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non défini</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Direction</th>
+                                <td>
+                                    @if (user.Direction != null)
+                                    {
+                                        @user.Direction.Nom
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non définie</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Service</th>
+                                <td>
+                                    @if (user.Service != null)
+                                    {
+                                        @user.Service.Nom
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non défini</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Fonction</th>
+                                <td>
+                                    @if (user.Fonction != null)
+                                    {
+                                        @user.Fonction.Nom
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Non définie</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Créé le</th>
+                                <td>
+                                    @if (user.CreatedAt.HasValue)
+                                    {
+                                        @user.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                        @if (!string.IsNullOrEmpty(user.CreatedBy))
+                                        {
+                                            <span class="text-muted">par @user.CreatedBy</span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Modifié le</th>
+                                <td>
+                                    @if (user.ModifiedAt.HasValue)
+                                    {
+                                        @user.ModifiedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                        @if (!string.IsNullOrEmpty(user.ModifiedBy))
+                                        {
+                                            <span class="text-muted">par @user.ModifiedBy</span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Diagnostic du problème -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            Diagnostic
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            // Récupération typée des claims depuis le ViewBag
+                            var claims = ((IEnumerable<dynamic>)(ViewBag.Claims ?? Enumerable.Empty<dynamic>()));
+                            var roleClaims = claims
+                                .Where(c => ((string)c.Type).Contains("Role"))
+                                .Select(c => (string)c.Value)
+                                .ToList();
+
+                            var roleEnBase = user.Role.ToString();
+                            var roleEnumValue = (int)user.Role;
+                        }
+
+                        <h6>Vérification des rôles :</h6>
+                        <ul>
+                            <li>
+                                <strong>Rôle en base de données :</strong> 
+                                <span class="badge bg-primary">@roleEnBase (@roleEnumValue)</span>
+                            </li>
+                            <li>
+                                <strong>Rôles dans les claims :</strong>
+                                @if (roleClaims.Any())
+                                {
+                                    foreach (var role in roleClaims)
+                                    {
+                                        <span class="badge bg-success me-1">@role</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Aucun rôle trouvé !</span>
+                                }
+                            </li>
+                        </ul>
+
+                        @if (user.Role == RoleType.RH && !roleClaims.Contains("RH"))
+                        {
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Problème détecté !</strong>
+                                <p class="mb-0">
+                                    L'utilisateur a le rôle <strong>RH</strong> en base de données mais ce rôle n'est pas présent dans les claims de la session.
+                                    <br>
+                                    <strong>Solution :</strong> L'utilisateur doit se déconnecter et se reconnecter pour que les rôles soient mis à jour.
+                                </p>
+                            </div>
+                        }
+                        else if (roleClaims.Any())
+                        {
+                            <div class="alert alert-success mt-3">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Tout semble correct !</strong>
+                                <p class="mb-0">
+                                    Les rôles sont correctement configurés.
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Attention :</strong> Utilisateur non trouvé en base de données.
+                </div>
+            }
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools me-2"></i>
+                        Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <a href="@Url.Action("Logout", "Auth")" class="btn btn-warning">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Se déconnecter et se reconnecter
+                    </a>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary ms-2">
+                        <i class="fas fa-home me-2"></i>
+                        Retour à l'accueil
+                    </a>
+                    <a href="@Url.Action("Index", "DiagnosticUser")" class="btn btn-info ms-2">
+                        <i class="fas fa-code me-2"></i>
+                        Voir JSON brut
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

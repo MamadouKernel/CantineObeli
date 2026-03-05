@@ -1,0 +1,83 @@
+ANALYSE DES DOUBLONS DANS LES MENUS
+=====================================
+
+MENU COMMANDES (Prestataire uniquement):
+- CreerCommandeInstantanee ✓
+- CreerCommandeDouaniers ✓
+- ValiderCommandeDouaniers ✓
+- Index (Liste) ✓
+- VerifierCommande ✓
+
+MENU COMMANDES (Autres utilisateurs):
+- Create (Passer commande) ✓
+- CreerCommandeInstantanee ❌ DOUBLON
+- CreerCommandeGroupee ✓
+- CreerCommandeDouaniers ❌ DOUBLON
+- ValiderCommandeDouaniers ❌ DOUBLON
+- MesPointsConsommation ✓
+- Index (Historique) ✓
+- PointConsommationCIT ✓
+- Dashboard (Reporting) ✓
+- CumulPointsConsommation ✓
+- Index (Extraction) ✓
+- ExporterExcel ✓
+- Index (GestionMarges) ✓
+- VerifierCommande ❌ DOUBLON
+- Index (Précommandées) ✓
+- Index (Annulées) ✓
+
+MENU MENUS (Admin/RH):
+- Index (FormuleJour) ✓
+- Create (FormuleJour) ✓
+- Import (FormuleJour) ✓
+
+MENU MENUS (Prestataire uniquement):
+- Index (FormuleJour) ❌ DOUBLON
+- Create (FormuleJour) ❌ DOUBLON
+- Import (FormuleJour) ❌ DOUBLON
+
+MENU VISITEUR:
+- List (Nouvelle commande) ✓
+- Commands (Liste) ✓
+
+MENU PRESTATAIRES:
+- GenererCommande ✓
+- QuantitesCommandePrestataire ✓
+- GestionMarges ✓
+
+MENU FACTURATION:
+- Index (FacturationAutomatique) ✓
+- Index (ParametresFacturation) ✓
+- Index (Facturation) ✓
+- Index (DiagnosticFacturation) ✓
+
+MENU ADMINISTRATION:
+- Index (DiagnosticConfig) ✓
+- Index (DiagnosticCommande) ✓
+- Index (DiagnosticUser) ✓
+- Index (InitConfig) ✓
+- Index (Admin) ✓
+- Index (Cleanup) ✓
+
+MENU PARAMETRES:
+- List (Utilisateur) ✓
+- Create (Utilisateur) ✓
+- ResetPassword (Utilisateur) ✓
+- Index (Admin) ❌ DOUBLON avec Administration
+- List (Direction) ✓
+- Create (Direction) ✓
+- List (Service) ✓
+- Create (Service) ✓
+- List (Fonction) ✓
+- Create (Fonction) ✓
+- Index (ConfigurationCommande) ✓
+- Index (GroupeNonCit) ✓
+
+DOUBLONS IDENTIFIÉS:
+=====================
+1. CreerCommandeInstantanee - dans Commandes (2 fois)
+2. CreerCommandeDouaniers - dans Commandes (2 fois)
+3. ValiderCommandeDouaniers - dans Commandes (2 fois)
+4. VerifierCommande - dans Commandes (2 fois)
+5. Index/Create/Import FormuleJour - dans Menus (2 fois: Admin/RH et Prestataire)
+6. Index Admin - dans Paramètres ET Administration
